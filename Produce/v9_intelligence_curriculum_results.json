@@ -1,0 +1,665 @@
+{
+  "methodology": "Developmental & Cognitive Master Curriculum (Ziwago-Prime v9.0 32-Core Intelligence Edition)",
+  "parquet_tokens_scanned": 1969986,
+  "parquet_stories_used": 10000,
+  "parquet_clean_sentences": 10160,
+  "cognitive_corpus_path": "/home/jupyter/Neuroweave Ziwago/data/ziwago_v9_cognitive_corpus.json",
+  "vocab_size": 1024,
+  "morpho_sdr_evaluation": {
+    "morpho_pair_overlaps": {
+      "walk<->walked": 0.3,
+      "walk<->walking": 0.275,
+      "play<->played": 0.25,
+      "happy<->happily": 0.125,
+      "lock<->unlock": 0.25,
+      "starlight_oov<->sunlight": 0.275
+    },
+    "mean_related_sdr_overlap": 0.2458,
+    "unrelated_sdr_overlap": 0.125,
+    "discrimination_ratio": 1.97,
+    "encoder_parameters": 65536,
+    "encoder_ops_per_token": 544
+  },
+  "compositional_indexer_capacity": 16777216,
+  "compositional_traces_stored": 39,
+  "total_ticks": 6582,
+  "total_tokens_processed": 6582,
+  "total_sleep_cycles": 50,
+  "mean_atp_per_token": 0.00324,
+  "epoch_history": [
+    {
+      "stage_idx": 1,
+      "stage_name": "Этап 1: Синтагматическое ядро (seq_len=4)",
+      "seq_len": 4,
+      "epoch": 1,
+      "mean_surprise_F": 1.7441,
+      "atp_per_token": 0.00448,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 1,
+      "stage_name": "Этап 1: Синтагматическое ядро (seq_len=4)",
+      "seq_len": 4,
+      "epoch": 2,
+      "mean_surprise_F": 1.0169,
+      "atp_per_token": 0.00356,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 1,
+      "stage_name": "Этап 1: Синтагматическое ядро (seq_len=4)",
+      "seq_len": 4,
+      "epoch": 3,
+      "mean_surprise_F": 0.7947,
+      "atp_per_token": 0.00333,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 2,
+      "stage_name": "Этап 2: Простые клаузы SVO (seq_len=8)",
+      "seq_len": 8,
+      "epoch": 1,
+      "mean_surprise_F": 1.234,
+      "atp_per_token": 0.00381,
+      "mean_atp_pool": 0.9736,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 2,
+      "stage_name": "Этап 2: Простые клаузы SVO (seq_len=8)",
+      "seq_len": 8,
+      "epoch": 2,
+      "mean_surprise_F": 0.9534,
+      "atp_per_token": 0.0035,
+      "mean_atp_pool": 0.974,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 2,
+      "stage_name": "Этап 2: Простые клаузы SVO (seq_len=8)",
+      "seq_len": 8,
+      "epoch": 3,
+      "mean_surprise_F": 0.8161,
+      "atp_per_token": 0.00335,
+      "mean_atp_pool": 0.9746,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 3,
+      "stage_name": "Этап 3: Двухклаузный дискурс и анафора (seq_len=16)",
+      "seq_len": 16,
+      "epoch": 1,
+      "mean_surprise_F": 1.0722,
+      "atp_per_token": 0.00361,
+      "mean_atp_pool": 0.9318,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 3,
+      "stage_name": "Этап 3: Двухклаузный дискурс и анафора (seq_len=16)",
+      "seq_len": 16,
+      "epoch": 2,
+      "mean_surprise_F": 0.8673,
+      "atp_per_token": 0.00339,
+      "mean_atp_pool": 0.9344,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 3,
+      "stage_name": "Этап 3: Двухклаузный дискурс и анафора (seq_len=16)",
+      "seq_len": 16,
+      "epoch": 3,
+      "mean_surprise_F": 0.7574,
+      "atp_per_token": 0.00327,
+      "mean_atp_pool": 0.938,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 4,
+      "stage_name": "Этап 4: Полный нарратив TinyStories (seq_len=64)",
+      "seq_len": 64,
+      "epoch": 1,
+      "mean_surprise_F": 1.1699,
+      "atp_per_token": 0.0036,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 4,
+      "stage_name": "Этап 4: Полный нарратив TinyStories (seq_len=64)",
+      "seq_len": 64,
+      "epoch": 2,
+      "mean_surprise_F": 0.9637,
+      "atp_per_token": 0.00346,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 4,
+      "stage_name": "Этап 4: Полный нарратив TinyStories (seq_len=64)",
+      "seq_len": 64,
+      "epoch": 3,
+      "mean_surprise_F": 0.8318,
+      "atp_per_token": 0.00332,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 5,
+      "stage_name": "Этап 5: Когнитивный Интеллект, Причинность и Theory-of-Mind (seq_len=128)",
+      "seq_len": 128,
+      "epoch": 1,
+      "mean_surprise_F": 1.1942,
+      "atp_per_token": 0.00281,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 5,
+      "stage_name": "Этап 5: Когнитивный Интеллект, Причинность и Theory-of-Mind (seq_len=128)",
+      "seq_len": 128,
+      "epoch": 2,
+      "mean_surprise_F": 1.008,
+      "atp_per_token": 0.00276,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    },
+    {
+      "stage_idx": 5,
+      "stage_name": "Этап 5: Когнитивный Интеллект, Причинность и Theory-of-Mind (seq_len=128)",
+      "seq_len": 128,
+      "epoch": 3,
+      "mean_surprise_F": 0.8864,
+      "atp_per_token": 0.00265,
+      "mean_atp_pool": 0.99,
+      "dht_episodes": 39
+    }
+  ],
+  "stage_reports": [
+    {
+      "stage_idx": 1,
+      "stage_name": "Этап 1: Синтагматическое ядро (seq_len=4)",
+      "seq_len": 4,
+      "epochs": 3,
+      "epoch_surprise_curve": [
+        1.7441,
+        1.0169,
+        0.7947
+      ],
+      "surprise_start": 1.7441,
+      "surprise_end": 0.7947,
+      "surprise_drop": 0.9494,
+      "atp_per_token_mean": 0.00379,
+      "high_surprise_episodes_stored": 39,
+      "sleep_cycles_in_stage": 13,
+      "context_retention_tokens": 93.6,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.12557286892758937,
+        "soft_frac": 0.0,
+        "hard_frac": 0.8744271310724107,
+        "n_hard": 954,
+        "n_soft": 0,
+        "mean_sleep_cycles": 25.99266815185547,
+        "mean_si_importance": 1.3554,
+        "estimated_half_life_ticks": 84772.3
+      },
+      "kl_divergence_bits": 1.0923,
+      "debiased_wpli": 0.3283,
+      "fast_head_promoted_words": 114,
+      "compositional_theta_gamma_traces": 39,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_1_seq4",
+        "stage_idx": 1,
+        "total_ticks": 414,
+        "sleep_cycles": 13,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl lived in the old castle . he went a brave boy walked to the green park . one time there was a little girl lived in the old castle . lily believed the apple was inside brave knight guarded the silver . tim found a magic stone near the blue river . mia baked a sweet cake upon a time there was a brave boy . a bright bird in the tall tree in the old castle in the high mountain in the tall tree upon a time boy was a little girl . once upon a time bird was a warm house . then the deep forest in the brave knight guarded the silver . a small boat guarded the golden dragon flew to the high mountain . the happy dog ran to the",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 93.6,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 60,
+          "repeat_run_max": 1,
+          "vte_rehearsals": 0
+        }
+      },
+      "elapsed_sec": 48.21
+    },
+    {
+      "stage_idx": 2,
+      "stage_name": "Этап 2: Простые клаузы SVO (seq_len=8)",
+      "seq_len": 8,
+      "epochs": 3,
+      "epoch_surprise_curve": [
+        1.234,
+        0.9534,
+        0.8161
+      ],
+      "surprise_start": 1.234,
+      "surprise_end": 0.8161,
+      "surprise_drop": 0.4179,
+      "atp_per_token_mean": 0.00355,
+      "high_surprise_episodes_stored": 0,
+      "sleep_cycles_in_stage": 10,
+      "context_retention_tokens": 103.68,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.03299725022914757,
+        "soft_frac": 0.0036663611365719525,
+        "hard_frac": 0.9633363886342805,
+        "n_hard": 1051,
+        "n_soft": 4,
+        "mean_sleep_cycles": 45.99266815185547,
+        "mean_si_importance": 0.4036,
+        "estimated_half_life_ticks": 162320.61
+      },
+      "kl_divergence_bits": 1.0923,
+      "debiased_wpli": 0.3631,
+      "fast_head_promoted_words": 194,
+      "compositional_theta_gamma_traces": 39,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_2_seq8",
+        "stage_idx": 2,
+        "total_ticks": 1191,
+        "sleep_cycles": 23,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she shared the sweet cake with mom . the old castle upon a time there was a little girl . one day the crab met a new boy . lily saw a bright bird in the old castle . tim found a magic stone near the blue river . leo sailed a small boat on lake . anna was a brave boy walked to the green park . a warm house melted the cold ice . the apple was inside little to the high mountain . the brave knight guarded the silver crown . the golden dragon flew to the deep forest . then the happy dog ran to the deep forest . the wise king lived in the old castle . once upon a time a brave boy walked to the green park",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 103.68,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 73,
+          "repeat_run_max": 1,
+          "vte_rehearsals": 0
+        }
+      },
+      "elapsed_sec": 80.04
+    },
+    {
+      "stage_idx": 3,
+      "stage_name": "Этап 3: Двухклаузный дискурс и анафора (seq_len=16)",
+      "seq_len": 16,
+      "epochs": 3,
+      "epoch_surprise_curve": [
+        1.0722,
+        0.8673,
+        0.7574
+      ],
+      "surprise_start": 1.0722,
+      "surprise_end": 0.7574,
+      "surprise_drop": 0.3148,
+      "atp_per_token_mean": 0.00342,
+      "high_surprise_episodes_stored": 0,
+      "sleep_cycles_in_stage": 10,
+      "context_retention_tokens": 113.76,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.0,
+        "soft_frac": 0.0,
+        "hard_frac": 1.0,
+        "n_hard": 1091,
+        "n_soft": 0,
+        "mean_sleep_cycles": 65.99266815185547,
+        "mean_si_importance": 0.1016,
+        "estimated_half_life_ticks": 239573.61
+      },
+      "kl_divergence_bits": 1.113,
+      "debiased_wpli": 0.2926,
+      "fast_head_promoted_words": 268,
+      "compositional_theta_gamma_traces": 39,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_3_seq16",
+        "stage_idx": 3,
+        "total_ticks": 2358,
+        "sleep_cycles": 33,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she lived in the old castle . he thought it was very special in the tall tree . one day the crab met a new friend . they wanted to be friends with the red apple was inside the house . it wanted to fly and be free with her friend . the family was so happy and proud of their teacher . the heat melted the cold ice into water . the apple was inside the golden dragon flew to the high mountain . the green park with his search and laughed until it was a brave boy . he walked to the green park . the wise king lived in the old castle . tim found a magic stone near the blue river . the brave knight guarded the silver crown .",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 113.76,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 82,
+          "repeat_run_max": 1,
+          "vte_rehearsals": 0
+        }
+      },
+      "elapsed_sec": 106.43
+    },
+    {
+      "stage_idx": 4,
+      "stage_name": "Этап 4: Полный нарратив TinyStories (seq_len=64)",
+      "seq_len": 64,
+      "epochs": 3,
+      "epoch_surprise_curve": [
+        1.1699,
+        0.9637,
+        0.8318
+      ],
+      "surprise_start": 1.1699,
+      "surprise_end": 0.8318,
+      "surprise_drop": 0.3381,
+      "atp_per_token_mean": 0.00346,
+      "high_surprise_episodes_stored": 0,
+      "sleep_cycles_in_stage": 10,
+      "context_retention_tokens": 123.84,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.0,
+        "soft_frac": 0.0,
+        "hard_frac": 1.0,
+        "n_hard": 1091,
+        "n_soft": 0,
+        "mean_sleep_cycles": 85.99266815185547,
+        "mean_si_importance": 0.0039,
+        "estimated_half_life_ticks": 311573.61
+      },
+      "kl_divergence_bits": 1.113,
+      "debiased_wpli": 0.3177,
+      "fast_head_promoted_words": 338,
+      "compositional_theta_gamma_traces": 39,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_4_seq64",
+        "stage_idx": 4,
+        "total_ticks": 4296,
+        "sleep_cycles": 43,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she lived in a warm house near the blue river . the brave knight guarded the silver crown . one day the crab met a new friend . then she found a magic stone near the blue river . tim found a magic stone near the old castle . a brave boy walked to the green park . lily went to the green park . a small boat on the high mountain to the deep forest to the park with his search and the little girl . the golden dragon flew to the high mountain . it wanted to be friends with the happy dog ran to the deep forest . the family was so happy and proud of their mom . they are healthy and strong to the green park . the bear",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 123.84,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 75,
+          "repeat_run_max": 1,
+          "vte_rehearsals": 10
+        }
+      },
+      "elapsed_sec": 146.7
+    },
+    {
+      "stage_idx": 5,
+      "stage_name": "Этап 5: Когнитивный Интеллект, Причинность и Theory-of-Mind (seq_len=128)",
+      "seq_len": 128,
+      "epochs": 3,
+      "epoch_surprise_curve": [
+        1.1942,
+        1.008,
+        0.8864
+      ],
+      "surprise_start": 1.1942,
+      "surprise_end": 0.8864,
+      "surprise_drop": 0.3078,
+      "atp_per_token_mean": 0.00274,
+      "high_surprise_episodes_stored": 0,
+      "sleep_cycles_in_stage": 7,
+      "context_retention_tokens": 145.52,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.0,
+        "soft_frac": 0.0,
+        "hard_frac": 1.0,
+        "n_hard": 1091,
+        "n_soft": 0,
+        "mean_sleep_cycles": 99.99266815185547,
+        "mean_si_importance": 0.0004,
+        "estimated_half_life_ticks": 361973.61
+      },
+      "kl_divergence_bits": 1.113,
+      "debiased_wpli": 0.3115,
+      "fast_head_promoted_words": 397,
+      "compositional_theta_gamma_traces": 39,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_5_seq128",
+        "stage_idx": 5,
+        "total_ticks": 6582,
+        "sleep_cycles": 50,
+        "n_tokens_generated": 160,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she lived in a warm house . her ran and the little girl . the golden dragon flew to the high mountain . it wanted to be friends with the red apple . lily was a brave boy walked to the green park . leo sailed a small boat on the lake . he went to the deep river . the old castle who a sweet cake in kitchen and ben played a clever game . the brave knight guarded the silver crown . the farmer smiles and says you are healthy and strong to the green park . then she found a magic stone near the blue river . the wise king lived on the cold ice . the bear is hungry and angry to the high mountain . one day the crab met a new friend . the family was so happy and proud of their mom . she says they are",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 145.52,
+          "max_coherent_span": 164,
+          "unique_vocab_used": 96,
+          "repeat_run_max": 1,
+          "vte_rehearsals": 23
+        }
+      },
+      "elapsed_sec": 157.9
+    }
+  ],
+  "first_sleep_generation": {
+    "checkpoint_label": "After_First_Sleep_Cycle",
+    "stage_idx": 1,
+    "total_ticks": 36,
+    "sleep_cycles": 1,
+    "n_tokens_generated": 120,
+    "prompt": "once upon a time",
+    "generated_text": "once upon a time boy walked a little girl . she was a brave boy walked a small boat . the green park upon a sweet boy lived in the old king . then a magic stone time a little boat there was a brave boy . tim lived upon the wise king lived a day . leo went a time girl there a afraid boy . anna was a amazing boat upon a ancient boy . a angry boat walked a beautiful boy . once upon a big girl was a black boat . the blue river there lived a bright boy . one time walked upon a broken boat . a busy boy was a blue girl . lily lived a calm",
+    "metrics": {
+      "grammar_validity": 1.0,
+      "context_retention_tokens": 82.0,
+      "max_coherent_span": 124,
+      "unique_vocab_used": 47,
+      "repeat_run_max": 1,
+      "vte_rehearsals": 0
+    }
+  },
+  "best_generation_checkpoint": {
+    "checkpoint_label": "Stage_5_seq128",
+    "stage_idx": 5,
+    "total_ticks": 6582,
+    "sleep_cycles": 50,
+    "n_tokens_generated": 160,
+    "prompt": "once upon a time",
+    "generated_text": "once upon a time there was a little girl . she lived in a warm house . her ran and the little girl . the golden dragon flew to the high mountain . it wanted to be friends with the red apple . lily was a brave boy walked to the green park . leo sailed a small boat on the lake . he went to the deep river . the old castle who a sweet cake in kitchen and ben played a clever game . the brave knight guarded the silver crown . the farmer smiles and says you are healthy and strong to the green park . then she found a magic stone near the blue river . the wise king lived on the cold ice . the bear is hungry and angry to the high mountain . one day the crab met a new friend . the family was so happy and proud of their mom . she says they are",
+    "metrics": {
+      "grammar_validity": 1.0,
+      "context_retention_tokens": 145.52,
+      "max_coherent_span": 164,
+      "unique_vocab_used": 96,
+      "repeat_run_max": 1,
+      "vte_rehearsals": 23
+    }
+  },
+  "multi_prompt_generations": [
+    {
+      "checkpoint_label": "Prompt_once upon a ",
+      "stage_idx": 5,
+      "total_ticks": 6582,
+      "sleep_cycles": 50,
+      "n_tokens_generated": 42,
+      "prompt": "once upon a time a curious girl named anna",
+      "generated_text": "once upon a time a curious girl anna studied nature . the golden dragon flew to the high mountain . it wanted to be friends with the red apple . the brave knight guarded the silver crown . then she found a magic stone near the blue river . the",
+      "metrics": {
+        "grammar_validity": 0.9796,
+        "context_retention_tokens": 24.63,
+        "max_coherent_span": 43,
+        "unique_vocab_used": 37,
+        "repeat_run_max": 1,
+        "vte_rehearsals": 5
+      }
+    },
+    {
+      "checkpoint_label": "Prompt_when warm su",
+      "stage_idx": 5,
+      "total_ticks": 6582,
+      "sleep_cycles": 50,
+      "n_tokens_generated": 42,
+      "prompt": "when warm sunlight shone from the bright sky",
+      "generated_text": "when warm shone from the bright bird in the old castle . she lived in a warm house . her was a little girl lived in the old castle . one day the crab met a new friend . then she found a magic stone near the blue",
+      "metrics": {
+        "grammar_validity": 0.9787,
+        "context_retention_tokens": 23.63,
+        "max_coherent_span": 46,
+        "unique_vocab_used": 31,
+        "repeat_run_max": 1,
+        "vte_rehearsals": 3
+      }
+    },
+    {
+      "checkpoint_label": "Prompt_lily looked ",
+      "stage_idx": 5,
+      "total_ticks": 6582,
+      "sleep_cycles": 50,
+      "n_tokens_generated": 42,
+      "prompt": "lily looked inside the woven basket first because",
+      "generated_text": "lily looked inside the basket first because she believed the apple . the brave knight guarded the silver crown . he went to the green park . the golden dragon flew to the high mountain . it wanted to be friends with the happy dog ran to the deep",
+      "metrics": {
+        "grammar_validity": 0.9583,
+        "context_retention_tokens": 15.84,
+        "max_coherent_span": 43,
+        "unique_vocab_used": 35,
+        "repeat_run_max": 1,
+        "vte_rehearsals": 7
+      }
+    },
+    {
+      "checkpoint_label": "Prompt_once upon a ",
+      "stage_idx": 5,
+      "total_ticks": 6582,
+      "sleep_cycles": 50,
+      "n_tokens_generated": 42,
+      "prompt": "once upon a time a brave boy named leo",
+      "generated_text": "once upon a time a brave boy leo wanted to be like the kind queen . he went to the green park . the golden dragon flew to the high mountain . one day the crab met a new friend . then she found a magic stone near the blue",
+      "metrics": {
+        "grammar_validity": 0.9796,
+        "context_retention_tokens": 24.63,
+        "max_coherent_span": 43,
+        "unique_vocab_used": 37,
+        "repeat_run_max": 1,
+        "vte_rehearsals": 2
+      }
+    },
+    {
+      "checkpoint_label": "Prompt_once upon a ",
+      "stage_idx": 5,
+      "total_ticks": 6582,
+      "sleep_cycles": 50,
+      "n_tokens_generated": 42,
+      "prompt": "once upon a time a golden dragon",
+      "generated_text": "once upon a time a golden dragon flew to the high mountain . it wanted to be friends with the red apple . the golden dragon flew to the green park . one day the crab met a new friend . then she found a magic stone near the",
+      "metrics": {
+        "grammar_validity": 1.0,
+        "context_retention_tokens": 49.0,
+        "max_coherent_span": 49,
+        "unique_vocab_used": 33,
+        "repeat_run_max": 1,
+        "vte_rehearsals": 3
+      }
+    }
+  ],
+  "cognitive_qa_results": [
+    {
+      "question": "Why did the cold ice melt into clear water when warm sunlight shone?",
+      "cognitive_domain": "Physical_Causality_Thermodynamics",
+      "seed_concepts": [
+        "did",
+        "ice",
+        "melt",
+        "water",
+        "shone"
+      ],
+      "hipporag_ppr_chain": [
+        "ice",
+        "melted",
+        "heat"
+      ],
+      "active_inference_mode": "ATTEND",
+      "answer": "when warm shone from the bright the heat melted the cold ice . she lived in a warm house ."
+    },
+    {
+      "question": "Where did lily look first for her red apple after ben hid it in the wooden box?",
+      "cognitive_domain": "Theory_of_Mind_False_Belief",
+      "seed_concepts": [
+        "did",
+        "lily",
+        "look",
+        "apple",
+        "ben",
+        "hid",
+        "box"
+      ],
+      "hipporag_ppr_chain": [
+        "lily",
+        "believed",
+        "apple",
+        "was",
+        "boy",
+        "walked"
+      ],
+      "active_inference_mode": "ATTEND",
+      "answer": "lily looked inside the basket first because she believed the apple . the brave knight guarded the silver crown ."
+    },
+    {
+      "question": "How did leo and sam fix the broken wooden bridge across the deep river?",
+      "cognitive_domain": "Multi_Hop_Planning",
+      "seed_concepts": [
+        "did",
+        "leo",
+        "sam",
+        "fix",
+        "bridge",
+        "river"
+      ],
+      "hipporag_ppr_chain": [
+        "did",
+        "leo",
+        "sam"
+      ],
+      "active_inference_mode": "ATTEND",
+      "answer": "the wise owl knew that strong could float on the tall tree . the old castle sang a sweet cake in kitchen ."
+    },
+    {
+      "question": "Where did the little girl walk and what did she see in the tall tree?",
+      "cognitive_domain": "Episodic_Associative_Recall",
+      "seed_concepts": [
+        "did",
+        "girl",
+        "walk",
+        "did",
+        "see",
+        "tree"
+      ],
+      "hipporag_ppr_chain": [
+        "girl",
+        "was",
+        "boy",
+        "walked"
+      ],
+      "active_inference_mode": "ATTEND",
+      "answer": "the girl smiled and had a golden dragon flew to the high mountain . one day the crab met a new friend ."
+    },
+    {
+      "question": "What did the brave boy discover near the blue river?",
+      "cognitive_domain": "Episodic_Associative_Recall",
+      "seed_concepts": [
+        "did",
+        "boy",
+        "discover",
+        "river"
+      ],
+      "hipporag_ppr_chain": [
+        "boy",
+        "was",
+        "apple",
+        "believed",
+        "lily",
+        "saw",
+        "bird"
+      ],
+      "active_inference_mode": "ATTEND",
+      "answer": "the boy walked to the green park . she lived in a warm house ."
+    }
+  ],
+  "adaptive_softmax_promoted_count": 397,
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v9_0_intelligence_master.pt",
+  "elapsed_sec": 547.05
+}

@@ -59,14 +59,15 @@ def configure_gpu_environment(gpu_arch: str = "ampere", use_tf32: bool = True) -
 def run_gpu_training(
     epochs_per_stage: int = 4,
     batch_size: int = 8,
-    max_stories: int = 5000,
+    max_vocab: int = 1024,
+    max_stories: int = 10_000,
     gpu_arch: str = "ampere",
-    workers: int = max(1, os.cpu_count() or 4),
+    workers: int = max(1, os.cpu_count() or 32),
 ) -> Dict[str, object]:
     t0 = time.perf_counter()
     gpu_info = configure_gpu_environment(gpu_arch=gpu_arch)
     parquet_path = ROOT / "data" / "10k-tinystories.parquet"
-    itos, stoi = build_bio_vocabulary(max_vocab=256)
+    itos, stoi = build_bio_vocabulary(max_vocab=max_vocab, parquet_path=parquet_path)
     dataset = build_developmental_dataset(
         parquet_path, stoi, itos, num_workers=workers, max_stories_to_scan=max_stories
     )
@@ -87,7 +88,7 @@ def run_gpu_training(
             syn.crossover_density = float(gpu_info["crossover_density"])
 
     print("=" * 102)
-    print("ZIWAGO-PRIME v8.5 — GPU / HIGH-THROUGHPUT DEVELOPMENTAL TRAINER")
+    print("ZIWAGO-PRIME v9.0 — GPU / 64-THREAD HIGH-THROUGHPUT INTELLIGENCE TRAINER")
     print("=" * 102)
     print(
         f"  • Устройство             : {gpu_info['device']} ({gpu_info['device_name']}) | "
@@ -104,6 +105,7 @@ def run_gpu_training(
         (2, "GPU Stage 2: Simple Clauses SVO (seq_len=8)", 8, dataset.stage2_seqs_len8),
         (3, "GPU Stage 3: Two-Clause Anaphora (seq_len=16)", 16, dataset.stage3_seqs_len16),
         (4, "GPU Stage 4: Full Narrative Window (seq_len=64)", 64, dataset.stage4_seqs_len64),
+        (5, "GPU Stage 5: Cognitive Intelligence & ToM (seq_len=128)", 128, dataset.stage5_seqs_len128),
     ]
 
     stage_reports = []
@@ -144,16 +146,18 @@ def run_gpu_training(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Ziwago-Prime v8.5 GPU-Accelerated Trainer")
+    parser = argparse.ArgumentParser(description="Ziwago-Prime v9.0 GPU / 64-Thread High-Throughput Trainer")
     parser.add_argument("--epochs", type=int, default=4, help="Epochs per developmental stage (default: 4)")
     parser.add_argument("--batch-size", type=int, default=8, help="Batch size per sleep group (default: 8)")
-    parser.add_argument("--max-stories", type=int, default=5000, help="Max stories from 10k-tinystories.parquet")
+    parser.add_argument("--max-vocab", type=int, default=1024, help="Morpho-cognitive bio-vocabulary size (default: 1024)")
+    parser.add_argument("--max-stories", type=int, default=10_000, help="Max stories from 10k-tinystories.parquet")
     parser.add_argument("--gpu-arch", type=str, default="ampere", choices=["volta", "ampere"], help="GPU architecture profile")
-    parser.add_argument("--workers", type=int, default=max(1, os.cpu_count() or 4), help="CPU data loader threads")
+    parser.add_argument("--workers", type=int, default=max(1, os.cpu_count() or 32), help="CPU data loader threads")
     args = parser.parse_args()
     run_gpu_training(
         epochs_per_stage=args.epochs,
         batch_size=args.batch_size,
+        max_vocab=args.max_vocab,
         max_stories=args.max_stories,
         gpu_arch=args.gpu_arch,
         workers=args.workers,

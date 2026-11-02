@@ -1306,5 +1306,35 @@ def test_ziwago_prime_v8_5_lab_html_breakthroughs():
     assert s_stop["mode"] == "STOP"
 
 
+def test_ziwago_prime_v9_morpho_sdr_and_compositional_intelligence():
+    """Проверяет масштабирование интеллекта Ziwago-Prime v9.0 (32-Core / 64-Thread Edition):
+      1. MorphoSemanticCorticalEncoder: морфо-синтаксическое обобщение однокоренных слов и OOV
+         на 2048-нейронном SDR (8 модулей × 256 клеток);
+      2. CompositionalThetaGammaIndexer: комбинаторная ёмкость 64^4 = 16,777,216 связок
+         (Subject × Verb × Object × Context);
+      3. Расширенный 1024-словный морфо-когнитивный словарь и генератор когнитивного корпуса."""
+    from neuroweave10.core.sdr import MorphoSemanticCorticalEncoder
+    from neuroweave10.memory.hippocampus import CompositionalThetaGammaIndexer
+    from train_ziwago_v8 import build_bio_vocabulary, build_cognitive_world_corpus_raw
 
+    enc = MorphoSemanticCorticalEncoder(vocab_size=50_000, n_sdr=2048, n_modules=8, active_per_module=5, d_out=24)
+    sdr_walk = enc.encode_word("walk", token_id=10, role_id=3)
+    sdr_walked = enc.encode_word("walked", token_id=11, role_id=3)
+    assert int(sdr_walk.sum().item()) == 40
+    assert int(sdr_walked.sum().item()) == 40
+    ov_morph = enc.sdr_overlap("walk", 3, "walked", 3, id_a=10, id_b=11)
+    ov_unrel = enc.sdr_overlap("dragon", 2, "quickly", 4, id_a=50, id_b=60)
+    assert ov_morph >= 0.20
+    assert ov_morph > ov_unrel
+    proj = enc.project_to_cortex("starlight_oov", token_id=49999, role_id=5)
+    assert proj.shape == (24,)
 
+    idx = CompositionalThetaGammaIndexer(n_slots=4, k_per_slot=64, d_slot=16)
+    assert idx.theoretical_capacity() == 16_777_216
+    qt = idx.encode_and_bind((12, 34, 56, 78), salience=1.5, learn=True)
+    assert qt in idx.compositional_traces
+
+    itos, stoi = build_bio_vocabulary(max_vocab=1024)
+    assert len(itos) == 1024
+    cog_stories = build_cognitive_world_corpus_raw()
+    assert len(cog_stories) >= 6
