@@ -1,0 +1,186 @@
+{
+  "task": "Scaling Ziwago-Prime v9.0 to GPT-2 Vocabulary (50,257 tokens) via Compositional VSA Binding",
+  "wikitext_source": "/home/jupyter/Neuroweave Ziwago/data/wikitext-103-raw/wiki.train.raw",
+  "tokens_tokenized": 2286547,
+  "unique_gpt2_tokens_in_sample": 36031,
+  "tokenize_time_sec": 1.04,
+  "encoder_memory_report": {
+    "vocab_size": 50257,
+    "base_static_tokens": 2048,
+    "dynamic_vsa_tokens": 48209,
+    "dense_matrix_mb": 392.63,
+    "compositional_vsa_kb": 528.0,
+    "compression_ratio_x": 761.5
+  },
+  "epoch_history": [
+    {
+      "epoch": 1,
+      "stage_label": "Stage 1 (BPE Roots & Syntagms)",
+      "context_window": 16,
+      "mean_surprise_F": 1.4374,
+      "atp_per_token": 0.00158,
+      "sleep_cycles_total": 6,
+      "ct_pnn_hard_synapses": 5377,
+      "elapsed_sec": 10.07
+    },
+    {
+      "epoch": 2,
+      "stage_label": "Stage 1 (BPE Roots & Syntagms)",
+      "context_window": 16,
+      "mean_surprise_F": 0.5768,
+      "atp_per_token": 0.00122,
+      "sleep_cycles_total": 12,
+      "ct_pnn_hard_synapses": 5477,
+      "elapsed_sec": 9.89
+    },
+    {
+      "epoch": 3,
+      "stage_label": "Stage 1 (BPE Roots & Syntagms)",
+      "context_window": 16,
+      "mean_surprise_F": 0.3819,
+      "atp_per_token": 0.00114,
+      "sleep_cycles_total": 18,
+      "ct_pnn_hard_synapses": 5497,
+      "elapsed_sec": 10.57
+    },
+    {
+      "epoch": 4,
+      "stage_label": "Stage 2 (Clauses & Wiki Facts)",
+      "context_window": 64,
+      "mean_surprise_F": 0.7568,
+      "atp_per_token": 0.0013,
+      "sleep_cycles_total": 29,
+      "ct_pnn_hard_synapses": 5569,
+      "elapsed_sec": 22.63
+    },
+    {
+      "epoch": 5,
+      "stage_label": "Stage 2 (Clauses & Wiki Facts)",
+      "context_window": 64,
+      "mean_surprise_F": 0.556,
+      "atp_per_token": 0.00121,
+      "sleep_cycles_total": 40,
+      "ct_pnn_hard_synapses": 5574,
+      "elapsed_sec": 28.06
+    },
+    {
+      "epoch": 6,
+      "stage_label": "Stage 2 (Clauses & Wiki Facts)",
+      "context_window": 64,
+      "mean_surprise_F": 0.4598,
+      "atp_per_token": 0.00117,
+      "sleep_cycles_total": 50,
+      "ct_pnn_hard_synapses": 5583,
+      "elapsed_sec": 23.71
+    },
+    {
+      "epoch": 7,
+      "stage_label": "Stage 3 (Multi-Paragraph Discourse)",
+      "context_window": 256,
+      "mean_surprise_F": 0.629,
+      "atp_per_token": 0.00124,
+      "sleep_cycles_total": 65,
+      "ct_pnn_hard_synapses": 5589,
+      "elapsed_sec": 43.22
+    },
+    {
+      "epoch": 8,
+      "stage_label": "Stage 3 (Multi-Paragraph Discourse)",
+      "context_window": 256,
+      "mean_surprise_F": 0.5111,
+      "atp_per_token": 0.00119,
+      "sleep_cycles_total": 80,
+      "ct_pnn_hard_synapses": 5590,
+      "elapsed_sec": 41.71
+    },
+    {
+      "epoch": 9,
+      "stage_label": "Stage 3 (Multi-Paragraph Discourse)",
+      "context_window": 256,
+      "mean_surprise_F": 0.4414,
+      "atp_per_token": 0.00117,
+      "sleep_cycles_total": 95,
+      "ct_pnn_hard_synapses": 5592,
+      "elapsed_sec": 41.71
+    },
+    {
+      "epoch": 10,
+      "stage_label": "Stage 4 (1000+ Token Long Context)",
+      "context_window": 1024,
+      "mean_surprise_F": 0.3939,
+      "atp_per_token": 0.00115,
+      "sleep_cycles_total": 110,
+      "ct_pnn_hard_synapses": 5595,
+      "elapsed_sec": 42.27
+    },
+    {
+      "epoch": 11,
+      "stage_label": "Stage 4 (1000+ Token Long Context)",
+      "context_window": 1024,
+      "mean_surprise_F": 0.3591,
+      "atp_per_token": 0.00113,
+      "sleep_cycles_total": 125,
+      "ct_pnn_hard_synapses": 5596,
+      "elapsed_sec": 39.95
+    },
+    {
+      "epoch": 12,
+      "stage_label": "Stage 4 (1000+ Token Long Context)",
+      "context_window": 1024,
+      "mean_surprise_F": 0.3321,
+      "atp_per_token": 0.00112,
+      "sleep_cycles_total": 140,
+      "ct_pnn_hard_synapses": 5597,
+      "elapsed_sec": 41.59
+    }
+  ],
+  "surprise_start": 1.4374,
+  "surprise_end": 0.3321,
+  "oov_cryptodragon_test": {
+    "oov_word": "cryptodragon",
+    "dynamic_token_id": 50257,
+    "is_in_static_gpt2_vocab": false,
+    "decomposed_morphemes": [
+      "crypto",
+      "dragon"
+    ],
+    "morpheme_gpt2_ids": [
+      21473,
+      14844
+    ],
+    "base_2048_bpe_roots": [
+      269,
+      563,
+      457,
+      78,
+      67,
+      81,
+      1840
+    ],
+    "sdr_active_neurons": 40,
+    "sdr_total_neurons": 2048,
+    "morpheme_sdr_overlaps": {
+      "crypto": 0.375,
+      "dragon": 0.375
+    },
+    "generated_contextual_text": "In modern computer science and ancient folklore , a cryptodragon systems protect digital knowledge across global networks . A secure crypto protocol uses mathematical keys and distributed ledger verification to guard valuable records . Meanwhile in ancient mythology , a great golden dragon guarded the sacred mountain fortress above the deep river . The legendary dragon breathed bright"
+  },
+  "long_context_1000_test": {
+    "total_generated_tokens": 1040,
+    "context_retention_tokens": 1017.0,
+    "unique_gpt2_tokens_in_stream": 390,
+    "max_consecutive_token_repeat": 1,
+    "thematic_anchor_overlap_head_vs_tail": 0.1491,
+    "anti_attractor_hysteresis_activations": 3202,
+    "stream_head_preview": "In modern computer science and security , crypto systems protect digital knowledge across global networks . A secure crypto protocol uses mathematical keys and distributed ledger verification to guard valuable records . Meanwhile in ancient mythology , a great golden dragon guarded the sacred mountain fortress above the deep river . The legendary dragon breathed bright fire across the stone bridge whenever fearless knights approached",
+    "stream_tail_preview_after_1000_tokens": "due to the major losses in manpower Gallia suffers towards the end of material created for previous games , such as the BLiTZ system , is carried , who had also worked on the previous V , Shocktroopers , Engineers , Lancers and Armored Soldier . Troopers can switch classes by changing their assigned weapon within the"
+  },
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v9_gpt2_50k_vsa_brain.pt",
+  "checkpoint_size_mb": 0.55,
+  "elapsed_total_sec": 357.96,
+  "gpu_deployment_zip": {
+    "zip_path": "/home/jupyter/Neuroweave Ziwago/Produce/ziwago_v9_gpt2vocab_gpu_bundle.zip",
+    "zip_size_mb": 0.92,
+    "files_packed_count": 116
+  }
+}

@@ -1338,3 +1338,43 @@ def test_ziwago_prime_v9_morpho_sdr_and_compositional_intelligence():
     assert len(itos) == 1024
     cog_stories = build_cognitive_world_corpus_raw()
     assert len(cog_stories) >= 6
+
+
+def test_ziwago_prime_v9_gpt2_50k_compositional_vsa_encoder():
+    """Проверяет масштабирование Ziwago-Prime v9.0 до словаря GPT-2 (50,257 токенов) по ТЗ next11.txt:
+      1. CompositionalVSABPEEncoder хранит статические SDR только для 2048 базовых BPE-токенов
+         (экономия памяти 761.5x против плотной матрицы [50257, 2048]);
+      2. Для остальных 48,209 токенов вычисляет 2048-мерный SDR (40 активных нейронов) на лету
+         по BPE-дереву из data/gpt2/merges.txt через VSA-связывание;
+      3. OOV-слово 'cryptodragon' автоматически собирается из морфем ['crypto', 'dragon']
+         с перекрытием 37.5% к каждой из родительских морфем."""
+    from pathlib import Path
+    from neuroweave10.core.sdr import CompositionalVSABPEEncoder
+
+    root = Path(__file__).resolve().parent.parent
+    enc = CompositionalVSABPEEncoder(
+        vocab_path=str(root / "data" / "gpt2" / "vocab.json"),
+        merges_path=str(root / "data" / "gpt2" / "merges.txt"),
+        n_base=2048,
+        n_sdr=2048,
+        n_modules=8,
+        active_per_module=5,
+        d_out=24,
+    )
+    assert enc.vocab_size == 50257
+    assert enc.base_active_bins.shape == (2048, 8, 5)
+    mem_rep = enc.memory_footprint_report()
+    assert mem_rep["compression_ratio_x"] > 400.0
+
+    sdr_base = enc.encode_token_id(262)      # базовый токен < 2048
+    sdr_comp = enc.encode_token_id(39738)    # композитный токен >= 2048 ('Ġneuroscience')
+    assert int(sdr_base.sum().item()) == 40
+    assert int(sdr_comp.sum().item()) == 40
+
+    oov = enc.decompose_oov_word("cryptodragon")
+    assert oov["is_in_gpt2_vocab"] is False
+    assert oov["morphemes"] == ["crypto", "dragon"]
+    assert oov["active_neurons"] == 40
+    assert oov["morpheme_sdr_overlaps"]["crypto"] >= 0.30
+    assert oov["morpheme_sdr_overlaps"]["dragon"] >= 0.30
+

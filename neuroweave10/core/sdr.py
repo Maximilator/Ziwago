@@ -303,3 +303,304 @@ class MorphoSemanticCorticalEncoder:
         return round(inter / denom, 4)
 
 
+class CompositionalVSABPEEncoder:
+    """Задача next11.txt: Композиционный VSA-Энкодер для словаря GPT-2 (50 257 токенов) без плотной матрицы `[50257, 2048]`.
+
+    Принцип работы:
+      1. Базовый словарь (`n_base = 2048` самых частых BPE-токенов: байты `0..255`, артикли, предлоги, базовые корни `256..2047`):
+         - Хранит компактные статические SDR-паттерны только для `2048` базовых BPE-токенов:
+           `base_active_bins` формы `[2048, 8, 5]` (`uint8`, всего `80 КБ` вместо `411 МБ` плотной матрицы `[50257, 2048]`!).
+      2. Композиционные токены (`2048..50256`, 48 209 токенов):
+         - НЕ хранит для них статических векторов.
+         - Использует BPE-дерево из `data/gpt2/merges.txt`, чтобы разбить любой токен на его морфемные/корневые
+           компоненты из базового пула `0..2047`, и ВЫЧИСЛЯЕТ его SDR-паттерн (2048 нейронов, 40 активных = 8 модулей × 5)
+           на лету через VSA-связывание (Sparse Block-Code модульный циклический сдвиг + композиционный VSA-ключ
+           для `HashedCorticalSDREncoder`).
+      3. Разрешение OOV-слов (например, `"cryptodragon"` -> `"crypto"` + `"dragon"`):
+         - Находит самые длинные известные морфемы в словаре GPT-2 (`"crypto"`, `"dragon"`),
+           связывает их SDR-паттерны через VSA-оператор (сохраняя 50% активных пучков от первой морфемы и
+           50% циклически сдвинутых пучков от второй морфемы), так что `"cryptodragon"` одновременно
+           резонирует в коре и с `"crypto"`, и с `"dragon"`!
+    """
+
+    def __init__(
+        self,
+        vocab_path: str,
+        merges_path: str,
+        n_base: int = 2048,
+        n_sdr: int = 2048,
+        n_modules: int = 8,
+        active_per_module: int = 5,
+        d_out: int = 64,
+        seed: int = 42,
+    ):
+        import json
+        from pathlib import Path
+
+        self.n_base = int(n_base)
+        self.n_sdr = int(n_sdr)
+        self.n_modules = int(n_modules)
+        self.bins_per_module = self.n_sdr // self.n_modules  # 256
+        self.active_per_module = int(active_per_module)      # 5 (итого 40 активных нейронов из 2048)
+        self.d_out = int(d_out)
+
+        v_file = Path(vocab_path)
+        m_file = Path(merges_path)
+        with v_file.open("r", encoding="utf-8") as f:
+            self.vocab: dict[str, int] = json.load(f)
+        self.id_to_token: dict[int, str] = {int(v): k for k, v in self.vocab.items()}
+        self.vocab_size = len(self.vocab)  # 50,257
+
+        # Строим BPE-дерево слияний из merges.txt: token_id -> (left_id, right_id)
+        self.bpe_children: dict[int, tuple[int, int]] = {}
+        self.bpe_ranks: dict[tuple[str, str], int] = {}
+        if m_file.exists():
+            lines = m_file.read_text(encoding="utf-8").splitlines()
+            merge_lines = [ln.strip() for ln in lines if ln.strip() and not ln.startswith("#")]
+            for rank, ln in enumerate(merge_lines):
+                parts = ln.split(" ")
+                if len(parts) == 2:
+                    a_str, b_str = parts[0], parts[1]
+                    self.bpe_ranks[(a_str, b_str)] = rank
+                    merged_str = a_str + b_str
+                    if merged_str in self.vocab and a_str in self.vocab and b_str in self.vocab:
+                        m_id = self.vocab[merged_str]
+                        if m_id >= self.n_base:
+                            self.bpe_children[m_id] = (self.vocab[a_str], self.vocab[b_str])
+
+        # Внутренний кортикальный SDR-энкодер (2048 нейронов, 40 активных)
+        self.hashed_sdr = HashedCorticalSDREncoder(
+            vocab_size=self.vocab_size,
+            n_sdr=self.n_sdr,
+            n_modules=self.n_modules,
+            active_per_module=self.active_per_module,
+            seed=seed,
+        )
+
+        # Статические SDR-паттерны ТОЛЬКО для 2048 базовых BPE-токенов (0..2047):
+        # Храним индексы активных миниколонок [2048, 8, 5] в uint8 (всего 81,920 байт!)
+        base_ids = torch.arange(self.n_base, dtype=torch.long)
+        base_sdrs = self.hashed_sdr.encode_tokens(base_ids, learn=False)  # [2048, 2048]
+        base_bins = torch.zeros(self.n_base, self.n_modules, self.active_per_module, dtype=torch.uint8)
+        for m in range(self.n_modules):
+            m_slice = base_sdrs[:, m * self.bins_per_module : (m + 1) * self.bins_per_module]
+            top_idx = m_slice.topk(self.active_per_module, dim=-1).indices.to(torch.uint8)
+            base_bins[:, m, :] = top_idx
+        self.base_active_bins = base_bins  # [2048, 8, 5] uint8 — единственная статическая таблица токенов!
+
+        g = torch.Generator().manual_seed(seed + 19)
+        self.w_proj = (
+            torch.randn(self.d_out, self.n_sdr, generator=g)
+            / (self.active_per_module * self.n_modules) ** 0.5
+        )
+        self.module_offsets = (torch.arange(self.n_modules, dtype=torch.long) * self.bins_per_module).view(self.n_modules, 1)
+
+    def decompose_to_base_tokens(self, token_id: int) -> List[int]:
+        """Разбивает любой из 50 257 токенов GPT-2 по BPE-дереву `merges.txt` до базовых корней `< 2048`."""
+        tid = int(token_id)
+        if tid < self.n_base:
+            return [max(0, tid)]
+        if tid not in self.bpe_children:
+            return [tid % self.n_base]
+        stack = [tid]
+        leaves: List[int] = []
+        while stack:
+            cur = stack.pop()
+            if cur < self.n_base or cur not in self.bpe_children:
+                leaves.append(cur if cur < self.n_base else (cur % self.n_base))
+            else:
+                left_id, right_id = self.bpe_children[cur]
+                stack.append(right_id)
+                stack.append(left_id)
+        return leaves
+
+    def _vsa_bind_bins(self, bins_list: List[torch.Tensor]) -> torch.Tensor:
+        """Выполняет композиционное VSA-связывание (`Sparse Block-Codes` + циклический сдвиг)
+        последовательности базовых морфемных кодов `[8, 5]` на лету:
+          - Модули 0..2 удерживают головной и хвостовой базовые корни с позиционным циклическим сдвигом;
+          - Модули 3..4 выполняют поблочное модульное связывание `(bin_a + bin_b + pos_shift) mod 256`;
+          - Модули 5..7 подают связанный VSA-ключ в `HashedCorticalSDREncoder` (2048 нейронов, 40 активных)."""
+        if len(bins_list) == 1:
+            return bins_list[0].long()
+
+        first_b = bins_list[0].long()
+        last_b = bins_list[-1].long()
+        out_bins = torch.zeros(self.n_modules, self.active_per_module, dtype=torch.long)
+
+        # Модули 0..1: первый корень морфемы (префикс/основа)
+        out_bins[0] = first_b[0]
+        out_bins[1] = first_b[1]
+        # Модуль 2: последний корень морфемы (суффикс/второй корень) с циклическим сдвигом +17
+        out_bins[2] = (last_b[2] + 17) % self.bins_per_module
+
+        # Модули 3..4: VSA модульное связывание всех компонентов дерева BPE по круговому сдвигу
+        acc3 = first_b[3].clone()
+        acc4 = first_b[4].clone()
+        for pos, b_item in enumerate(bins_list[1:], start=1):
+            b_long = b_item.long()
+            acc3 = (acc3 + torch.roll(b_long[3], shifts=pos % self.active_per_module, dims=0) + pos * 13) % self.bins_per_module
+            acc4 = (acc4 + torch.roll(b_long[4], shifts=(pos * 2) % self.active_per_module, dims=0) + pos * 29) % self.bins_per_module
+
+        # Гарантируем ровно 5 уникальных активных бинов в каждом модуле
+        for m_idx, acc in ((3, acc3), (4, acc4)):
+            uniq: List[int] = []
+            for v in acc.tolist():
+                cand = int(v) % self.bins_per_module
+                while cand in uniq:
+                    cand = (cand + 37) % self.bins_per_module
+                uniq.append(cand)
+            out_bins[m_idx] = torch.tensor(uniq[: self.active_per_module], dtype=torch.long)
+
+        # Вычисляем композитный VSA-ключ и подаём его на вход HashedCorticalSDREncoder для модулей 5..7
+        vsa_hash_key = 0
+        for pos, b_item in enumerate(bins_list):
+            vsa_hash_key = (vsa_hash_key * 1315423911 + int(b_item.long().sum().item()) + (pos + 1) * 2654435761) & 0x7FFFFFFF
+        hashed_sdr = self.hashed_sdr.encode_tokens(torch.tensor([vsa_hash_key % self.vocab_size]), learn=False)[0]
+        for m in range(5, self.n_modules):
+            m_slice = hashed_sdr[m * self.bins_per_module : (m + 1) * self.bins_per_module]
+            out_bins[m] = m_slice.topk(self.active_per_module).indices.long()
+
+        return out_bins
+
+    def _bins_to_sdr(self, bins: torch.Tensor) -> torch.Tensor:
+        """Преобразует матрицу активных бинов `[8, 5]` в разреженный 2048-мерный SDR (ровно 40 единиц)."""
+        sdr = torch.zeros(self.n_sdr, dtype=torch.float32)
+        global_idx = (bins.long() + self.module_offsets).reshape(-1)
+        sdr[global_idx] = 1.0
+        return sdr
+
+    def encode_token_id(self, token_id: int) -> torch.Tensor:
+        """Вычисляет 2048-мерный SDR (40 активных нейронов) для любого из 50 257 токенов GPT-2:
+        - Если `token_id < 2048`: берёт статический базовый SDR;
+        - Если `token_id >= 2048`: раскладывает по BPE-дереву `merges.txt` на базовые токены
+          и связывает их на лету через VSA-связывание."""
+        tid = int(token_id)
+        if 0 <= tid < self.n_base:
+            return self._bins_to_sdr(self.base_active_bins[tid])
+        base_leaves = self.decompose_to_base_tokens(tid)
+        bins_list = [self.base_active_bins[leaf] for leaf in base_leaves]
+        bound_bins = self._vsa_bind_bins(bins_list)
+        return self._bins_to_sdr(bound_bins)
+
+    def decompose_oov_word(self, word: str) -> Dict[str, object]:
+        """Разбивает неизвестное (OOV) композитное слово (например, `'cryptodragon'`) на известные
+        морфемы словаря GPT-2 (`'crypto'` + `'dragon'`), а затем до базовых BPE-токенов `< 2048`,
+        и собирает его 2048-мерный SDR-паттерн через VSA-связывание."""
+        clean_w = word.strip()
+        prefixed_w = "Ġ" + clean_w if not clean_w.startswith("Ġ") else clean_w
+
+        # Если слово целиком есть в словаре, используем его, иначе жадно выделяем самые длинные морфемы
+        sub_morphemes: List[str] = []
+        sub_token_ids: List[int] = []
+        pos = 0
+        target_str = clean_w
+        while pos < len(target_str):
+            matched_sub = None
+            matched_id = None
+            for end in range(len(target_str), pos, -1):
+                piece = target_str[pos:end]
+                # Избегаем тривиального совпадения всего слова, если тестируется составное OOV
+                if pos == 0 and end == len(target_str) and piece not in self.vocab and ("Ġ" + piece) not in self.vocab:
+                    continue
+                cand_g = ("Ġ" + piece) if pos == 0 else piece
+                if cand_g in self.vocab:
+                    matched_sub = piece
+                    matched_id = self.vocab[cand_g]
+                    break
+                if piece in self.vocab:
+                    matched_sub = piece
+                    matched_id = self.vocab[piece]
+                    break
+            if matched_sub is not None and matched_id is not None:
+                sub_morphemes.append(matched_sub)
+                sub_token_ids.append(int(matched_id))
+                pos += len(matched_sub)
+            else:
+                ch = target_str[pos]
+                sub_morphemes.append(ch)
+                sub_token_ids.append(int(self.vocab.get(ch, ord(ch) % self.n_base)))
+                pos += 1
+
+        # Для каждой найденной морфемы вычисляем её SDR и связываем через VSA
+        morpheme_sdrs = [self.encode_token_id(mid) for mid in sub_token_ids]
+        morpheme_bins: List[torch.Tensor] = []
+        for sdr_m in morpheme_sdrs:
+            b_m = torch.zeros(self.n_modules, self.active_per_module, dtype=torch.long)
+            for m in range(self.n_modules):
+                m_slice = sdr_m[m * self.bins_per_module : (m + 1) * self.bins_per_module]
+                b_m[m] = m_slice.topk(self.active_per_module).indices.long()
+            morpheme_bins.append(b_m)
+
+        # Композиционное связывание морфем: чтобы составное OOV-слово ("cryptodragon") сохраняло
+        # высокое семантическое перекрытие с ОБЕИМИ родительскими морфемами ("crypto" и "dragon"),
+        # модули 0..3 наследуют структурные пучки первой морфемы, модули 4..6 — второй морфемы,
+        # а модуль 7 содержит их VSA-свёртку (циклический сдвиг)!
+        if len(morpheme_bins) >= 2:
+            b_first = morpheme_bins[0]
+            b_second = morpheme_bins[1]
+            comp_bins = torch.zeros(self.n_modules, self.active_per_module, dtype=torch.long)
+            comp_bins[0:3] = b_first[0:3]
+            comp_bins[3:6] = b_second[3:6]
+            comp_bins[6] = (b_first[6] + b_second[6] + 11) % self.bins_per_module
+            comp_bins[7] = self._vsa_bind_bins(morpheme_bins)[7]
+            # Убираем возможные дубликаты внутри модуля 6
+            u6: List[int] = []
+            for v in comp_bins[6].tolist():
+                c = int(v) % self.bins_per_module
+                while c in u6:
+                    c = (c + 37) % self.bins_per_module
+                u6.append(c)
+            comp_bins[6] = torch.tensor(u6[: self.active_per_module], dtype=torch.long)
+            oov_sdr = self._bins_to_sdr(comp_bins)
+        else:
+            oov_sdr = morpheme_sdrs[0]
+
+        base_leaves_all: List[int] = []
+        for mid in sub_token_ids:
+            base_leaves_all.extend(self.decompose_to_base_tokens(mid))
+
+        overlaps: Dict[str, float] = {}
+        for morph_str, morph_sdr in zip(sub_morphemes, morpheme_sdrs):
+            ov = float((oov_sdr * morph_sdr).sum().item()) / float(max(1.0, oov_sdr.sum().item()))
+            overlaps[morph_str] = round(ov, 4)
+
+        idx_act = torch.nonzero(oov_sdr > 0.0, as_tuple=False).flatten()
+        cortical_vec = self.w_proj[:, idx_act].sum(dim=-1) if idx_act.numel() > 0 else torch.zeros(self.d_out)
+
+        return {
+            "word": clean_w,
+            "is_in_gpt2_vocab": (clean_w in self.vocab or prefixed_w in self.vocab),
+            "morphemes": sub_morphemes,
+            "morpheme_token_ids": sub_token_ids,
+            "base_2048_leaves": base_leaves_all,
+            "sdr": oov_sdr,
+            "active_neurons": int(oov_sdr.sum().item()),
+            "sdr_total_neurons": self.n_sdr,
+            "morpheme_sdr_overlaps": overlaps,
+            "cortical_vector": cortical_vec,
+        }
+
+    def project_token_to_cortex(self, token_id: int) -> torch.Tensor:
+        """Проецирует 2048-мерный SDR токена в компактный входной вектор коры `[d_out]`."""
+        sdr = self.encode_token_id(token_id)
+        idx = torch.nonzero(sdr > 0.0, as_tuple=False).flatten()
+        if idx.numel() == 0:
+            return torch.zeros(self.d_out)
+        return self.w_proj[:, idx].sum(dim=-1)
+
+    def memory_footprint_report(self) -> Dict[str, object]:
+        """Сравнивает объём памяти композиционного VSA-энкодера с плотной матрицей `[50257, 2048]`."""
+        dense_floats = self.vocab_size * self.n_sdr
+        dense_bytes = dense_floats * 4  # float32
+        static_base_bytes = int(self.base_active_bins.numel() * self.base_active_bins.element_size())
+        hashed_weights_bytes = int(self.hashed_sdr.micro_weights.numel() * 4)
+        proj_bytes = int(self.w_proj.numel() * 4)
+        total_vsa_bytes = static_base_bytes + hashed_weights_bytes + proj_bytes
+        return {
+            "vocab_size": self.vocab_size,
+            "base_static_tokens": self.n_base,
+            "dynamic_vsa_tokens": self.vocab_size - self.n_base,
+            "dense_matrix_mb": round(dense_bytes / (1024 * 1024), 2),
+            "compositional_vsa_kb": round(total_vsa_bytes / 1024, 2),
+            "compression_ratio_x": round(dense_bytes / max(1, total_vsa_bytes), 1),
+        }
