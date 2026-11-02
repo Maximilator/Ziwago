@@ -1,0 +1,168 @@
+{
+  "version": "Ziwago-Prime v10.0 (7-Level Poirazi Dendrites + 8x512 Cortical MoE + Honest 60/20/20 Curriculum)",
+  "dendrite_benchmark": {
+    "n_neurons": 512,
+    "n_in": 64,
+    "benchmark_steps": 1000,
+    "scalar_dendrite_total_ms": 414.76,
+    "scalar_dendrite_ms_per_step": 0.4148,
+    "deep_7level_dendrite_total_ms": 643.26,
+    "deep_7level_dendrite_ms_per_step": 0.6433,
+    "compute_overhead_ratio": 1.55,
+    "equivalent_mlp_depth_gain": "7x (Beniaguev et al., 2021)",
+    "single_neuron_xor_accuracy_scalar": 0.5,
+    "single_neuron_xor_accuracy_deep7": 1.0,
+    "ca_nmda_plateau_fraction": 0.0003
+  },
+  "honest_curriculum_stats": {
+    "total_tokens": 10500,
+    "unique_paragraphs": 78,
+    "wikitext_tokens": 6300,
+    "cornell_tokens": 2100,
+    "tinystories_tokens": 2100,
+    "wikitext_share": 0.6,
+    "cornell_share": 0.2,
+    "tinystories_share": 0.2,
+    "max_exposure_per_uid": 1
+  },
+  "training_report": {
+    "epoch_curves": [
+      {
+        "epoch": 1,
+        "mean_surprise_F": 1.4095,
+        "discrete_surprise_pin_rate": 0.7773,
+        "wikitext_surprise_F": 1.6313,
+        "cornell_dialogs_surprise_F": 0.7098,
+        "tinystories_surprise_F": 1.4396,
+        "mean_somatic_fep_error": 0.878,
+        "mean_apical_fep_error": 0.0042,
+        "block_sparse_32x32_flop_efficiency": 0.8796,
+        "mean_lag_dwpli": 0.7311,
+        "analytic_rehydrations_in_epoch": 121,
+        "elapsed_sec": 17.78
+      },
+      {
+        "epoch": 2,
+        "mean_surprise_F": 0.5343,
+        "discrete_surprise_pin_rate": 0.417,
+        "wikitext_surprise_F": 0.645,
+        "cornell_dialogs_surprise_F": 0.1834,
+        "tinystories_surprise_F": 0.5512,
+        "mean_somatic_fep_error": 0.9663,
+        "mean_apical_fep_error": 0.0022,
+        "block_sparse_32x32_flop_efficiency": 0.8769,
+        "mean_lag_dwpli": 0.5575,
+        "analytic_rehydrations_in_epoch": 128,
+        "elapsed_sec": 18.06
+      },
+      {
+        "epoch": 3,
+        "mean_surprise_F": 0.3252,
+        "discrete_surprise_pin_rate": 0.0021,
+        "wikitext_surprise_F": 0.3866,
+        "cornell_dialogs_surprise_F": 0.1272,
+        "tinystories_surprise_F": 0.3378,
+        "mean_somatic_fep_error": 0.9753,
+        "mean_apical_fep_error": 0.0018,
+        "block_sparse_32x32_flop_efficiency": 0.8869,
+        "mean_lag_dwpli": 0.5571,
+        "analytic_rehydrations_in_epoch": 129,
+        "elapsed_sec": 18.0
+      },
+      {
+        "epoch": 4,
+        "mean_surprise_F": 0.2289,
+        "discrete_surprise_pin_rate": 0.0,
+        "wikitext_surprise_F": 0.2686,
+        "cornell_dialogs_surprise_F": 0.1035,
+        "tinystories_surprise_F": 0.2346,
+        "mean_somatic_fep_error": 0.9893,
+        "mean_apical_fep_error": 0.0017,
+        "block_sparse_32x32_flop_efficiency": 0.8852,
+        "mean_lag_dwpli": 0.5701,
+        "analytic_rehydrations_in_epoch": 124,
+        "elapsed_sec": 15.89
+      }
+    ],
+    "moe_routing_telemetry": {
+      "total_columns": 8,
+      "neurons_per_column": 512,
+      "total_cortical_neurons": 4096,
+      "total_dendritic_branches": 28672,
+      "top_k_active": 2,
+      "active_neurons_per_tick": 1024,
+      "dormant_cold_state_saving_fraction": 0.75,
+      "total_analytic_rehydrations": 502,
+      "block_sparse_tile_size": "32x32",
+      "mean_block_sparse_32x32_flop_efficiency": 0.8622,
+      "lag_based_dwpli_mean": 0.5101,
+      "reference_sweep_invariance_check": {
+        "dwpli_reference_0": 0.5101,
+        "dwpli_reference_shifted": 0.5101,
+        "max_reference_sweep_deviation": 2.5e-07,
+        "is_reference_invariant": true
+      },
+      "discrete_pc_wall_hits": 284,
+      "stranger_check_interventions": 0,
+      "expert_utilization_distribution": {
+        "Col0_SYNTAX_BA44": 0.1036,
+        "Col1_LEXICAL_SEMANTICS": 0.1381,
+        "Col2_ENCYCLOPEDIC_FACTS": 0.1547,
+        "Col3_PRAGMATIC_DIALOG": 0.1464,
+        "Col4_NARRATIVE_EPISODIC": 0.1133,
+        "Col5_CAUSAL_PHYSICS": 0.1298,
+        "Col6_THEORY_OF_MIND": 0.1492,
+        "Col7_EXECUTIVE_PFC": 0.0649
+      }
+    },
+    "total_train_sec": 69.74
+  },
+  "domain_generations": {
+    "wikitext": {
+      "domain": "wikitext",
+      "prompt": "The Valkyria Chronicles III game system",
+      "active_moe_experts": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col0_SYNTAX_BA44"
+      ],
+      "active_neurons_count": 1024,
+      "discrete_wall_resets": 0,
+      "stranger_checks_fired": 0,
+      "generated_text": "The Valkyria Chronicles III game system , is a tactical role-playing video game for the PlayStation Portable . Its story was darker and more somber than that of its predecessor , Valkyria Chronicles III was not localized , but proved inadequate . The",
+      "unique_token_ratio": 0.8
+    },
+    "cornell_dialogs": {
+      "domain": "cornell_dialogs",
+      "prompt": "DR. VANCE : Wait a second , do you honestly expect",
+      "active_moe_experts": [
+        "Col0_SYNTAX_BA44",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "active_neurons_count": 1024,
+      "discrete_wall_resets": 0,
+      "stranger_checks_fired": 0,
+      "generated_text": "DR. VANCE : Wait a second , do you honestly expect me to believe that explanation ? We have been analyzing ancient history and the Roman aqueduct for 3 hours . DR. VANCE : That changes everything ; let us record the observation and alert the team immediately .",
+      "unique_token_ratio": 0.8545
+    },
+    "tinystories": {
+      "domain": "tinystories",
+      "prompt": "Once upon a time there was a little",
+      "active_moe_experts": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "active_neurons_count": 1024,
+      "discrete_wall_resets": 0,
+      "stranger_checks_fired": 0,
+      "generated_text": "Once upon a time there was a little girl named Lily. They knew that their love for each other. One day, a little boy named Tim. He said, \"Yes, Lily went to the park. One day, Tim won the race.",
+      "unique_token_ratio": 0.68
+    }
+  },
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v10_0_moe_4096_master.pt",
+  "checkpoint_size_mb": 0.75,
+  "gpu_bundle_zip": {
+    "zip_path": "/home/jupyter/Neuroweave Ziwago/Produce/ziwago_v10_moe_dendritic_gpu_bundle.zip",
+    "zip_size_mb": 0.97,
+    "files_count": 121
+  }
+}

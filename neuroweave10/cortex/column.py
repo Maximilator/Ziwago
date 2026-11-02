@@ -101,9 +101,9 @@ class CorticalColumn:
         self.fb_layer_gain[:, self.layer_slices["L5"]] = 1.10
         # Ламинарный LFP и эфаптическое поле (Уровень 6)
         self.lfp = EphapticLFP(n, self.layer_slices)
-        # Базальное дендритное дерево Poirazi: суперлинейные ветви+плато
+        # Базальное 7-уровневое дендритное дерево Poirazi / Beniaguev (v10.0: 7 ветвей с локальными Ca2+/NMDA-спайками)
         from ..core.dendrite import DendriticTree
-        self.dendrite = DendriticTree(n, n_in, n_branch=4, seed=seed + 3)
+        self.dendrite = DendriticTree(n, n_in, n_branch=7, seed=seed + 3)
         # D3 (archnext.txt): O(1) Локальный оценщик критичности колонки без глобального readout
         self.local_sigma: float = 0.97
         self._loc_act_mean: float = 0.06
@@ -240,8 +240,8 @@ class CorticalColumn:
             dw_istdp = 0.0015 * torch.outer(pre_pv, post_err)
             self.w_pv_in = (self.w_pv_in + dw_istdp).clamp(0.05, 3.0)
 
-        # Базальный вход идёт через ветви Poirazi: суперлинейная сумма + плато
-        g_tree = self.dendrite.step(x_ff, pyr_s)
+        # Базальный вход идёт через 7-уровневые ветви Poirazi/Beniaguev: суперлинейная сумма + Ca2+/NMDA-плато + ADCG
+        g_tree = self.dendrite.step(x_ff, pyr_s, apical_potential=self.pyr.v_a, dt=dt)
         g_ampa = (g_ampa + g_tree).clamp(0.0, None)
         # Тонический фон + эфаптическое поле LFP (Уровень 6)
         i_ext = torch.full_like(g_ampa, 1.5)
@@ -303,6 +303,8 @@ class CorticalColumn:
             self.w_rec.learn(out.error, self._last_s, out.s,
                              f_mod, ltp_field, dt, ach=ach_val,
                              da_phasic=da_phasic, lambda_atp=lam_atp)
+            ap_err_step = ((self.pyr.v_a - self.pyr.cfg.e_l) / 25.0).clamp(-1.5, 1.5)
+            self.dendrite.learn(out.error, x_ff, apical_error=ap_err_step, f_mod=f_mod)
             # Узел 4: Бодрствующий структурный морфогенез при высокой ошибке и всплеске BDNF
             bdnf_val = float(mod_ctx.get("bdnf", 0.35))
             err_inst = float(out.error.abs().mean().item())

@@ -1378,3 +1378,93 @@ def test_ziwago_prime_v9_gpt2_50k_compositional_vsa_encoder():
     assert oov["morpheme_sdr_overlaps"]["crypto"] >= 0.30
     assert oov["morpheme_sdr_overlaps"]["dragon"] >= 0.30
 
+
+def test_ziwago_prime_v10_dendritic_moe_and_honest_curriculum():
+    """Проверяет все требования upgrade11.txt для Ziwago-Prime v10.0:
+      1. Dendritic Scaling: 7-уровневое дерево Poirazi/Beniaguev (n_branch=7) с Ca2+/NMDA-плато,
+         ADCG и обучением сомы + апикала (100% XOR-разделимость против 50% у скалярного);
+      2. Mixture of Experts: 8 колонок по 512 нейронов (4096 нейронов), Sparsely-Gated Top-2/3
+         маршрутизация и межколоночные связи Block-Sparse 32x32 с FLOP-эффективностью >= 0.80;
+      3. Honest Data Mixing: 60% WikiText-103 + 20% Cornell Movie-Dialogs + 20% TinyStories,
+         где каждый абзац встречается ровно 1 раз за эпоху (max_exposure_per_uid == 1)."""
+    from pathlib import Path
+    from neuroweave10.cortex.moe_cortex import SparselyGatedCorticalMoE
+    from train_ziwago_v10 import (
+        benchmark_7level_dendrite_vs_scalar,
+        build_honest_data_mixing_stream,
+    )
+
+    root = Path(__file__).resolve().parent.parent
+    bench = benchmark_7level_dendrite_vs_scalar(n_neurons=128, n_in=32, n_steps=50)
+    assert bench["single_neuron_xor_accuracy_deep7"] == 1.0
+    assert bench["single_neuron_xor_accuracy_deep7"] > bench["single_neuron_xor_accuracy_scalar"]
+
+    moe = SparselyGatedCorticalMoE(n_columns=8, neurons_per_column=512, n_in=64, n_branch_per_neuron=7, top_k_active=2)
+    assert moe.total_neurons == 4096
+    assert moe.columns[0].dendrite.k == 7
+    out_w = moe.step(torch.randn(64), domain_tag="wikitext", learn=True, k_active=2)
+    assert len(out_w.active_expert_ids) == 2
+    assert out_w.active_neurons_this_tick == 1024
+    assert out_w.block_sparse_32x32_flop_efficiency >= 0.80
+
+    stream = build_honest_data_mixing_stream(root, target_total_tokens=2000)
+    assert stream.max_exposure_per_uid == 1
+    assert 0.58 <= stream.wikitext_share <= 0.62
+    assert 0.18 <= stream.cornell_share <= 0.22
+    assert 0.18 <= stream.tinystories_share <= 0.22
+
+
+def test_ziwago_prime_v10_5_upgrade12_and_lab2_breakthroughs():
+    """Проверяет прорывы из upgrade12.txt и lab2.txt (Ziwago-Prime v10.5):
+      1. Discrete Predictive Coding (All-or-None Surprise Pin in {0, 1}) + Stranger's Check (F#109, F#111);
+      2. Reference-Invariant Lag-Based dwPLI (10..50 ms axonal lag, 100% инвариантность к сдвигу
+         электрода сравнения Reference Sweep и отсечение объёмного проведения tau=0, F#95, F#107);
+      3. Clock-Domain Allocation & Analytic Rehydration спящих колонок MoE (F#79, F#60)."""
+    from neuroweave10.cortex.moe_cortex import (
+        DiscretePredictiveCodingBarrier,
+        ReferenceInvariantLagPLVRouter,
+        SparselyGatedCorticalMoE,
+    )
+
+    # 1. Проверка All-or-None Discrete Predictive Coding + Stranger's Check
+    barrier = DiscretePredictiveCodingBarrier(binary_threshold=0.82, epistemic_floor=0.18)
+    v_match = barrier.evaluate_discrete_pin_and_stranger_check(
+        continuous_error=0.12,
+        primary_synaptic_support=2.4,
+        stranger_contrast_support=0.8,
+        recent_repetition_pressure=0.0,
+    )
+    assert v_match["discrete_surprise_pin"] == 0
+    assert v_match["is_hallucination_wall"] is False
+
+    v_halluc = barrier.evaluate_discrete_pin_and_stranger_check(
+        continuous_error=0.35,
+        primary_synaptic_support=2.2,
+        stranger_contrast_support=0.05,
+        recent_repetition_pressure=0.75,
+    )
+    assert v_halluc["discrete_surprise_pin"] == 1
+    assert v_halluc["is_hallucination_wall"] is True
+    assert v_halluc["stranger_check_triggered"] is True
+    assert v_halluc["action_mode"] == "PROBE"
+
+    # 2. Проверка Reference-Invariant Lag-Based dwPLI (F#95, F#107)
+    router = ReferenceInvariantLagPLVRouter(n_columns=8, ring_len=64, seed=42)
+    for t in range(30):
+        rates = torch.sin(torch.arange(8, dtype=torch.float32) * 0.7 + t * 0.25).abs() * 0.2
+        _ = router.step_phases_and_compute_causal_matrix(rates)
+    inv_rep = router.verify_reference_sweep_invariance()
+    assert inv_rep["is_reference_invariant"] is True
+    assert inv_rep["max_reference_sweep_deviation"] < 1e-5
+
+    # 3. Проверка аналитической регидратации спящих колонок в SparselyGatedCorticalMoE (F#79)
+    moe = SparselyGatedCorticalMoE(n_columns=8, neurons_per_column=512, n_in=64, n_branch_per_neuron=7, top_k_active=2)
+    _ = moe.step(torch.randn(64), domain_tag="wikitext", learn=True, k_active=2)
+    _ = moe.step(torch.randn(64), domain_tag="cornell_dialogs", learn=True, k_active=2)
+    _ = moe.step(torch.randn(64), domain_tag="tinystories", learn=True, k_active=2)
+    tel = moe.routing_telemetry()
+    assert tel["total_analytic_rehydrations"] >= 1
+    assert tel["dormant_cold_state_saving_fraction"] == 0.75
+
+
+
