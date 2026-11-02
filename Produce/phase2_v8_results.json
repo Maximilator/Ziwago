@@ -1,0 +1,73 @@
+{
+  "phase2_1_syllabary_motor_and_spoonerisms": {
+    "vocab_size": 50000,
+    "d_in": 512,
+    "dense_linear_parameters": 25600000,
+    "syllabary_parameters": 598016,
+    "parameter_compression_ratio": 42.81,
+    "ops_compression_ratio": 48.08,
+    "learned_tail_accuracy": 1.0,
+    "promoted_habit_token_id": 1000,
+    "oov_composition": {
+      "composed_token_id": 963,
+      "onset_from_a": 3,
+      "coda_from_b": 195,
+      "label": "neuro_weave_oov",
+      "articulatory_norm": 1.0
+    },
+    "spoonerism_head_high_ne_rate": 0.105,
+    "spoonerism_tail_high_ne_rate": 0.325,
+    "spoonerism_tail_low_ne_rate": 0.14,
+    "prediction_3_verified": true
+  },
+  "phase2_2_vsa_dht_hippocampus": {
+    "n_shards": 4,
+    "total_distributed_capacity": 38400,
+    "capacity_expansion_vs_flat256": 150.0,
+    "episodes_stored": 10000,
+    "store_10k_time_ms": 712.47,
+    "recall_at_5_exact_10k": 1.0,
+    "recall_at_5_noisy_multiprobe_10k": 1.0,
+    "mean_lsh_speedup_vs_flat_scan": 127.76,
+    "theta_composite_syncs_in_10_gamma_ticks": 2,
+    "last_two_clock_step": {
+      "gamma_tick": 10,
+      "active_shard": "Ventral-Affective",
+      "is_theta_composite_sync": true,
+      "recovered_fillers_count": 4,
+      "theta_bindings_completed": 2
+    }
+  },
+  "phase2_3_polychrony_and_gossip_plv": {
+    "routing_edges_count": 5,
+    "initial_edge_delays_ms": {
+      "0->1": 12.0,
+      "0->2": 22.0,
+      "1->2": 10.0,
+      "1->0": 12.0,
+      "2->1": 10.0
+    },
+    "quarter_period_f_max_hz": {
+      "0->1": 20.65,
+      "0->2": 11.34,
+      "1->2": 25.0,
+      "1->0": 21.57,
+      "2->1": 25.0
+    },
+    "gossip_plv_pre_myelination": 0.9155,
+    "gossip_plv_post_myelination": 0.9624,
+    "polychronous_catalog_size": 3,
+    "myelination_sleep_stats": {
+      "mean_delay_ms": 13.149,
+      "mean_myelin_shift_ms": 0.1138
+    }
+  },
+  "phase2_4_thermodynamic_active_inference": {
+    "vte_g_prime_cand5_at_full_atp": -0.1373,
+    "vte_g_prime_cand5_at_low_atp": 0.3471,
+    "vte_metabolic_penalty_at_low_atp": 0.4844,
+    "ltp_mean_dw_at_lambda_0": 0.001223,
+    "ltp_mean_dw_at_lambda_2": 0.0,
+    "ltp_metabolic_suppression_ratio": 1222760.067
+  }
+}

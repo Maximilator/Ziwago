@@ -1,0 +1,3 @@
+[stage2-prime] started: stories=4000 seq_len=64 vocab=128
+[stage2] stories=400 tok=24336 elapsed=587s rss=845MB ce=5.242 acc=0.106 reward_ema=-0.3412 sigma=0.851 patho=None
+[stage2] stories=800 tok=48219 elapsed=1133s rss=850MB ce=5.355 acc=0.107 reward_ema=-0.3392 sigma=0.971 patho=None

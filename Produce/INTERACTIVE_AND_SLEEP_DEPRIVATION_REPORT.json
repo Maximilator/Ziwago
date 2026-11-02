@@ -1,0 +1,718 @@
+{
+  "elapsed_sec": 91.05,
+  "task1_interactive_active_inference": {
+    "total_turns": 6,
+    "kappa_explore_boring_1": 0.222,
+    "kappa_explore_boring_2_repeated": 0.626,
+    "kappa_explore_intriguing_dragon": 1.0,
+    "kappa_explore_meta_surprise": 0.8963,
+    "counter_questions_generated": [
+      "where did the dragon fly ?",
+      "what is in the dark cave ? [epistemic probe: 'shadow']",
+      "where did the dragon go in the forest ? [epistemic probe: 'glorp']"
+    ],
+    "turns": [
+      {
+        "prompt": "how are you",
+        "prompt_norm": "how are you",
+        "mode": "ROUTINE_HOMEOSTATIC_REPLY",
+        "unknown_words": [],
+        "active_mtl_concepts": {},
+        "d_novelty_boredom": 0.14,
+        "epistemic_uncertainty": 0.12,
+        "meta_surprise": 0.11,
+        "kappa_explore": 0.222,
+        "vte_winner_token": "house",
+        "vte_g_min": -12.4359,
+        "vte_breakdown": {
+          "house": {
+            "G": -12.4359,
+            "lat_fit": 2.256,
+            "role_fit": 3.3748,
+            "valence": -0.006,
+            "concept_sim": 0.6014,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 1.15,
+            "curiosity_bonus": 0.0823,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5164,
+            "repeat_penalty": 0.0
+          },
+          "castle": {
+            "G": -8.2689,
+            "lat_fit": 2.256,
+            "role_fit": 3.1862,
+            "valence": -0.0052,
+            "concept_sim": 0.366,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5174,
+            "repeat_penalty": 1.2848
+          },
+          "forest": {
+            "G": -3.9483,
+            "lat_fit": 1.5,
+            "role_fit": 3.3737,
+            "valence": -0.0071,
+            "concept_sim": 0.3252,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5148,
+            "repeat_penalty": 3.0848
+          },
+          "cave": {
+            "G": 4.6961,
+            "lat_fit": 0.0,
+            "role_fit": 0.875,
+            "valence": 0.0032,
+            "concept_sim": 0.2973,
+            "semantic_bridge": 0.0342,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5244,
+            "repeat_penalty": 5.8
+          }
+        },
+        "interrogative_efe": {},
+        "counter_question": null,
+        "reply": "the girl lived in the house .",
+        "scenario_label": "Boring/Phatic #1 (Calm Homeostasis)"
+      },
+      {
+        "prompt": "how are you",
+        "prompt_norm": "how are you",
+        "mode": "BOREDOM_ESCAPE_EXPLORATION",
+        "unknown_words": [],
+        "active_mtl_concepts": {},
+        "d_novelty_boredom": 0.5,
+        "epistemic_uncertainty": 0.22,
+        "meta_surprise": 0.16,
+        "kappa_explore": 0.626,
+        "vte_winner_token": "castle",
+        "vte_g_min": -10.2434,
+        "vte_breakdown": {
+          "castle": {
+            "G": -10.2434,
+            "lat_fit": 2.823,
+            "role_fit": 0.9141,
+            "valence": -0.0052,
+            "concept_sim": 0.366,
+            "semantic_bridge": 0.0274,
+            "clause_concept_fit": 1.15,
+            "curiosity_bonus": 0.097,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5674,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": -5.3813,
+            "lat_fit": 2.256,
+            "role_fit": 0.2259,
+            "valence": 0.0091,
+            "concept_sim": 0.412,
+            "semantic_bridge": 0.35,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0362,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5743,
+            "repeat_penalty": 0.6584
+          },
+          "house": {
+            "G": -4.8574,
+            "lat_fit": 2.256,
+            "role_fit": 1.3747,
+            "valence": -0.006,
+            "concept_sim": 0.6014,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5663,
+            "repeat_penalty": 2.2058
+          },
+          "cave": {
+            "G": 5.152,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 0.0032,
+            "concept_sim": 0.2973,
+            "semantic_bridge": 0.7,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5743,
+            "repeat_penalty": 5.8
+          }
+        },
+        "interrogative_efe": {},
+        "counter_question": "where did the dragon fly ?",
+        "reply": "the knight rode to the castle .",
+        "scenario_label": "Boring/Phatic #2 (Boredom Escape + Counter-Question)"
+      },
+      {
+        "prompt": "tell me about the dragon",
+        "prompt_norm": "tell me about the dragon",
+        "mode": "INTRIGUED_CONCEPTUAL_VTE",
+        "unknown_words": [],
+        "active_mtl_concepts": {
+          "dragon": 0.165
+        },
+        "d_novelty_boredom": 0.6282,
+        "epistemic_uncertainty": 0.5899,
+        "meta_surprise": 0.502,
+        "kappa_explore": 1.0,
+        "vte_winner_token": "castle",
+        "vte_g_min": -11.386,
+        "vte_breakdown": {
+          "castle": {
+            "G": -11.386,
+            "lat_fit": 2.823,
+            "role_fit": 3.2642,
+            "valence": -0.0052,
+            "concept_sim": 0.366,
+            "semantic_bridge": 0.0274,
+            "clause_concept_fit": 0.9463,
+            "curiosity_bonus": 0.0051,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.2286,
+            "repeat_penalty": 0.8936
+          },
+          "mountain": {
+            "G": -8.7941,
+            "lat_fit": 2.256,
+            "role_fit": 3.2001,
+            "valence": 0.0091,
+            "concept_sim": 0.412,
+            "semantic_bridge": 0.35,
+            "clause_concept_fit": 0.3955,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.2355,
+            "repeat_penalty": 1.7158
+          },
+          "forest": {
+            "G": -6.0085,
+            "lat_fit": 2.823,
+            "role_fit": 0.7081,
+            "valence": -0.0071,
+            "concept_sim": 0.3252,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.2259,
+            "repeat_penalty": 1.2868
+          },
+          "cave": {
+            "G": 1.0857,
+            "lat_fit": 0.0,
+            "role_fit": 3.375,
+            "valence": 0.0032,
+            "concept_sim": 0.2973,
+            "semantic_bridge": 0.7,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.2355,
+            "repeat_penalty": 5.8
+          }
+        },
+        "interrogative_efe": {},
+        "counter_question": null,
+        "reply": "the dragon flew to the castle .",
+        "scenario_label": "Intriguing Concept #1 (Dragon + REM Bridge VTE)"
+      },
+      {
+        "prompt": "tell me about the knight",
+        "prompt_norm": "tell me about the knight",
+        "mode": "INTRIGUED_CONCEPTUAL_VTE",
+        "unknown_words": [],
+        "active_mtl_concepts": {
+          "knight": 0.165
+        },
+        "d_novelty_boredom": 0.6282,
+        "epistemic_uncertainty": 0.5899,
+        "meta_surprise": 0.506,
+        "kappa_explore": 1.0,
+        "vte_winner_token": "forest",
+        "vte_g_min": -10.5551,
+        "vte_breakdown": {
+          "castle": {
+            "G": -9.1516,
+            "lat_fit": 2.823,
+            "role_fit": 0.9141,
+            "valence": -0.0052,
+            "concept_sim": 0.366,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.696,
+            "curiosity_bonus": 0.0403,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.2227,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": -5.7838,
+            "lat_fit": 2.256,
+            "role_fit": 0.2259,
+            "valence": 0.0091,
+            "concept_sim": 0.412,
+            "semantic_bridge": 0.0342,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0403,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.2297,
+            "repeat_penalty": 0.0
+          },
+          "forest": {
+            "G": -10.5551,
+            "lat_fit": 2.823,
+            "role_fit": 3.375,
+            "valence": -0.0071,
+            "concept_sim": 0.3252,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0366,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.22,
+            "repeat_penalty": 0.0
+          },
+          "cave": {
+            "G": 5.7821,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 0.0032,
+            "concept_sim": 0.2973,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.2297,
+            "repeat_penalty": 5.8
+          }
+        },
+        "interrogative_efe": {},
+        "counter_question": null,
+        "reply": "the knight rode to the forest .",
+        "scenario_label": "Intriguing Concept #2 (Knight + Heroic VTE)"
+      },
+      {
+        "prompt": "what is inside the unknown shadow ?",
+        "prompt_norm": "what is inside the unknown shadow",
+        "mode": "EPISTEMIC_COUNTER_QUESTION",
+        "unknown_words": [
+          "unknown",
+          "shadow"
+        ],
+        "active_mtl_concepts": {},
+        "d_novelty_boredom": 0.35,
+        "epistemic_uncertainty": 0.8467,
+        "meta_surprise": 0.872,
+        "kappa_explore": 0.8963,
+        "vte_winner_token": "mountain",
+        "vte_g_min": -10.1275,
+        "vte_breakdown": {
+          "cave": {
+            "G": 1.6993,
+            "lat_fit": 0.0,
+            "role_fit": 3.375,
+            "valence": 0.0032,
+            "concept_sim": 0.2973,
+            "semantic_bridge": 0.0214,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3549,
+            "repeat_penalty": 5.8
+          },
+          "forest": {
+            "G": -1.1956,
+            "lat_fit": 1.5,
+            "role_fit": 0.7081,
+            "valence": -0.0071,
+            "concept_sim": 0.3252,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3452,
+            "repeat_penalty": 2.5266
+          },
+          "mountain": {
+            "G": -10.1275,
+            "lat_fit": 2.256,
+            "role_fit": 3.2001,
+            "valence": 0.0091,
+            "concept_sim": 0.412,
+            "semantic_bridge": 0.0351,
+            "clause_concept_fit": 0.65,
+            "curiosity_bonus": 0.016,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3549,
+            "repeat_penalty": 0.9331
+          },
+          "castle": {
+            "G": -5.1376,
+            "lat_fit": 1.5,
+            "role_fit": 3.2642,
+            "valence": -0.0052,
+            "concept_sim": 0.366,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3479,
+            "repeat_penalty": 1.8
+          }
+        },
+        "interrogative_efe": {
+          "what is in the dark cave ? [epistemic probe: 'shadow']": -13.9207,
+          "where did the dragon go in the forest ? [epistemic probe: 'shadow']": -13.2667,
+          "who guarded the shadow near the mountain ?": -12.8307,
+          "declarative_statement_without_info_gain": -7.9475
+        },
+        "counter_question": "what is in the dark cave ? [epistemic probe: 'shadow']",
+        "reply": "what is in the dark cave ? [epistemic probe: 'shadow']",
+        "scenario_label": "High Meta-Surprise #1 (Unknown Shadow -> Counter-Question)"
+      },
+      {
+        "prompt": "where did the mysterious glorp vanish ?",
+        "prompt_norm": "where did the mysterious glorp vanish",
+        "mode": "EPISTEMIC_COUNTER_QUESTION",
+        "unknown_words": [
+          "mysterious",
+          "glorp"
+        ],
+        "active_mtl_concepts": {},
+        "d_novelty_boredom": 0.35,
+        "epistemic_uncertainty": 0.8467,
+        "meta_surprise": 0.8732,
+        "kappa_explore": 0.8963,
+        "vte_winner_token": "mountain",
+        "vte_g_min": -6.6344,
+        "vte_breakdown": {
+          "cave": {
+            "G": 5.7661,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 0.0032,
+            "concept_sim": 0.2973,
+            "semantic_bridge": 0.0214,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3144,
+            "repeat_penalty": 5.8
+          },
+          "forest": {
+            "G": -5.2128,
+            "lat_fit": 1.5,
+            "role_fit": 3.375,
+            "valence": -0.0071,
+            "concept_sim": 0.3252,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3047,
+            "repeat_penalty": 1.8
+          },
+          "mountain": {
+            "G": -6.6344,
+            "lat_fit": 2.256,
+            "role_fit": 0.2259,
+            "valence": 0.0091,
+            "concept_sim": 0.412,
+            "semantic_bridge": 0.0351,
+            "clause_concept_fit": 0.65,
+            "curiosity_bonus": 0.0834,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3144,
+            "repeat_penalty": 0.774
+          },
+          "castle": {
+            "G": -1.713,
+            "lat_fit": 1.5,
+            "role_fit": 0.9141,
+            "valence": -0.0052,
+            "concept_sim": 0.366,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.3074,
+            "repeat_penalty": 2.3545
+          }
+        },
+        "interrogative_efe": {
+          "what is in the dark cave ? [epistemic probe: 'glorp']": -9.7342,
+          "where did the dragon go in the forest ? [epistemic probe: 'glorp']": -10.4765,
+          "who guarded the glorp near the mountain ?": -9.3413,
+          "declarative_statement_without_info_gain": -4.4514
+        },
+        "counter_question": "where did the dragon go in the forest ? [epistemic probe: 'glorp']",
+        "reply": "where did the dragon go in the forest ? [epistemic probe: 'glorp']",
+        "scenario_label": "High Meta-Surprise #2 (Mysterious Glorp -> Counter-Question)"
+      }
+    ]
+  },
+  "task2_sleep_deprivation_10k": {
+    "deprivation_ticks": 10000,
+    "tick_atp_crossed_sleep_threshold_085": 511,
+    "tick_plasticity_blocked_atp_060": 1825,
+    "tick_delirium_onset_atp_035": 3740,
+    "min_atp_reached": 0.0608,
+    "max_adenosine_reached": 1.0,
+    "peak_hyperexcitable_sigma": 1.215,
+    "min_delirium_sigma": 0.52,
+    "recovery_sleep_report": {
+      "ticks": 60,
+      "nrem_ticks": 42,
+      "rem_ticks": 18,
+      "sigma": 0.9815420905362883,
+      "episodes": 512,
+      "spindle_mean": 0.5,
+      "dg_neurogenesis": 7,
+      "bdnf": 1.5,
+      "sprouted_synapses": 1582,
+      "pruned_synapses": 190,
+      "rem_chimera_similarity": 0.0669,
+      "semantic_bridges": 645.0,
+      "interleaved_pairs": 0
+    },
+    "timeline": [
+      {
+        "tick": 0,
+        "phase": "RESTED_BASELINE",
+        "atp": 1.0,
+        "adenosine": 0.3,
+        "sigma": 0.97,
+        "plasticity_blocked": false,
+        "pathology": null,
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew to the castle .",
+          "speech_status": "COHERENT_GRAMMATICAL",
+          "max_repeat_run": 1,
+          "hallucination_index": 0.0,
+          "atp": 1.0,
+          "adenosine": 0.3,
+          "sigma": 0.97
+        }
+      },
+      {
+        "tick": 1000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.7477,
+        "adenosine": 0.7177,
+        "sigma": 1.038,
+        "plasticity_blocked": false,
+        "pathology": null,
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew to the forest .",
+          "speech_status": "COHERENT_GRAMMATICAL",
+          "max_repeat_run": 1,
+          "hallucination_index": 0.0,
+          "atp": 0.7477,
+          "adenosine": 0.7177,
+          "sigma": 1.038
+        }
+      },
+      {
+        "tick": 2000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.5709,
+        "adenosine": 1.0,
+        "sigma": 1.1367,
+        "plasticity_blocked": true,
+        "pathology": null,
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave wolf dark mountain",
+          "speech_status": "HYPEREXCITABLE_SEMANTIC_INTRUSION",
+          "max_repeat_run": 1,
+          "hallucination_index": 0.2507,
+          "atp": 0.5709,
+          "adenosine": 1.0,
+          "sigma": 1.1367
+        }
+      },
+      {
+        "tick": 3000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.4306,
+        "adenosine": 1.0,
+        "sigma": 1.215,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_hyperexcitability",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave wolf dark mountain",
+          "speech_status": "HYPEREXCITABLE_SEMANTIC_INTRUSION",
+          "max_repeat_run": 1,
+          "hallucination_index": 0.4471,
+          "atp": 0.4306,
+          "adenosine": 1.0,
+          "sigma": 1.215
+        }
+      },
+      {
+        "tick": 4000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.3257,
+        "adenosine": 1.0,
+        "sigma": 0.7574,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_delirium_exhaustion",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave cave dragon dragon",
+          "speech_status": "MODERATE_DELIRIUM_ECHOLALIA",
+          "max_repeat_run": 2,
+          "hallucination_index": 0.78,
+          "atp": 0.3257,
+          "adenosine": 1.0,
+          "sigma": 0.7574
+        }
+      },
+      {
+        "tick": 5000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.2466,
+        "adenosine": 1.0,
+        "sigma": 0.684,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_delirium_exhaustion",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave cave dragon dragon",
+          "speech_status": "MODERATE_DELIRIUM_ECHOLALIA",
+          "max_repeat_run": 2,
+          "hallucination_index": 0.78,
+          "atp": 0.2466,
+          "adenosine": 1.0,
+          "sigma": 0.684
+        }
+      },
+      {
+        "tick": 6000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.1864,
+        "adenosine": 1.0,
+        "sigma": 0.6281,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_delirium_exhaustion",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave cave dragon dragon",
+          "speech_status": "MODERATE_DELIRIUM_ECHOLALIA",
+          "max_repeat_run": 2,
+          "hallucination_index": 0.78,
+          "atp": 0.1864,
+          "adenosine": 1.0,
+          "sigma": 0.6281
+        }
+      },
+      {
+        "tick": 7000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.1409,
+        "adenosine": 1.0,
+        "sigma": 0.5858,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_delirium_exhaustion",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave cave cave cave",
+          "speech_status": "SEVERE_DELIRIUM_PERSEVERATION_LOOP",
+          "max_repeat_run": 4,
+          "hallucination_index": 0.96,
+          "atp": 0.1409,
+          "adenosine": 1.0,
+          "sigma": 0.5858
+        }
+      },
+      {
+        "tick": 8000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.1065,
+        "adenosine": 1.0,
+        "sigma": 0.5539,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_delirium_exhaustion",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave cave cave cave",
+          "speech_status": "SEVERE_DELIRIUM_PERSEVERATION_LOOP",
+          "max_repeat_run": 4,
+          "hallucination_index": 0.96,
+          "atp": 0.1065,
+          "adenosine": 1.0,
+          "sigma": 0.5539
+        }
+      },
+      {
+        "tick": 9000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.0805,
+        "adenosine": 1.0,
+        "sigma": 0.5297,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_delirium_exhaustion",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave cave cave cave",
+          "speech_status": "SEVERE_DELIRIUM_PERSEVERATION_LOOP",
+          "max_repeat_run": 4,
+          "hallucination_index": 0.96,
+          "atp": 0.0805,
+          "adenosine": 1.0,
+          "sigma": 0.5297
+        }
+      },
+      {
+        "tick": 10000,
+        "phase": "SLEEP_DEPRIVED",
+        "atp": 0.0608,
+        "adenosine": 1.0,
+        "sigma": 0.52,
+        "plasticity_blocked": true,
+        "pathology": "sleep_deprivation_delirium_exhaustion",
+        "auto_sleeps": 0,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew cave cave cave cave",
+          "speech_status": "SEVERE_DELIRIUM_PERSEVERATION_LOOP",
+          "max_repeat_run": 4,
+          "hallucination_index": 0.96,
+          "atp": 0.0608,
+          "adenosine": 1.0,
+          "sigma": 0.52
+        }
+      },
+      {
+        "tick": 10060,
+        "phase": "POST_RECOVERY_SLEEP_RESCUE",
+        "atp": 0.985,
+        "adenosine": 0.08,
+        "sigma": 1.002,
+        "plasticity_blocked": false,
+        "pathology": null,
+        "auto_sleeps": 1,
+        "speech_probe": {
+          "generated_phrase": "the dragon flew to the forest .",
+          "speech_status": "COHERENT_GRAMMATICAL",
+          "max_repeat_run": 1,
+          "hallucination_index": 0.0,
+          "atp": 0.985,
+          "adenosine": 0.08,
+          "sigma": 1.002
+        }
+      }
+    ]
+  }
+}

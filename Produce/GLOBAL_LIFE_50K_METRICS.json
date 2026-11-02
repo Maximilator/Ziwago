@@ -1,0 +1,3814 @@
+{
+  "ticks_completed": 50000,
+  "epochs_completed": 10,
+  "manual_sleep_calls": 0,
+  "pathology": null,
+  "sigma_global": 0.7714,
+  "zone_sigmas": {
+    "SENS": 1.0326,
+    "ASSOC": 1.029,
+    "PFC": 1.0104
+  },
+  "resource_control": {
+    "elapsed_seconds": 4042.0,
+    "elapsed_minutes": 67.37,
+    "elapsed_hours": 1.123,
+    "ms_per_tick_mean": 80.44,
+    "sec_per_1000_ticks_mean": 80.44,
+    "ram_rss_mb": 701.79,
+    "ram_peak_mb": 701.79,
+    "vram_alloc_mb": 0.0,
+    "vram_peak_mb": 0.0,
+    "initial_active_synapses": 3930,
+    "final_active_synapses": 5634,
+    "net_synapse_gain": 1704,
+    "total_sprouted_synapses": 2091,
+    "total_pruned_synapses": 387,
+    "per_zone_synapses": {
+      "SENS": 2045,
+      "ASSOC": 1817,
+      "PFC": 1772
+    }
+  },
+  "autonomous_sleep_summary": {
+    "total_auto_sleep_cycles": 1564,
+    "atp_threshold": 0.85,
+    "ado_threshold": 0.35,
+    "recent_sleep_events": [
+      {
+        "sleep_cycle_num": 1555,
+        "tick": 49711,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9642,
+        "pre_sleep_ado": 0.3515,
+        "pre_sleep_bdnf": 1.1059,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3157,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1556,
+        "tick": 49744,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.967,
+        "pre_sleep_ado": 0.3569,
+        "pre_sleep_bdnf": 1.2582,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3157,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1557,
+        "tick": 49777,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9672,
+        "pre_sleep_ado": 0.3575,
+        "pre_sleep_bdnf": 1.0662,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3157,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1558,
+        "tick": 49809,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9665,
+        "pre_sleep_ado": 0.3575,
+        "pre_sleep_bdnf": 1.0219,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3158,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1559,
+        "tick": 49841,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9685,
+        "pre_sleep_ado": 0.355,
+        "pre_sleep_bdnf": 1.0236,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3158,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1560,
+        "tick": 49873,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9679,
+        "pre_sleep_ado": 0.3541,
+        "pre_sleep_bdnf": 1.0217,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3158,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1561,
+        "tick": 49905,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9661,
+        "pre_sleep_ado": 0.3584,
+        "pre_sleep_bdnf": 1.0207,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3158,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1562,
+        "tick": 49936,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9678,
+        "pre_sleep_ado": 0.3518,
+        "pre_sleep_bdnf": 1.0177,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3158,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1563,
+        "tick": 49967,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9669,
+        "pre_sleep_ado": 0.3522,
+        "pre_sleep_bdnf": 1.0132,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3159,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      },
+      {
+        "sleep_cycle_num": 1564,
+        "tick": 49998,
+        "trigger": "ADO>0.35",
+        "pre_sleep_atp": 0.9657,
+        "pre_sleep_ado": 0.353,
+        "pre_sleep_bdnf": 1.0384,
+        "post_sleep_atp": 0.985,
+        "post_sleep_ado": 0.08,
+        "replayed_episodes": 0,
+        "semantic_bridges": 3159,
+        "interleaved_pairs": 5,
+        "sprouted_synapses": 2091,
+        "pruned_synapses": 387
+      }
+    ]
+  },
+  "latest_spontaneous_generation": {
+    "tick": 50000,
+    "dragon_concept_cell": 30,
+    "dragon_semantic_bridges": {
+      "knight": 2.0,
+      "castle": 2.0,
+      "mountain": 2.0,
+      "forest": 2.0,
+      "girl": 2.0,
+      "boy": 2.0,
+      "wizard": 2.0,
+      "wolf": 2.0,
+      "house": 2.0,
+      "flew": 2.0,
+      "saw": 2.0,
+      "rode": 1.1799,
+      "walked": 2.0,
+      "cave": 2.0,
+      "sword": 0.4271
+    },
+    "canonical_recall_phrase": "the dragon guarded the golden castle .",
+    "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+    "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+    "novel_castle_bridge_formed": true,
+    "novel_knight_bridge_formed": true,
+    "vte_object_breakdown": {
+      "castle": {
+        "G": -14.9777,
+        "lat_fit": 2.9842,
+        "role_fit": 3.3531,
+        "valence": 0.8706,
+        "concept_sim": 0.3706,
+        "semantic_bridge": 2.0,
+        "clause_concept_fit": 1.4633,
+        "curiosity_bonus": 0.1753,
+        "survival_veto": 0.0,
+        "eff_kappa_explore": 1.0,
+        "repeat_penalty": 1.5125
+      },
+      "mountain": {
+        "G": -0.165,
+        "lat_fit": 1.5645,
+        "role_fit": 2.2366,
+        "valence": -1.8503,
+        "concept_sim": 0.419,
+        "semantic_bridge": 2.0,
+        "clause_concept_fit": 0.3996,
+        "curiosity_bonus": 0.0,
+        "survival_veto": 4.8457,
+        "eff_kappa_explore": 0.0,
+        "repeat_penalty": 3.025
+      },
+      "forest": {
+        "G": -9.9182,
+        "lat_fit": 3.2211,
+        "role_fit": 3.1625,
+        "valence": 1.7584,
+        "concept_sim": 0.3171,
+        "semantic_bridge": 0.0,
+        "clause_concept_fit": 0.0,
+        "curiosity_bonus": 0.0,
+        "survival_veto": 0.0,
+        "eff_kappa_explore": 1.0,
+        "repeat_penalty": 2.299
+      },
+      "cave": {
+        "G": -0.7632,
+        "lat_fit": 0.0,
+        "role_fit": 3.375,
+        "valence": 1.9787,
+        "concept_sim": 0.4198,
+        "semantic_bridge": 0.848,
+        "clause_concept_fit": 0.0,
+        "curiosity_bonus": 0.0,
+        "survival_veto": 0.0,
+        "eff_kappa_explore": 1.0,
+        "repeat_penalty": 5.8
+      }
+    },
+    "vte_social_breakdown": {
+      "knight": {
+        "G": -13.7014,
+        "lat_fit": 2.4361,
+        "role_fit": 1.3529,
+        "valence": 1.8074,
+        "concept_sim": 0.403,
+        "semantic_bridge": 2.0,
+        "clause_concept_fit": 1.3932,
+        "curiosity_bonus": 0.1246,
+        "survival_veto": 0.0,
+        "eff_kappa_explore": 0.8735,
+        "repeat_penalty": 0.0
+      },
+      "mountain": {
+        "G": -0.7749,
+        "lat_fit": 2.2089,
+        "role_fit": 0.7218,
+        "valence": -1.8503,
+        "concept_sim": 0.419,
+        "semantic_bridge": 2.0,
+        "clause_concept_fit": 0.3996,
+        "curiosity_bonus": 0.0,
+        "survival_veto": 4.8457,
+        "eff_kappa_explore": 0.0,
+        "repeat_penalty": 1.7976
+      },
+      "cave": {
+        "G": 1.6642,
+        "lat_fit": 0.0,
+        "role_fit": 0.5,
+        "valence": 1.9787,
+        "concept_sim": 0.4198,
+        "semantic_bridge": 2.0,
+        "clause_concept_fit": 0.0,
+        "curiosity_bonus": 0.0,
+        "survival_veto": 0.0,
+        "eff_kappa_explore": 0.8735,
+        "repeat_penalty": 5.8
+      },
+      "bird": {
+        "G": 3.354,
+        "lat_fit": 0.0,
+        "role_fit": 0.3674,
+        "valence": 1.8661,
+        "concept_sim": 0.3866,
+        "semantic_bridge": 2.0,
+        "clause_concept_fit": 0.0,
+        "curiosity_bonus": 0.0,
+        "survival_veto": 0.0,
+        "eff_kappa_explore": 0.8735,
+        "repeat_penalty": 7.2231
+      }
+    }
+  },
+  "milestones_5k": [
+    {
+      "tick": 1000,
+      "epoch": 0,
+      "auto_sleeps_so_far": 24,
+      "total_semantic_bridges": 890,
+      "active_synapses": 5634,
+      "total_sprouted": 1714,
+      "total_pruned": 10,
+      "bdnf": 1.3249,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9552,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5325,
+          "active_bridges_count": 39,
+          "top_semantic_bridges": [
+            "flew(2.00)",
+            "mountain(2.00)",
+            "house(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.9597,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.7282,
+          "active_bridges_count": 29,
+          "top_semantic_bridges": [
+            "road(2.00)",
+            "walked(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.9433,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.4119,
+          "active_bridges_count": 22,
+          "top_semantic_bridges": [
+            "wizard(2.00)",
+            "knight(2.00)",
+            "girl(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9597,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1126,
+          "active_bridges_count": 14,
+          "top_semantic_bridges": [
+            "flew(2.00)",
+            "dragon(2.00)",
+            "road(1.68)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9597,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5971,
+          "active_bridges_count": 20,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "castle(2.00)",
+            "dark(1.63)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.9775,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.727,
+          "active_bridges_count": 24,
+          "top_semantic_bridges": [
+            "road(2.00)",
+            "castle(2.00)",
+            "little(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9925,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0002,
+          "active_bridges_count": 27,
+          "top_semantic_bridges": [
+            "was(2.00)",
+            "little(2.00)",
+            "road(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.9626,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8367,
+          "active_bridges_count": 25,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "walked(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.9344,
+          "metaplastic_shield": 4.3,
+          "concept_valence": -0.1639,
+          "active_bridges_count": 19,
+          "top_semantic_bridges": [
+            "road(1.96)",
+            "dragon(1.75)",
+            "dark(1.37)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.9656,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2035,
+          "active_bridges_count": 25,
+          "top_semantic_bridges": [
+            "dragon(2.00)",
+            "road(2.00)",
+            "walked(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 1000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 1.4208,
+          "girl": 1.6944,
+          "boy": 2.0,
+          "wizard": 1.05,
+          "wolf": 1.75,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.4,
+          "rode": 0.35,
+          "walked": 1.05,
+          "cave": 1.1953,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -12.3201,
+            "lat_fit": 2.4265,
+            "role_fit": 0.0,
+            "valence": -0.0848,
+            "concept_sim": 0.3707,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.4633,
+            "curiosity_bonus": 1.3643,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8855,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": 3.2829,
+            "lat_fit": 1.7103,
+            "role_fit": 0.0,
+            "valence": -1.7051,
+            "concept_sim": 0.4132,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.4322,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -5.3285,
+            "lat_fit": 2.4385,
+            "role_fit": 0.1145,
+            "valence": 1.7214,
+            "concept_sim": 0.3104,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 2.4642,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 1.9791,
+            "concept_sim": 0.2998,
+            "semantic_bridge": 1.8236,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -10.802,
+            "lat_fit": 1.7169,
+            "role_fit": 0.4951,
+            "valence": 1.8552,
+            "concept_sim": 0.3994,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.9232,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5736,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": 2.116,
+            "lat_fit": 1.7244,
+            "role_fit": 0.5516,
+            "valence": -1.7051,
+            "concept_sim": 0.4132,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.4322,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 2.5689
+          },
+          "cave": {
+            "G": 2.0235,
+            "lat_fit": 0.0,
+            "role_fit": 0.2343,
+            "valence": 1.9791,
+            "concept_sim": 0.2998,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5736,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 6.8523,
+            "lat_fit": 0.0,
+            "role_fit": 0.1194,
+            "valence": 0.9376,
+            "concept_sim": 0.3908,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.5736,
+            "repeat_penalty": 7.8337
+          }
+        }
+      }
+    },
+    {
+      "tick": 5000,
+      "epoch": 1,
+      "auto_sleeps_so_far": 133,
+      "total_semantic_bridges": 1520,
+      "active_synapses": 5634,
+      "total_sprouted": 1715,
+      "total_pruned": 11,
+      "bdnf": 1.1253,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9196,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6451,
+          "active_bridges_count": 50,
+          "top_semantic_bridges": [
+            "was(2.00)",
+            "lived(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.997,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.7863,
+          "active_bridges_count": 54,
+          "top_semantic_bridges": [
+            "boy(2.00)",
+            "found(2.00)",
+            "wizard(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.9078,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5951,
+          "active_bridges_count": 28,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "knight(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9478,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1843,
+          "active_bridges_count": 21,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "flew(2.00)",
+            "road(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9226,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.7167,
+          "active_bridges_count": 27,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "wolf(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.9746,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6894,
+          "active_bridges_count": 36,
+          "top_semantic_bridges": [
+            "was(2.00)",
+            "forest(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9955,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.0057,
+          "active_bridges_count": 39,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "bright(2.00)",
+            "little(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.997,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8438,
+          "active_bridges_count": 46,
+          "top_semantic_bridges": [
+            "lived(2.00)",
+            "road(2.00)",
+            "asked(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.899,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.0314,
+          "active_bridges_count": 33,
+          "top_semantic_bridges": [
+            "forest(2.00)",
+            "cave(2.00)",
+            "walked(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.93,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.241,
+          "active_bridges_count": 37,
+          "top_semantic_bridges": [
+            "girl(2.00)",
+            "boy(2.00)",
+            "wolf(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 5000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 1.7708,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.4,
+          "rode": 0.7,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -12.5201,
+            "lat_fit": 2.2913,
+            "role_fit": 0.0,
+            "valence": 0.6576,
+            "concept_sim": 0.3699,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.4633,
+            "curiosity_bonus": 1.4025,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": 2.5202,
+            "lat_fit": 1.5624,
+            "role_fit": 0.049,
+            "valence": -1.8578,
+            "concept_sim": 0.4173,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8673,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -5.0438,
+            "lat_fit": 2.4929,
+            "role_fit": 0.0,
+            "valence": 1.7695,
+            "concept_sim": 0.312,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 2.3027,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 1.9834,
+            "concept_sim": 0.2975,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -12.0149,
+            "lat_fit": 1.6884,
+            "role_fit": 0.5959,
+            "valence": 1.8826,
+            "concept_sim": 0.4049,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1243,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": 0.0207,
+            "lat_fit": 1.6472,
+            "role_fit": 0.734,
+            "valence": -1.8578,
+            "concept_sim": 0.4173,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8673,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 1.7976
+          },
+          "cave": {
+            "G": 0.708,
+            "lat_fit": 0.0,
+            "role_fit": 1.3233,
+            "valence": 1.9834,
+            "concept_sim": 0.2975,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 4.6996,
+            "lat_fit": 0.0,
+            "role_fit": 0.7589,
+            "valence": 1.8391,
+            "concept_sim": 0.4061,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 7.2231
+          }
+        }
+      }
+    },
+    {
+      "tick": 10000,
+      "epoch": 2,
+      "auto_sleeps_so_far": 286,
+      "total_semantic_bridges": 1898,
+      "active_synapses": 5634,
+      "total_sprouted": 1715,
+      "total_pruned": 11,
+      "bdnf": 1.1749,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9493,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5919,
+          "active_bridges_count": 55,
+          "top_semantic_bridges": [
+            "girl(2.00)",
+            "road(2.00)",
+            "wolf(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.9716,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8166,
+          "active_bridges_count": 58,
+          "top_semantic_bridges": [
+            "found(2.00)",
+            "little(2.00)",
+            "cave(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.9374,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6364,
+          "active_bridges_count": 35,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "ran(2.00)",
+            "forest(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9448,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1937,
+          "active_bridges_count": 25,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "lived(2.00)",
+            "flew(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9522,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.655,
+          "active_bridges_count": 33,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "knight(2.00)",
+            "walked(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.988,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5192,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "endoftext(2.00)",
+            "knight(2.00)",
+            "happy(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9985,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1579,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "little(2.00)",
+            "wizard(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.9716,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8896,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "girl(2.00)",
+            "asked(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.9285,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.0229,
+          "active_bridges_count": 40,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "forest(2.00)",
+            "house(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.9597,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2142,
+          "active_bridges_count": 43,
+          "top_semantic_bridges": [
+            "was(2.00)",
+            "knight(2.00)",
+            "walked(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 10000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 1.7708,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.4988,
+          "rode": 0.7,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -10.3025,
+            "lat_fit": 2.3522,
+            "role_fit": 0.0245,
+            "valence": 0.8049,
+            "concept_sim": 0.3698,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.4633,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": 2.2335,
+            "lat_fit": 1.5668,
+            "role_fit": 0.0,
+            "valence": -1.84,
+            "concept_sim": 0.4176,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8164,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -6.8229,
+            "lat_fit": 2.7782,
+            "role_fit": 0.837,
+            "valence": 1.7252,
+            "concept_sim": 0.3488,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 3.7027,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 1.9815,
+            "concept_sim": 0.3506,
+            "semantic_bridge": 0.424,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -11.3298,
+            "lat_fit": 1.792,
+            "role_fit": 0.9913,
+            "valence": 1.832,
+            "concept_sim": 0.3876,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3939,
+            "curiosity_bonus": 0.0018,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.1926
+          },
+          "mountain": {
+            "G": 0.0799,
+            "lat_fit": 1.704,
+            "role_fit": 0.9488,
+            "valence": -1.84,
+            "concept_sim": 0.4176,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8164,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 2.2899
+          },
+          "cave": {
+            "G": 2.0464,
+            "lat_fit": 0.0,
+            "role_fit": 1.111,
+            "valence": 1.9815,
+            "concept_sim": 0.3506,
+            "semantic_bridge": 0.7811,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 5.1307,
+            "lat_fit": 0.0,
+            "role_fit": 0.7307,
+            "valence": 1.8308,
+            "concept_sim": 0.4066,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 7.6128
+          }
+        }
+      }
+    },
+    {
+      "tick": 15000,
+      "epoch": 3,
+      "auto_sleeps_so_far": 441,
+      "total_semantic_bridges": 2098,
+      "active_synapses": 5634,
+      "total_sprouted": 1760,
+      "total_pruned": 56,
+      "bdnf": 1.2867,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9805,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6083,
+          "active_bridges_count": 56,
+          "top_semantic_bridges": [
+            "lived(2.00)",
+            "road(2.00)",
+            "wolf(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.9731,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8458,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "rode(2.00)",
+            "cave(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.9686,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6594,
+          "active_bridges_count": 42,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "forest(2.00)",
+            "knight(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9761,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2244,
+          "active_bridges_count": 29,
+          "top_semantic_bridges": [
+            "wizard(2.00)",
+            "lived(2.00)",
+            "road(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9835,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6535,
+          "active_bridges_count": 36,
+          "top_semantic_bridges": [
+            "bright(2.00)",
+            "knight(2.00)",
+            "ran(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.9517,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6749,
+          "active_bridges_count": 53,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "forest(2.00)",
+            "endoftext(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9955,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2717,
+          "active_bridges_count": 53,
+          "top_semantic_bridges": [
+            "road(2.00)",
+            "concept#45(2.00)",
+            "wizard(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.988,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8927,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "boy(2.00)",
+            "asked(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.9597,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0121,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "ran(2.00)",
+            "house(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2974,
+          "active_bridges_count": 45,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "was(2.00)",
+            "knight(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 15000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 1.8479,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.4988,
+          "rode": 0.7,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -10.8536,
+            "lat_fit": 2.4424,
+            "role_fit": 0.8248,
+            "valence": 0.7347,
+            "concept_sim": 0.3684,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.4633,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": 2.2172,
+            "lat_fit": 1.5654,
+            "role_fit": 0.2402,
+            "valence": -1.8463,
+            "concept_sim": 0.4176,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3902,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8343,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -9.833,
+            "lat_fit": 3.0755,
+            "role_fit": 3.272,
+            "valence": 1.7976,
+            "concept_sim": 0.3433,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 2.6454,
+            "lat_fit": 0.0,
+            "role_fit": 0.875,
+            "valence": 1.9837,
+            "concept_sim": 0.366,
+            "semantic_bridge": 0.424,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -11.7055,
+            "lat_fit": 1.8833,
+            "role_fit": 1.1473,
+            "valence": 1.89,
+            "concept_sim": 0.3916,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3937,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.7694,
+            "repeat_penalty": 1.223
+          },
+          "mountain": {
+            "G": -0.1435,
+            "lat_fit": 1.7666,
+            "role_fit": 1.1288,
+            "valence": -1.8463,
+            "concept_sim": 0.4176,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3902,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8343,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 2.3482
+          },
+          "cave": {
+            "G": 0.8971,
+            "lat_fit": 0.0,
+            "role_fit": 1.417,
+            "valence": 1.9837,
+            "concept_sim": 0.366,
+            "semantic_bridge": 1.6411,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.7694,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 5.0509,
+            "lat_fit": 0.0,
+            "role_fit": 0.8293,
+            "valence": 1.8351,
+            "concept_sim": 0.4156,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.7694,
+            "repeat_penalty": 7.659
+          }
+        }
+      }
+    },
+    {
+      "tick": 20000,
+      "epoch": 4,
+      "auto_sleeps_so_far": 602,
+      "total_semantic_bridges": 2303,
+      "active_synapses": 5634,
+      "total_sprouted": 1762,
+      "total_pruned": 58,
+      "bdnf": 1.1724,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.8406,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5752,
+          "active_bridges_count": 57,
+          "top_semantic_bridges": [
+            "road(2.00)",
+            "castle(2.00)",
+            "was(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8223,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "mountain(2.00)",
+            "concept#39(2.00)",
+            "found(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6806,
+          "active_bridges_count": 45,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "ran(2.00)",
+            "forest(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9671,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.106,
+          "active_bridges_count": 33,
+          "top_semantic_bridges": [
+            "dragon(2.00)",
+            "road(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.979,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5625,
+          "active_bridges_count": 41,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "knight(2.00)",
+            "walked(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.94,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5559,
+          "active_bridges_count": 55,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "boy(2.00)",
+            "happy(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9315,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0669,
+          "active_bridges_count": 58,
+          "top_semantic_bridges": [
+            "farmer(2.00)",
+            "happy(2.00)",
+            "little(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.89,
+          "active_bridges_count": 51,
+          "top_semantic_bridges": [
+            "boy(2.00)",
+            "asked(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.994,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0292,
+          "active_bridges_count": 52,
+          "top_semantic_bridges": [
+            "dragon(2.00)",
+            "entered(2.00)",
+            "house(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 5.0,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2609,
+          "active_bridges_count": 47,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "was(2.00)",
+            "knight(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 20000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 1.9845,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.7082,
+          "rode": 0.7,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -13.0235,
+            "lat_fit": 2.5196,
+            "role_fit": 2.7788,
+            "valence": 0.5535,
+            "concept_sim": 0.3699,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": 1.0536,
+            "lat_fit": 1.5712,
+            "role_fit": 1.1159,
+            "valence": -1.8204,
+            "concept_sim": 0.4176,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.7605,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -9.9612,
+            "lat_fit": 3.2207,
+            "role_fit": 2.9296,
+            "valence": 1.7932,
+            "concept_sim": 0.3387,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 0.0627,
+            "lat_fit": 0.0,
+            "role_fit": 3.0166,
+            "valence": 1.982,
+            "concept_sim": 0.3659,
+            "semantic_bridge": 0.424,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -12.1689,
+            "lat_fit": 1.9766,
+            "role_fit": 1.1582,
+            "valence": 1.8763,
+            "concept_sim": 0.3833,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3967,
+            "curiosity_bonus": 0.0016,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.4447,
+            "repeat_penalty": 0.9363
+          },
+          "mountain": {
+            "G": -0.2493,
+            "lat_fit": 1.8372,
+            "role_fit": 0.5627,
+            "valence": -1.8204,
+            "concept_sim": 0.4176,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.7605,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 1.7976
+          },
+          "cave": {
+            "G": 1.6798,
+            "lat_fit": 0.0,
+            "role_fit": 0.5076,
+            "valence": 1.982,
+            "concept_sim": 0.3659,
+            "semantic_bridge": 1.9911,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.4447,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 3.9384,
+            "lat_fit": 0.0,
+            "role_fit": 0.2695,
+            "valence": 1.7502,
+            "concept_sim": 0.4095,
+            "semantic_bridge": 1.5835,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.4447,
+            "repeat_penalty": 7.2231
+          }
+        }
+      }
+    },
+    {
+      "tick": 25000,
+      "epoch": 5,
+      "auto_sleeps_so_far": 763,
+      "total_semantic_bridges": 2486,
+      "active_synapses": 5634,
+      "total_sprouted": 1933,
+      "total_pruned": 229,
+      "bdnf": 1.0617,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9108,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5891,
+          "active_bridges_count": 58,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "concept#51(2.00)",
+            "dark(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.9567,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8434,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "mountain(2.00)",
+            "concept#39(2.00)",
+            "found(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6774,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "ran(2.00)",
+            "forest(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 5.0,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1802,
+          "active_bridges_count": 39,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "flew(2.00)",
+            "road(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9805,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8345,
+          "active_bridges_count": 45,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "wolf(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.9567,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6622,
+          "active_bridges_count": 58,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "endoftext(2.00)",
+            "road(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9641,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0049,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "happy(2.00)",
+            "road(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.9955,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.9055,
+          "active_bridges_count": 52,
+          "top_semantic_bridges": [
+            "girl(2.00)",
+            "asked(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.9196,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.16,
+          "active_bridges_count": 55,
+          "top_semantic_bridges": [
+            "bright(2.00)",
+            "house(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.9611,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.3006,
+          "active_bridges_count": 51,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "knight(2.00)",
+            "was(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 25000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 2.0,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.7823,
+          "rode": 0.7,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -10.381,
+            "lat_fit": 2.6094,
+            "role_fit": 0.5525,
+            "valence": 0.3947,
+            "concept_sim": 0.3687,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": 1.5242,
+            "lat_fit": 1.5778,
+            "role_fit": 0.615,
+            "valence": -1.7846,
+            "concept_sim": 0.4093,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.6585,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -7.123,
+            "lat_fit": 3.2359,
+            "role_fit": 0.5713,
+            "valence": 1.7697,
+            "concept_sim": 0.3116,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 3.0937,
+            "lat_fit": 0.0,
+            "role_fit": 0.5076,
+            "valence": 1.9829,
+            "concept_sim": 0.3401,
+            "semantic_bridge": 0.424,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -10.6382,
+            "lat_fit": 2.0612,
+            "role_fit": 0.1462,
+            "valence": 1.8673,
+            "concept_sim": 0.3967,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3959,
+            "curiosity_bonus": 0.002,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.4003
+          },
+          "mountain": {
+            "G": 0.6904,
+            "lat_fit": 1.9048,
+            "role_fit": 0.3036,
+            "valence": -1.7846,
+            "concept_sim": 0.4093,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.6585,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 2.6886
+          },
+          "cave": {
+            "G": 1.2392,
+            "lat_fit": 0.0,
+            "role_fit": 0.875,
+            "valence": 1.9829,
+            "concept_sim": 0.3401,
+            "semantic_bridge": 1.9911,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 3.9919,
+            "lat_fit": 0.0,
+            "role_fit": 0.5755,
+            "valence": 1.7133,
+            "concept_sim": 0.4101,
+            "semantic_bridge": 1.9335,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 7.9285
+          }
+        }
+      }
+    },
+    {
+      "tick": 30000,
+      "epoch": 6,
+      "auto_sleeps_so_far": 924,
+      "total_semantic_bridges": 2677,
+      "active_synapses": 5634,
+      "total_sprouted": 1939,
+      "total_pruned": 235,
+      "bdnf": 1.0351,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9093,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5749,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "wolf(2.00)",
+            "mountain(2.00)",
+            "boy(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.9925,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8474,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "concept#44(2.00)",
+            "magic(2.00)",
+            "rode(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.9359,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6355,
+          "active_bridges_count": 52,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "ran(2.00)",
+            "forest(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9152,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.159,
+          "active_bridges_count": 41,
+          "top_semantic_bridges": [
+            "dragon(2.00)",
+            "flew(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9656,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.7472,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "ran(2.00)",
+            "dragon(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.9925,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.625,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "endoftext(2.00)",
+            "dragon(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.0643,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "happy(2.00)",
+            "little(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.9925,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.9022,
+          "active_bridges_count": 54,
+          "top_semantic_bridges": [
+            "girl(2.00)",
+            "asked(2.00)",
+            "lived(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.7571,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.0743,
+          "active_bridges_count": 58,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "ran(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.9865,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1898,
+          "active_bridges_count": 54,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "concept#39(2.00)",
+            "was(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 30000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 2.0,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.7823,
+          "rode": 0.7,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -10.0447,
+            "lat_fit": 2.6771,
+            "role_fit": 0.0245,
+            "valence": 0.6023,
+            "concept_sim": 0.3693,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": 2.3202,
+            "lat_fit": 1.5706,
+            "role_fit": 0.0,
+            "valence": -1.8213,
+            "concept_sim": 0.3987,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.4381,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.7632,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -7.4572,
+            "lat_fit": 3.227,
+            "role_fit": 0.875,
+            "valence": 1.7471,
+            "concept_sim": 0.3168,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 3.9335,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 1.9803,
+            "concept_sim": 0.3767,
+            "semantic_bridge": 0.16,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -12.7114,
+            "lat_fit": 2.1426,
+            "role_fit": 1.595,
+            "valence": 1.8178,
+            "concept_sim": 0.4012,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.395,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8742,
+            "repeat_penalty": 0.9368
+          },
+          "mountain": {
+            "G": -1.527,
+            "lat_fit": 1.9532,
+            "role_fit": 1.577,
+            "valence": -1.8213,
+            "concept_sim": 0.3987,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.4381,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.7632,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 1.7987
+          },
+          "cave": {
+            "G": -0.5697,
+            "lat_fit": 0.0,
+            "role_fit": 2.3658,
+            "valence": 1.9803,
+            "concept_sim": 0.3767,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8742,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 2.3659,
+            "lat_fit": 0.0,
+            "role_fit": 1.1214,
+            "valence": 1.7619,
+            "concept_sim": 0.4319,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8742,
+            "repeat_penalty": 7.224
+          }
+        }
+      }
+    },
+    {
+      "tick": 35000,
+      "epoch": 7,
+      "auto_sleeps_so_far": 1085,
+      "total_semantic_bridges": 2849,
+      "active_synapses": 5634,
+      "total_sprouted": 1939,
+      "total_pruned": 235,
+      "bdnf": 1.205,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9389,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5003,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "road(2.00)",
+            "concept#39(2.00)",
+            "mountain(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.9865,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8508,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "concept#44(2.00)",
+            "magic(2.00)",
+            "rode(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.9656,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6756,
+          "active_bridges_count": 53,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "forest(2.00)",
+            "knight(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9847,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1515,
+          "active_bridges_count": 42,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "road(2.00)",
+            "dragon(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9955,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.7423,
+          "active_bridges_count": 54,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "ran(2.00)",
+            "dragon(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 5.0,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5309,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "cried(2.00)",
+            "dragon(2.00)",
+            "asked(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9385,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.03,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "bright(2.00)",
+            "concept#45(2.00)",
+            "road(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.9865,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8699,
+          "active_bridges_count": 57,
+          "top_semantic_bridges": [
+            "castle(2.00)",
+            "asked(2.00)",
+            "dragon(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.8044,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.1117,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "mountain(2.00)",
+            "concept#39(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.9356,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1597,
+          "active_bridges_count": 55,
+          "top_semantic_bridges": [
+            "concept#45(2.00)",
+            "wolf(2.00)",
+            "concept#39(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 35000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 2.0,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 1.8564,
+          "rode": 0.8103,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -10.3572,
+            "lat_fit": 2.7596,
+            "role_fit": 0.0483,
+            "valence": 0.7612,
+            "concept_sim": 0.372,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": 2.4669,
+            "lat_fit": 1.5713,
+            "role_fit": 0.0,
+            "valence": -1.8353,
+            "concept_sim": 0.4174,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.803,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -7.4742,
+            "lat_fit": 3.2326,
+            "role_fit": 0.875,
+            "valence": 1.7417,
+            "concept_sim": 0.3606,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 3.6908,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 1.9813,
+            "concept_sim": 0.3911,
+            "semantic_bridge": 0.424,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -14.2157,
+            "lat_fit": 2.228,
+            "role_fit": 1.8466,
+            "valence": 1.8235,
+            "concept_sim": 0.3991,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.396,
+            "curiosity_bonus": 0.1134,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": -1.7412,
+            "lat_fit": 2.0188,
+            "role_fit": 1.7648,
+            "valence": -1.8353,
+            "concept_sim": 0.4174,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.803,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 1.7976
+          },
+          "cave": {
+            "G": -1.0087,
+            "lat_fit": 0.0,
+            "role_fit": 2.7258,
+            "valence": 1.9813,
+            "concept_sim": 0.3911,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 2.3173,
+            "lat_fit": 0.0,
+            "role_fit": 1.2278,
+            "valence": 1.8239,
+            "concept_sim": 0.4603,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 7.2231
+          }
+        }
+      }
+    },
+    {
+      "tick": 40000,
+      "epoch": 8,
+      "auto_sleeps_so_far": 1242,
+      "total_semantic_bridges": 2968,
+      "active_synapses": 5634,
+      "total_sprouted": 2091,
+      "total_pruned": 387,
+      "bdnf": 1.2988,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.9701,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5161,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "road(2.00)",
+            "concept#39(2.00)",
+            "mountain(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8512,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "concept#44(2.00)",
+            "magic(2.00)",
+            "rode(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.997,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6593,
+          "active_bridges_count": 53,
+          "top_semantic_bridges": [
+            "knight(2.00)",
+            "ran(2.00)",
+            "forest(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9761,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1704,
+          "active_bridges_count": 45,
+          "top_semantic_bridges": [
+            "dragon(2.00)",
+            "saw(2.00)",
+            "road(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.8391,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6311,
+          "active_bridges_count": 54,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "ran(2.00)",
+            "dragon(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.9656,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6175,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "little(2.00)",
+            "lived(2.00)",
+            "happy(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9108,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0304,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "farmer(2.00)",
+            "happy(2.00)",
+            "little(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.9656,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8638,
+          "active_bridges_count": 58,
+          "top_semantic_bridges": [
+            "girl(2.00)",
+            "asked(2.00)",
+            "lived(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.816,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.0723,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "mountain(2.00)",
+            "concept#39(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.927,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2034,
+          "active_bridges_count": 57,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "wolf(2.00)",
+            "little(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 40000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 2.0,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 2.0,
+          "rode": 0.8103,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -10.4964,
+            "lat_fit": 2.8463,
+            "role_fit": 0.0488,
+            "valence": 0.7384,
+            "concept_sim": 0.3701,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": 2.3581,
+            "lat_fit": 1.5807,
+            "role_fit": 0.0,
+            "valence": -1.8381,
+            "concept_sim": 0.4173,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.4381,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.811,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -7.1785,
+            "lat_fit": 3.2206,
+            "role_fit": 0.875,
+            "valence": 1.7579,
+            "concept_sim": 0.3439,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": 3.6859,
+            "lat_fit": 0.0,
+            "role_fit": 0.0,
+            "valence": 1.9815,
+            "concept_sim": 0.4074,
+            "semantic_bridge": 0.424,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -13.2813,
+            "lat_fit": 2.3147,
+            "role_fit": 2.0684,
+            "valence": 1.8466,
+            "concept_sim": 0.4049,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.4633,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.1293
+          },
+          "mountain": {
+            "G": -1.513,
+            "lat_fit": 2.0843,
+            "role_fit": 1.9767,
+            "valence": -1.8381,
+            "concept_sim": 0.4173,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.4381,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.811,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 2.1682
+          },
+          "cave": {
+            "G": -1.1409,
+            "lat_fit": 0.0,
+            "role_fit": 2.8316,
+            "valence": 1.9815,
+            "concept_sim": 0.4074,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 2.5004,
+            "lat_fit": 0.0,
+            "role_fit": 1.346,
+            "valence": 1.8208,
+            "concept_sim": 0.4054,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 7.5165
+          }
+        }
+      }
+    },
+    {
+      "tick": 45000,
+      "epoch": 9,
+      "auto_sleeps_so_far": 1403,
+      "total_semantic_bridges": 3076,
+      "active_synapses": 5634,
+      "total_sprouted": 2091,
+      "total_pruned": 387,
+      "bdnf": 0.9128,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.991,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.4984,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "wolf(2.00)",
+            "boy(2.00)",
+            "cave(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.9955,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.7664,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "concept#44(2.00)",
+            "magic(2.00)",
+            "rode(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.9226,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6509,
+          "active_bridges_count": 53,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "forest(2.00)",
+            "knight(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.9865,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1903,
+          "active_bridges_count": 48,
+          "top_semantic_bridges": [
+            "dragon(2.00)",
+            "concept#45(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.8697,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6576,
+          "active_bridges_count": 55,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "ran(2.00)",
+            "dragon(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.9955,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6974,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "cried(2.00)",
+            "dragon(2.00)",
+            "asked(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.9418,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0694,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "happy(2.00)",
+            "little(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.9955,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8431,
+          "active_bridges_count": 60,
+          "top_semantic_bridges": [
+            "boy(2.00)",
+            "asked(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.9034,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0805,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "mountain(2.00)",
+            "concept#39(2.00)",
+            "castle(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.9582,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.2306,
+          "active_bridges_count": 59,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "wolf(2.00)",
+            "little(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 45000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 2.0,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 2.0,
+          "rode": 0.9475,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -14.5867,
+            "lat_fit": 2.9083,
+            "role_fit": 3.3121,
+            "valence": 0.6236,
+            "concept_sim": 0.3731,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.4633,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": -0.0542,
+            "lat_fit": 1.5827,
+            "role_fit": 2.0317,
+            "valence": -1.8484,
+            "concept_sim": 0.4237,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.4381,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8403,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -9.8461,
+            "lat_fit": 3.2274,
+            "role_fit": 3.1425,
+            "valence": 1.6823,
+            "concept_sim": 0.3473,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": -0.7697,
+            "lat_fit": 0.0,
+            "role_fit": 3.375,
+            "valence": 1.9832,
+            "concept_sim": 0.4287,
+            "semantic_bridge": 0.848,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -13.5933,
+            "lat_fit": 2.3555,
+            "role_fit": 1.3771,
+            "valence": 1.817,
+            "concept_sim": 0.3969,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1264,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8742,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": -0.7483,
+            "lat_fit": 2.1512,
+            "role_fit": 0.7088,
+            "valence": -1.8484,
+            "concept_sim": 0.4237,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.4381,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8403,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 1.7987
+          },
+          "cave": {
+            "G": 1.6613,
+            "lat_fit": 0.0,
+            "role_fit": 0.5,
+            "valence": 1.9832,
+            "concept_sim": 0.4287,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8742,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 3.3581,
+            "lat_fit": 0.0,
+            "role_fit": 0.3675,
+            "valence": 1.8625,
+            "concept_sim": 0.3883,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8742,
+            "repeat_penalty": 7.224
+          }
+        }
+      }
+    },
+    {
+      "tick": 50000,
+      "epoch": 10,
+      "auto_sleeps_so_far": 1564,
+      "total_semantic_bridges": 3159,
+      "active_synapses": 5634,
+      "total_sprouted": 2091,
+      "total_pruned": 387,
+      "bdnf": 1.0226,
+      "core_concepts": {
+        "dragon": {
+          "word_id": 5,
+          "concept_cell_idx": 30,
+          "concept_salience": 4.8976,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5745,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "wolf(2.00)",
+            "boy(2.00)",
+            "cave(2.00)"
+          ]
+        },
+        "knight": {
+          "word_id": 6,
+          "concept_cell_idx": 35,
+          "concept_salience": 4.997,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6818,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "concept#44(2.00)",
+            "magic(2.00)",
+            "rode(2.00)"
+          ]
+        },
+        "castle": {
+          "word_id": 7,
+          "concept_cell_idx": 14,
+          "concept_salience": 4.8858,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5659,
+          "active_bridges_count": 54,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "forest(2.00)",
+            "knight(2.00)"
+          ]
+        },
+        "mountain": {
+          "word_id": 8,
+          "concept_cell_idx": 43,
+          "concept_salience": 4.8931,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1778,
+          "active_bridges_count": 52,
+          "top_semantic_bridges": [
+            "dragon(2.00)",
+            "concept#45(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "forest": {
+          "word_id": 9,
+          "concept_cell_idx": 34,
+          "concept_salience": 4.9005,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.6972,
+          "active_bridges_count": 59,
+          "top_semantic_bridges": [
+            "walked(2.00)",
+            "dragon(2.00)",
+            "bright(2.00)"
+          ]
+        },
+        "girl": {
+          "word_id": 10,
+          "concept_cell_idx": 55,
+          "concept_salience": 4.997,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.5645,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "forest(2.00)",
+            "boy(2.00)",
+            "endoftext(2.00)"
+          ]
+        },
+        "boy": {
+          "word_id": 11,
+          "concept_cell_idx": 20,
+          "concept_salience": 4.997,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.0342,
+          "active_bridges_count": 63,
+          "top_semantic_bridges": [
+            "farmer(2.00)",
+            "sad(2.00)",
+            "little(2.00)"
+          ]
+        },
+        "wizard": {
+          "word_id": 12,
+          "concept_cell_idx": 23,
+          "concept_salience": 4.997,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.8862,
+          "active_bridges_count": 61,
+          "top_semantic_bridges": [
+            "laughed(2.00)",
+            "lived(2.00)",
+            "concept#39(2.00)"
+          ]
+        },
+        "wolf": {
+          "word_id": 13,
+          "concept_cell_idx": 17,
+          "concept_salience": 4.9049,
+          "metaplastic_shield": 4.4,
+          "concept_valence": -0.0923,
+          "active_bridges_count": 62,
+          "top_semantic_bridges": [
+            "concept#39(2.00)",
+            "knight(2.00)",
+            "cave(2.00)"
+          ]
+        },
+        "house": {
+          "word_id": 14,
+          "concept_cell_idx": 9,
+          "concept_salience": 4.9895,
+          "metaplastic_shield": 4.4,
+          "concept_valence": 0.1375,
+          "active_bridges_count": 60,
+          "top_semantic_bridges": [
+            "wolf(2.00)",
+            "boy(2.00)",
+            "concept#39(2.00)"
+          ]
+        }
+      },
+      "spontaneous_generation": {
+        "tick": 50000,
+        "dragon_concept_cell": 30,
+        "dragon_semantic_bridges": {
+          "knight": 2.0,
+          "castle": 2.0,
+          "mountain": 2.0,
+          "forest": 2.0,
+          "girl": 2.0,
+          "boy": 2.0,
+          "wizard": 2.0,
+          "wolf": 2.0,
+          "house": 2.0,
+          "flew": 2.0,
+          "saw": 2.0,
+          "rode": 1.1799,
+          "walked": 2.0,
+          "cave": 2.0,
+          "sword": 0.4271
+        },
+        "canonical_recall_phrase": "the dragon guarded the golden castle .",
+        "spontaneous_chimeric_phrase_1": "the dragon flew to the castle .",
+        "spontaneous_chimeric_phrase_2": "the dragon saw the knight .",
+        "novel_castle_bridge_formed": true,
+        "novel_knight_bridge_formed": true,
+        "vte_object_breakdown": {
+          "castle": {
+            "G": -14.9777,
+            "lat_fit": 2.9842,
+            "role_fit": 3.3531,
+            "valence": 0.8706,
+            "concept_sim": 0.3706,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.4633,
+            "curiosity_bonus": 0.1753,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 1.5125
+          },
+          "mountain": {
+            "G": -0.165,
+            "lat_fit": 1.5645,
+            "role_fit": 2.2366,
+            "valence": -1.8503,
+            "concept_sim": 0.419,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8457,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 3.025
+          },
+          "forest": {
+            "G": -9.9182,
+            "lat_fit": 3.2211,
+            "role_fit": 3.1625,
+            "valence": 1.7584,
+            "concept_sim": 0.3171,
+            "semantic_bridge": 0.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 2.299
+          },
+          "cave": {
+            "G": -0.7632,
+            "lat_fit": 0.0,
+            "role_fit": 3.375,
+            "valence": 1.9787,
+            "concept_sim": 0.4198,
+            "semantic_bridge": 0.848,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 1.0,
+            "repeat_penalty": 5.8
+          }
+        },
+        "vte_social_breakdown": {
+          "knight": {
+            "G": -13.7014,
+            "lat_fit": 2.4361,
+            "role_fit": 1.3529,
+            "valence": 1.8074,
+            "concept_sim": 0.403,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 1.3932,
+            "curiosity_bonus": 0.1246,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 0.0
+          },
+          "mountain": {
+            "G": -0.7749,
+            "lat_fit": 2.2089,
+            "role_fit": 0.7218,
+            "valence": -1.8503,
+            "concept_sim": 0.419,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.3996,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 4.8457,
+            "eff_kappa_explore": 0.0,
+            "repeat_penalty": 1.7976
+          },
+          "cave": {
+            "G": 1.6642,
+            "lat_fit": 0.0,
+            "role_fit": 0.5,
+            "valence": 1.9787,
+            "concept_sim": 0.4198,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 5.8
+          },
+          "bird": {
+            "G": 3.354,
+            "lat_fit": 0.0,
+            "role_fit": 0.3674,
+            "valence": 1.8661,
+            "concept_sim": 0.3866,
+            "semantic_bridge": 2.0,
+            "clause_concept_fit": 0.0,
+            "curiosity_bonus": 0.0,
+            "survival_veto": 0.0,
+            "eff_kappa_explore": 0.8735,
+            "repeat_penalty": 7.2231
+          }
+        }
+      }
+    }
+  ],
+  "perf_1k_blocks": [
+    {
+      "tick": 1000,
+      "sec_per_1000_ticks": 75.19,
+      "ms_per_tick": 75.19,
+      "ram_rss_mb": 683.24,
+      "active_synapses": 5634,
+      "bdnf": 1.26,
+      "free_energy_mean": 0.8513
+    },
+    {
+      "tick": 2000,
+      "sec_per_1000_ticks": 79.68,
+      "ms_per_tick": 79.68,
+      "ram_rss_mb": 687.32,
+      "active_synapses": 5634,
+      "bdnf": 1.3069,
+      "free_energy_mean": 0.855
+    },
+    {
+      "tick": 3000,
+      "sec_per_1000_ticks": 74.93,
+      "ms_per_tick": 74.93,
+      "ram_rss_mb": 687.32,
+      "active_synapses": 5634,
+      "bdnf": 1.2823,
+      "free_energy_mean": 0.8651
+    },
+    {
+      "tick": 4000,
+      "sec_per_1000_ticks": 80.87,
+      "ms_per_tick": 80.87,
+      "ram_rss_mb": 687.57,
+      "active_synapses": 5634,
+      "bdnf": 0.8413,
+      "free_energy_mean": 0.8452
+    },
+    {
+      "tick": 5000,
+      "sec_per_1000_ticks": 81.52,
+      "ms_per_tick": 81.52,
+      "ram_rss_mb": 687.57,
+      "active_synapses": 5634,
+      "bdnf": 0.7316,
+      "free_energy_mean": 0.8407
+    },
+    {
+      "tick": 6000,
+      "sec_per_1000_ticks": 81.99,
+      "ms_per_tick": 81.99,
+      "ram_rss_mb": 687.75,
+      "active_synapses": 5634,
+      "bdnf": 0.8475,
+      "free_energy_mean": 0.8377
+    },
+    {
+      "tick": 7000,
+      "sec_per_1000_ticks": 79.85,
+      "ms_per_tick": 79.85,
+      "ram_rss_mb": 688.46,
+      "active_synapses": 5634,
+      "bdnf": 1.2758,
+      "free_energy_mean": 0.8408
+    },
+    {
+      "tick": 8000,
+      "sec_per_1000_ticks": 81.72,
+      "ms_per_tick": 81.72,
+      "ram_rss_mb": 692.71,
+      "active_synapses": 5634,
+      "bdnf": 1.1965,
+      "free_energy_mean": 0.8234
+    },
+    {
+      "tick": 9000,
+      "sec_per_1000_ticks": 81.04,
+      "ms_per_tick": 81.04,
+      "ram_rss_mb": 693.21,
+      "active_synapses": 5634,
+      "bdnf": 1.2306,
+      "free_energy_mean": 0.7952
+    },
+    {
+      "tick": 10000,
+      "sec_per_1000_ticks": 78.74,
+      "ms_per_tick": 78.74,
+      "ram_rss_mb": 693.45,
+      "active_synapses": 5634,
+      "bdnf": 1.0816,
+      "free_energy_mean": 0.7685
+    },
+    {
+      "tick": 11000,
+      "sec_per_1000_ticks": 78.38,
+      "ms_per_tick": 78.38,
+      "ram_rss_mb": 694.07,
+      "active_synapses": 5634,
+      "bdnf": 1.1147,
+      "free_energy_mean": 0.7372
+    },
+    {
+      "tick": 12000,
+      "sec_per_1000_ticks": 80.04,
+      "ms_per_tick": 80.04,
+      "ram_rss_mb": 694.33,
+      "active_synapses": 5634,
+      "bdnf": 1.0569,
+      "free_energy_mean": 0.713
+    },
+    {
+      "tick": 13000,
+      "sec_per_1000_ticks": 80.05,
+      "ms_per_tick": 80.05,
+      "ram_rss_mb": 694.84,
+      "active_synapses": 5634,
+      "bdnf": 1.2162,
+      "free_energy_mean": 0.6979
+    },
+    {
+      "tick": 14000,
+      "sec_per_1000_ticks": 81.68,
+      "ms_per_tick": 81.68,
+      "ram_rss_mb": 694.84,
+      "active_synapses": 5634,
+      "bdnf": 0.5745,
+      "free_energy_mean": 0.7449
+    },
+    {
+      "tick": 15000,
+      "sec_per_1000_ticks": 79.43,
+      "ms_per_tick": 79.43,
+      "ram_rss_mb": 695.1,
+      "active_synapses": 5634,
+      "bdnf": 1.1601,
+      "free_energy_mean": 0.7109
+    },
+    {
+      "tick": 16000,
+      "sec_per_1000_ticks": 81.51,
+      "ms_per_tick": 81.51,
+      "ram_rss_mb": 695.88,
+      "active_synapses": 5634,
+      "bdnf": 0.6528,
+      "free_energy_mean": 0.7051
+    },
+    {
+      "tick": 17000,
+      "sec_per_1000_ticks": 80.49,
+      "ms_per_tick": 80.49,
+      "ram_rss_mb": 696.13,
+      "active_synapses": 5634,
+      "bdnf": 0.905,
+      "free_energy_mean": 0.7163
+    },
+    {
+      "tick": 18000,
+      "sec_per_1000_ticks": 80.29,
+      "ms_per_tick": 80.29,
+      "ram_rss_mb": 696.13,
+      "active_synapses": 5634,
+      "bdnf": 0.5983,
+      "free_energy_mean": 0.7196
+    },
+    {
+      "tick": 19000,
+      "sec_per_1000_ticks": 80.31,
+      "ms_per_tick": 80.31,
+      "ram_rss_mb": 696.39,
+      "active_synapses": 5634,
+      "bdnf": 0.798,
+      "free_energy_mean": 0.6763
+    },
+    {
+      "tick": 20000,
+      "sec_per_1000_ticks": 80.76,
+      "ms_per_tick": 80.76,
+      "ram_rss_mb": 696.39,
+      "active_synapses": 5634,
+      "bdnf": 0.7,
+      "free_energy_mean": 0.7094
+    },
+    {
+      "tick": 21000,
+      "sec_per_1000_ticks": 80.68,
+      "ms_per_tick": 80.68,
+      "ram_rss_mb": 696.64,
+      "active_synapses": 5634,
+      "bdnf": 1.258,
+      "free_energy_mean": 0.7099
+    },
+    {
+      "tick": 22000,
+      "sec_per_1000_ticks": 81.21,
+      "ms_per_tick": 81.21,
+      "ram_rss_mb": 696.9,
+      "active_synapses": 5634,
+      "bdnf": 0.5435,
+      "free_energy_mean": 0.7074
+    },
+    {
+      "tick": 23000,
+      "sec_per_1000_ticks": 80.23,
+      "ms_per_tick": 80.23,
+      "ram_rss_mb": 696.9,
+      "active_synapses": 5634,
+      "bdnf": 0.7886,
+      "free_energy_mean": 0.6954
+    },
+    {
+      "tick": 24000,
+      "sec_per_1000_ticks": 80.47,
+      "ms_per_tick": 80.47,
+      "ram_rss_mb": 697.16,
+      "active_synapses": 5634,
+      "bdnf": 0.9441,
+      "free_energy_mean": 0.6958
+    },
+    {
+      "tick": 25000,
+      "sec_per_1000_ticks": 79.91,
+      "ms_per_tick": 79.91,
+      "ram_rss_mb": 697.16,
+      "active_synapses": 5634,
+      "bdnf": 1.0264,
+      "free_energy_mean": 0.6937
+    },
+    {
+      "tick": 26000,
+      "sec_per_1000_ticks": 81.91,
+      "ms_per_tick": 81.91,
+      "ram_rss_mb": 697.42,
+      "active_synapses": 5634,
+      "bdnf": 0.6229,
+      "free_energy_mean": 0.7016
+    },
+    {
+      "tick": 27000,
+      "sec_per_1000_ticks": 80.81,
+      "ms_per_tick": 80.81,
+      "ram_rss_mb": 697.42,
+      "active_synapses": 5634,
+      "bdnf": 0.8942,
+      "free_energy_mean": 0.6851
+    },
+    {
+      "tick": 28000,
+      "sec_per_1000_ticks": 80.16,
+      "ms_per_tick": 80.16,
+      "ram_rss_mb": 697.67,
+      "active_synapses": 5634,
+      "bdnf": 0.9589,
+      "free_energy_mean": 0.6789
+    },
+    {
+      "tick": 29000,
+      "sec_per_1000_ticks": 81.2,
+      "ms_per_tick": 81.2,
+      "ram_rss_mb": 698.18,
+      "active_synapses": 5634,
+      "bdnf": 0.6036,
+      "free_energy_mean": 0.67
+    },
+    {
+      "tick": 30000,
+      "sec_per_1000_ticks": 80.38,
+      "ms_per_tick": 80.38,
+      "ram_rss_mb": 698.18,
+      "active_synapses": 5634,
+      "bdnf": 0.6003,
+      "free_energy_mean": 0.6869
+    },
+    {
+      "tick": 31000,
+      "sec_per_1000_ticks": 81.27,
+      "ms_per_tick": 81.27,
+      "ram_rss_mb": 698.44,
+      "active_synapses": 5634,
+      "bdnf": 1.0293,
+      "free_energy_mean": 0.6788
+    },
+    {
+      "tick": 32000,
+      "sec_per_1000_ticks": 82.22,
+      "ms_per_tick": 82.22,
+      "ram_rss_mb": 698.44,
+      "active_synapses": 5634,
+      "bdnf": 0.6369,
+      "free_energy_mean": 0.6603
+    },
+    {
+      "tick": 33000,
+      "sec_per_1000_ticks": 81.22,
+      "ms_per_tick": 81.22,
+      "ram_rss_mb": 698.7,
+      "active_synapses": 5634,
+      "bdnf": 0.723,
+      "free_energy_mean": 0.6586
+    },
+    {
+      "tick": 34000,
+      "sec_per_1000_ticks": 81.22,
+      "ms_per_tick": 81.22,
+      "ram_rss_mb": 698.7,
+      "active_synapses": 5634,
+      "bdnf": 0.8089,
+      "free_energy_mean": 0.6745
+    },
+    {
+      "tick": 35000,
+      "sec_per_1000_ticks": 81.69,
+      "ms_per_tick": 81.69,
+      "ram_rss_mb": 698.95,
+      "active_synapses": 5634,
+      "bdnf": 0.798,
+      "free_energy_mean": 0.6811
+    },
+    {
+      "tick": 36000,
+      "sec_per_1000_ticks": 82.53,
+      "ms_per_tick": 82.53,
+      "ram_rss_mb": 699.21,
+      "active_synapses": 5634,
+      "bdnf": 0.5455,
+      "free_energy_mean": 0.6804
+    },
+    {
+      "tick": 37000,
+      "sec_per_1000_ticks": 81.12,
+      "ms_per_tick": 81.12,
+      "ram_rss_mb": 699.21,
+      "active_synapses": 5634,
+      "bdnf": 0.6487,
+      "free_energy_mean": 0.6718
+    },
+    {
+      "tick": 38000,
+      "sec_per_1000_ticks": 80.66,
+      "ms_per_tick": 80.66,
+      "ram_rss_mb": 699.47,
+      "active_synapses": 5634,
+      "bdnf": 0.889,
+      "free_energy_mean": 0.6785
+    },
+    {
+      "tick": 39000,
+      "sec_per_1000_ticks": 80.58,
+      "ms_per_tick": 80.58,
+      "ram_rss_mb": 699.47,
+      "active_synapses": 5634,
+      "bdnf": 0.6171,
+      "free_energy_mean": 0.6906
+    },
+    {
+      "tick": 40000,
+      "sec_per_1000_ticks": 76.68,
+      "ms_per_tick": 76.68,
+      "ram_rss_mb": 699.73,
+      "active_synapses": 5634,
+      "bdnf": 1.1263,
+      "free_energy_mean": 0.6667
+    },
+    {
+      "tick": 41000,
+      "sec_per_1000_ticks": 82.12,
+      "ms_per_tick": 82.12,
+      "ram_rss_mb": 699.98,
+      "active_synapses": 5634,
+      "bdnf": 0.5777,
+      "free_energy_mean": 0.6768
+    },
+    {
+      "tick": 42000,
+      "sec_per_1000_ticks": 79.51,
+      "ms_per_tick": 79.51,
+      "ram_rss_mb": 699.98,
+      "active_synapses": 5634,
+      "bdnf": 0.7749,
+      "free_energy_mean": 0.6699
+    },
+    {
+      "tick": 43000,
+      "sec_per_1000_ticks": 80.08,
+      "ms_per_tick": 80.08,
+      "ram_rss_mb": 700.24,
+      "active_synapses": 5634,
+      "bdnf": 0.9385,
+      "free_energy_mean": 0.6683
+    },
+    {
+      "tick": 44000,
+      "sec_per_1000_ticks": 81.3,
+      "ms_per_tick": 81.3,
+      "ram_rss_mb": 700.24,
+      "active_synapses": 5634,
+      "bdnf": 1.0125,
+      "free_energy_mean": 0.6582
+    },
+    {
+      "tick": 45000,
+      "sec_per_1000_ticks": 81.04,
+      "ms_per_tick": 81.04,
+      "ram_rss_mb": 700.5,
+      "active_synapses": 5634,
+      "bdnf": 0.538,
+      "free_energy_mean": 0.6873
+    },
+    {
+      "tick": 46000,
+      "sec_per_1000_ticks": 80.76,
+      "ms_per_tick": 80.76,
+      "ram_rss_mb": 701.27,
+      "active_synapses": 5634,
+      "bdnf": 0.9806,
+      "free_energy_mean": 0.6667
+    },
+    {
+      "tick": 47000,
+      "sec_per_1000_ticks": 81.49,
+      "ms_per_tick": 81.49,
+      "ram_rss_mb": 701.53,
+      "active_synapses": 5634,
+      "bdnf": 0.5119,
+      "free_energy_mean": 0.6787
+    },
+    {
+      "tick": 48000,
+      "sec_per_1000_ticks": 80.0,
+      "ms_per_tick": 80.0,
+      "ram_rss_mb": 701.53,
+      "active_synapses": 5634,
+      "bdnf": 0.6835,
+      "free_energy_mean": 0.66
+    },
+    {
+      "tick": 49000,
+      "sec_per_1000_ticks": 80.67,
+      "ms_per_tick": 80.67,
+      "ram_rss_mb": 701.79,
+      "active_synapses": 5634,
+      "bdnf": 0.9928,
+      "free_energy_mean": 0.6648
+    },
+    {
+      "tick": 50000,
+      "sec_per_1000_ticks": 80.31,
+      "ms_per_tick": 80.31,
+      "ram_rss_mb": 701.79,
+      "active_synapses": 5634,
+      "bdnf": 0.5967,
+      "free_energy_mean": 0.6694
+    }
+  ]
+}

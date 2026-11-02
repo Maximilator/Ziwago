@@ -1,0 +1,85 @@
+{
+  "phase1_1_mc_mrei_and_tick_ladder": {
+    "max_exact_lazy_ode_error_mv": 0.000343,
+    "ladder_only_compression": 3.425,
+    "combined_mc_mrei_compression_ratio": 34.329,
+    "actual_vars_updated_per_neuron": 1.544,
+    "dense_baseline_vars_per_neuron": 15.0,
+    "hot_tile_frac": 0.125,
+    "warm_tile_frac": 0.0,
+    "cold_tile_frac": 0.875,
+    "total_exact_analytical_wakeups": 20,
+    "elapsed_ms": 902.86
+  },
+  "phase1_2_pdsr_block_sparse": {
+    "exact_open_subspace_error": 0.0,
+    "pdsr_flop_efficiency": 0.84,
+    "masked_f_linear_baseline_efficiency": 0.15,
+    "efficiency_gain_vs_masked_linear": 5.6,
+    "elapsed_ms": 37.24
+  },
+  "phase1_3_ct_pnn_scaffold_and_power_law": {
+    "scaffold_after_sleep": {
+      "plastic_frac": 0.933428775948461,
+      "soft_frac": 0.0,
+      "hard_frac": 0.06657122405153901,
+      "n_hard": 93,
+      "n_soft": 0,
+      "mean_sleep_cycles": 3.0,
+      "estimated_half_life_ticks": 2046.9
+    },
+    "half_life_progression_over_sleep_cycles": [
+      727.76,
+      1471.21,
+      2046.9
+    ],
+    "hard_synapse_max_drift_under_100_interfering_steps": 0.0,
+    "chabc_targeted_unlocked_synapses": 41,
+    "power_law_forgetting": {
+      "time_points": [
+        10,
+        25,
+        50,
+        100,
+        200,
+        400,
+        800,
+        1600
+      ],
+      "retentions": [
+        0.6781640944813757,
+        0.5552992623372098,
+        0.4743971920695141,
+        0.37964774482735975,
+        0.2929149752313952,
+        0.22984402210558774,
+        0.1747451842830099,
+        0.13383734726643184
+      ],
+      "alpha_exponent": 0.371,
+      "r2_power_law": 0.9987,
+      "r2_exponential": 0.7795,
+      "is_power_law_in_biological_range": true
+    },
+    "elapsed_ms": 290.38
+  },
+  "phase1_4_integrated_column_v8": {
+    "zone": "ASSOC_V8",
+    "state_compression_ratio": 3.409,
+    "ladder_compression_ratio": 3.409,
+    "hot_frac": 1.0,
+    "warm_frac": 0.0,
+    "cold_frac": 0.0,
+    "exact_wakeups": 0,
+    "flop_efficiency_ff": 1.0,
+    "scaffold_ff": {
+      "plastic_frac": 0.7791915324850806,
+      "soft_frac": 0.0827609503434298,
+      "hard_frac": 0.1380475171714897,
+      "n_hard": 1226,
+      "n_soft": 735,
+      "mean_sleep_cycles": 0.920054018497467,
+      "estimated_half_life_ticks": 1389.06
+    }
+  }
+}

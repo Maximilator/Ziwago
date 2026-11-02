@@ -1,0 +1,137 @@
+{
+  "elapsed_s": 57.4,
+  "exp1_vte_mind_theater": {
+    "prompt": "the knight went to the",
+    "top5_candidates": [
+      {
+        "rank": 1,
+        "word": "house",
+        "G": -5.9235,
+        "lat_fit": 0.5181,
+        "role_fit": 0.289,
+        "valence": 1.1752,
+        "concept_sim": 0.2584,
+        "semantic_bridge": 2.0,
+        "repeat_penalty": 0.0,
+        "selected": true
+      },
+      {
+        "rank": 2,
+        "word": "park",
+        "G": -2.2605,
+        "lat_fit": 0.5181,
+        "role_fit": 0.2829,
+        "valence": -1.2675,
+        "concept_sim": 0.5002,
+        "semantic_bridge": 0.16,
+        "repeat_penalty": 0.0,
+        "selected": false
+      },
+      {
+        "rank": 3,
+        "word": "castle",
+        "G": -5.3777,
+        "lat_fit": 0.3886,
+        "role_fit": 0.2122,
+        "valence": 1.9104,
+        "concept_sim": 0.1999,
+        "semantic_bridge": 1.2728,
+        "repeat_penalty": 0.0,
+        "selected": false
+      },
+      {
+        "rank": 4,
+        "word": "cave",
+        "G": -3.766,
+        "lat_fit": 0.3886,
+        "role_fit": 0.2122,
+        "valence": 0.0025,
+        "concept_sim": 0.312,
+        "semantic_bridge": 1.2728,
+        "repeat_penalty": 0.0,
+        "selected": false
+      },
+      {
+        "rank": 5,
+        "word": "forest",
+        "G": -1.9309,
+        "lat_fit": 0.5181,
+        "role_fit": 0.2829,
+        "valence": -0.6192,
+        "concept_sim": 0.4002,
+        "semantic_bridge": 0.16,
+        "repeat_penalty": 0.875,
+        "selected": false
+      }
+    ],
+    "chosen_word": "house",
+    "full_sentence": "the knight went to the house"
+  },
+  "exp2_allostasis": {
+    "phase1_mean_allostatic_drive": 0.554,
+    "phase2_mean_allostatic_drive": 0.8162,
+    "phase2_mean_atp": 0.969,
+    "trace": [
+      {"step": 1, "phase": "PHASE_1_EASY", "word": "the", "F_t": 1.1628, "ATP": 1.0, "intero_error": 0.0093, "allostatic_drive": 0.4732, "arousal": 0.8596, "trn_gate": 0.266, "bg_threshold_shift": 1.071, "sleep_pressure_ado": 0.1038},
+      {"step": 2, "phase": "PHASE_1_EASY", "word": "knight", "F_t": 1.1637, "ATP": 1.0, "intero_error": 0.0141, "allostatic_drive": 0.4736, "arousal": 0.8725, "trn_gate": 0.2659, "bg_threshold_shift": 1.071, "sleep_pressure_ado": 0.1076},
+      {"step": 3, "phase": "PHASE_1_EASY", "word": "went", "F_t": 0.7916, "ATP": 0.9988, "intero_error": 0.0605, "allostatic_drive": 0.5491, "arousal": 0.8944, "trn_gate": 0.2657, "bg_threshold_shift": 1.0824, "sleep_pressure_ado": 0.112},
+      {"step": 4, "phase": "PHASE_1_EASY", "word": "to", "F_t": 1.1164, "ATP": 0.9987, "intero_error": 0.0297, "allostatic_drive": 0.5428, "arousal": 0.8588, "trn_gate": 0.51, "bg_threshold_shift": 1.0814, "sleep_pressure_ado": 0.1163},
+      {"step": 5, "phase": "PHASE_1_EASY", "word": "the", "F_t": 1.1664, "ATP": 0.9987, "intero_error": 0.018, "allostatic_drive": 0.5357, "arousal": 0.8755, "trn_gate": 0.3832, "bg_threshold_shift": 1.0804, "sleep_pressure_ado": 0.1206},
+      {"step": 6, "phase": "PHASE_1_EASY", "word": "castle", "F_t": 0.7579, "ATP": 0.9973, "intero_error": 0.0625, "allostatic_drive": 0.6154, "arousal": 0.9094, "trn_gate": 0.2945, "bg_threshold_shift": 1.0923, "sleep_pressure_ado": 0.1255},
+      {"step": 7, "phase": "PHASE_1_EASY", "word": ".", "F_t": 1.0226, "ATP": 0.9969, "intero_error": 0.0336, "allostatic_drive": 0.6235, "arousal": 0.5553, "trn_gate": 0.6036, "bg_threshold_shift": 1.0935, "sleep_pressure_ado": 0.1305},
+      {"step": 8, "phase": "PHASE_1_EASY", "word": "the", "F_t": 1.1566, "ATP": 0.9968, "intero_error": 0.0273, "allostatic_drive": 0.6185, "arousal": 0.6779, "trn_gate": 0.4094, "bg_threshold_shift": 1.0928, "sleep_pressure_ado": 0.1355},
+      {"step": 9, "phase": "PHASE_2_RISING_F", "word": "ancient", "F_t": 0.9232, "ATP": 0.99, "intero_error": 0.0509, "allostatic_drive": 0.7094, "arousal": 0.5603, "trn_gate": 0.3166, "bg_threshold_shift": 1.1064, "sleep_pressure_ado": 0.1411},
+      {"step": 10, "phase": "PHASE_2_RISING_F", "word": "wolf", "F_t": 1.1543, "ATP": 0.984, "intero_error": 0.0269, "allostatic_drive": 0.7388, "arousal": 0.5227, "trn_gate": 0.4998, "bg_threshold_shift": 1.1108, "sleep_pressure_ado": 0.1471},
+      {"step": 11, "phase": "PHASE_2_RISING_F", "word": "guarded", "F_t": 1.106, "ATP": 0.9779, "intero_error": 0.0266, "allostatic_drive": 0.7781, "arousal": 0.5102, "trn_gate": 0.319, "bg_threshold_shift": 1.1167, "sleep_pressure_ado": 0.1533},
+      {"step": 12, "phase": "PHASE_2_RISING_F", "word": "bright", "F_t": 1.1069, "ATP": 0.9719, "intero_error": 0.0202, "allostatic_drive": 0.8101, "arousal": 0.0723, "trn_gate": 0.4331, "bg_threshold_shift": 1.1215, "sleep_pressure_ado": 0.1598},
+      {"step": 13, "phase": "PHASE_2_RISING_F", "word": "sword", "F_t": 1.0753, "ATP": 0.9658, "intero_error": 0.0258, "allostatic_drive": 0.8468, "arousal": 0.3034, "trn_gate": 0.4096, "bg_threshold_shift": 1.127, "sleep_pressure_ado": 0.1665},
+      {"step": 14, "phase": "PHASE_2_RISING_F", "word": "near", "F_t": 1.1249, "ATP": 0.9598, "intero_error": 0.0239, "allostatic_drive": 0.8694, "arousal": 0.1405, "trn_gate": 0.4104, "bg_threshold_shift": 1.1304, "sleep_pressure_ado": 0.1735},
+      {"step": 15, "phase": "PHASE_2_RISING_F", "word": "deep", "F_t": 1.1586, "ATP": 0.954, "intero_error": 0.0223, "allostatic_drive": 0.8839, "arousal": 0.0, "trn_gate": 0.3172, "bg_threshold_shift": 1.1326, "sleep_pressure_ado": 0.1806},
+      {"step": 16, "phase": "PHASE_2_RISING_F", "word": "river", "F_t": 1.1761, "ATP": 0.9483, "intero_error": 0.019, "allostatic_drive": 0.8928, "arousal": 0.0325, "trn_gate": 0.4029, "bg_threshold_shift": 1.1339, "sleep_pressure_ado": 0.1877},
+      {"step": 17, "phase": "PHASE_3_HEAVY_LOAD", "word": "dark", "F_t": 1.1438, "ATP": 0.9151, "intero_error": 0.0216, "allostatic_drive": 1.0, "arousal": 0.0146, "trn_gate": 0.3107, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.1957},
+      {"step": 18, "phase": "PHASE_3_HEAVY_LOAD", "word": "dragon", "F_t": 1.1778, "ATP": 0.8831, "intero_error": 0.0192, "allostatic_drive": 1.0, "arousal": 0.0843, "trn_gate": 0.3032, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.2037},
+      {"step": 19, "phase": "PHASE_3_HEAVY_LOAD", "word": "breathed", "F_t": 1.1787, "ATP": 0.8523, "intero_error": 0.0189, "allostatic_drive": 1.0, "arousal": 0.0697, "trn_gate": 0.2969, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.2117},
+      {"step": 20, "phase": "PHASE_3_HEAVY_LOAD", "word": "hot", "F_t": 1.1796, "ATP": 0.8225, "intero_error": 0.0185, "allostatic_drive": 1.0, "arousal": 0.1418, "trn_gate": 0.2915, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.2197},
+      {"step": 21, "phase": "PHASE_3_HEAVY_LOAD", "word": "fire", "F_t": 1.1804, "ATP": 0.7938, "intero_error": 0.0183, "allostatic_drive": 1.0, "arousal": 0.0381, "trn_gate": 0.287, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.2277},
+      {"step": 22, "phase": "PHASE_3_HEAVY_LOAD", "word": "over", "F_t": 1.1813, "ATP": 0.7661, "intero_error": 0.0182, "allostatic_drive": 1.0, "arousal": 0.1844, "trn_gate": 0.2831, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.2357},
+      {"step": 23, "phase": "PHASE_3_HEAVY_LOAD", "word": "tall", "F_t": 1.1821, "ATP": 0.7394, "intero_error": 0.0181, "allostatic_drive": 1.0, "arousal": 0.023, "trn_gate": 0.2797, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.2437},
+      {"step": 24, "phase": "PHASE_3_HEAVY_LOAD", "word": "tower", "F_t": 1.183, "ATP": 0.7136, "intero_error": 0.018, "allostatic_drive": 1.0, "arousal": 0.0015, "trn_gate": 0.2769, "bg_threshold_shift": 1.15, "sleep_pressure_ado": 0.2517}
+    ]
+  },
+  "exp3_chimeric_rem_sleep": {
+    "dragon_concept_idx": 13,
+    "castle_concept_idx": 1,
+    "bridge_pre_sleep": 0.0,
+    "bridge_post_sleep": 1.4,
+    "total_bridges_pre": 30,
+    "total_bridges_post": 33,
+    "phrase_pre_sleep": "the dragon flew to the mountain dragon",
+    "phrase_post_sleep": "the dragon flew to the castle dragon",
+    "sleep_report": {
+      "ticks": 40,
+      "nrem_ticks": 28,
+      "rem_ticks": 12,
+      "sigma": 0.8878608650296365,
+      "episodes": 90,
+      "spindle_mean": 0.5,
+      "dg_neurogenesis": 2,
+      "rem_chimera_similarity": 0.1354,
+      "semantic_bridges": 33.0
+    }
+  },
+  "exp4_zonal_criticality": {
+    "baseline_zone_sigmas": {"SENS": 1.0306, "ASSOC": 1.0282, "PFC": 1.0228},
+    "perturbed_zone_sigmas": {"SENS": 1.18, "ASSOC": 0.76, "PFC": 1.0228},
+    "recovered_zone_sigmas": {"SENS": 1.0256, "ASSOC": 1.028, "PFC": 1.0213}
+  },
+  "exp5_continuous_stream_600": {
+    "tokens_processed": 600,
+    "auto_sleep_cycles": 8,
+    "vte_events": 48,
+    "explore_peaks": 536,
+    "fe_first_100": 1.0392,
+    "fe_last_100": 0.9088,
+    "final_zone_sigmas": {"SENS": 1.0401, "ASSOC": 1.01, "PFC": 1.01},
+    "pathology": null
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "elapsed_sec": 23.64,
+  "stress_1_stability_plasticity": {
+    "stage_1_after_story_A": {
+      "bridge_dragon_mountain": 0.8552,
+      "total_semantic_bridges": 95,
+      "interleaved_pairs": 0
+    },
+    "stage_2_after_story_B": {
+      "bridge_dragon_mountain": 0.8552,
+      "bridge_knight_castle": 0.4462,
+      "chimera_dragon_castle": 0.4462,
+      "total_semantic_bridges": 103,
+      "interleaved_pairs": 5
+    },
+    "stage_3_after_story_C": {
+      "bridge_dragon_mountain": 0.8552,
+      "bridge_knight_castle": 0.4462,
+      "bridge_wizard_forest": 0.5615,
+      "chimera_dragon_forest": 0.0,
+      "total_semantic_bridges": 116,
+      "interleaved_pairs": 5,
+      "swr_interleaved_replays": 62
+    },
+    "bridge_retention": {
+      "story_A_retention_pct": 100.0,
+      "story_B_retention_pct": 100.0,
+      "zero_catastrophic_forgetting": true
+    },
+    "multi_story_recall_after_all_3": {
+      "story_A_probe": {
+        "prompt": "the dragon flew to the",
+        "winner": "mountain",
+        "g_scores": {
+          "mountain": -7.375,
+          "castle": -2.9455,
+          "forest": -5.6021
+        }
+      },
+      "story_B_probe": {
+        "prompt": "the knight rode to the",
+        "winner": "castle",
+        "g_scores": {
+          "mountain": -4.4845,
+          "castle": -5.7136,
+          "forest": -5.2052
+        }
+      },
+      "story_C_probe": {
+        "prompt": "the wizard walked to the",
+        "winner": "forest",
+        "g_scores": {
+          "mountain": -4.3863,
+          "castle": -4.2199,
+          "forest": -8.3216
+        }
+      }
+    }
+  },
+  "stress_2_cognitive_dissonance": {
+    "hypothalamus_boredom_d_novelty": 1.0,
+    "kappa_explore_under_boredom": 1.0,
+    "amygdala_low_road_on_cave": {
+      "aversive_A_minus": 0.331,
+      "valence": -0.2411,
+      "kappa_explore_suppressed_to": 0.8628
+    },
+    "binary_conflict_cave_vs_house": {
+      "winner": "house",
+      "dominant_instinct": "AMYGDALA_SURVIVAL_VETO",
+      "breakdown": {
+        "house": {
+          "G": -2.4334,
+          "lat_fit": 1.4615,
+          "role_fit": 0.1855,
+          "valence": 0.0611,
+          "concept_sim": 0.3354,
+          "semantic_bridge": 0.3164,
+          "clause_concept_fit": 0.5776,
+          "curiosity_bonus": 0.0,
+          "survival_veto": 0.0,
+          "eff_kappa_explore": 1.0,
+          "repeat_penalty": 2.08
+        },
+        "cave": {
+          "G": -1.0916,
+          "lat_fit": 0.4092,
+          "role_fit": 0.1125,
+          "valence": -0.8737,
+          "concept_sim": 0.3827,
+          "semantic_bridge": 0.0,
+          "clause_concept_fit": 0.5832,
+          "curiosity_bonus": 1.65,
+          "survival_veto": 2.0624,
+          "eff_kappa_explore": 0.0,
+          "repeat_penalty": 0.0
+        }
+      }
+    },
+    "triadic_resolution_house_cave_castle": {
+      "winner": "castle",
+      "resolution_strategy": "SAFE_NOVELTY_EXPLORATION",
+      "breakdown": {
+        "house": {
+          "G": -2.4334,
+          "lat_fit": 1.4615,
+          "role_fit": 0.1855,
+          "valence": 0.0611,
+          "concept_sim": 0.3354,
+          "semantic_bridge": 0.3164,
+          "clause_concept_fit": 0.5776,
+          "curiosity_bonus": 0.0,
+          "survival_veto": 0.0,
+          "eff_kappa_explore": 0.8628,
+          "repeat_penalty": 2.08
+        },
+        "cave": {
+          "G": -1.0916,
+          "lat_fit": 0.4092,
+          "role_fit": 0.1125,
+          "valence": -0.8737,
+          "concept_sim": 0.3827,
+          "semantic_bridge": 0.0,
+          "clause_concept_fit": 0.5832,
+          "curiosity_bonus": 1.65,
+          "survival_veto": 2.0624,
+          "eff_kappa_explore": 0.0,
+          "repeat_penalty": 0.0
+        },
+        "castle": {
+          "G": -4.0596,
+          "lat_fit": 0.2291,
+          "role_fit": 0.0262,
+          "valence": -0.0147,
+          "concept_sim": 0.3753,
+          "semantic_bridge": 0.0,
+          "clause_concept_fit": 0.3787,
+          "curiosity_bonus": 1.5345,
+          "survival_veto": 0.0,
+          "eff_kappa_explore": 0.843,
+          "repeat_penalty": 0.13
+        }
+      }
+    }
+  },
+  "stress_3_structural_morphogenesis": {
+    "bdnf_dynamics": {
+      "initial": 0.35,
+      "after_canonical_svo": 1.2995,
+      "peak_during_inverted_ovs": 1.4429,
+      "after_inverted_ovs_sleep": 1.4429
+    },
+    "synaptogenesis_sprouting": {
+      "active_edges_initial": {
+        "SENS": 1431,
+        "ASSOC": 1268,
+        "PFC": 1231,
+        "total": 3930
+      },
+      "active_edges_after_svo": {
+        "SENS": 1931,
+        "ASSOC": 1691,
+        "PFC": 1567,
+        "total": 5189
+      },
+      "active_edges_after_ovs": {
+        "SENS": 1969,
+        "ASSOC": 1729,
+        "PFC": 1624,
+        "total": 5322
+      },
+      "net_new_synapses_added": 1392,
+      "total_sprouted_by_zone": {
+        "SENS": 547,
+        "ASSOC": 461,
+        "PFC": 394
+      },
+      "total_sprouted_all_zones": 1402,
+      "total_pruned_all_zones": 10
+    },
+    "dg_neurogenesis": {
+      "born_after_canonical_svo": 6,
+      "born_after_inverted_ovs": 7
+    },
+    "old_grammar_preservation": {
+      "svo_synfire_retention_ratio": 1.0267,
+      "cortical_shield_cosine_sim": 0.8939,
+      "canonical_svo_generation": "the knight rode to the castle .",
+      "inverted_ovs_generation": "castle to rode knight ."
+    }
+  }
+}

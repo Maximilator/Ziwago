@@ -1,0 +1,219 @@
+{
+  "gpu_environment": {
+    "cuda_available": false,
+    "device": "cpu",
+    "device_name": "cpu",
+    "gpu_arch_profile": "ampere",
+    "crossover_density": 0.5
+  },
+  "vocab_size": 256,
+  "total_ticks": 741,
+  "stage_reports": [
+    {
+      "stage_idx": 1,
+      "stage_name": "GPU Stage 1: Syntagmatic Core (seq_len=4)",
+      "seq_len": 4,
+      "epochs": 1,
+      "epoch_surprise_curve": [
+        1.7971
+      ],
+      "surprise_start": 1.7971,
+      "surprise_end": 1.7971,
+      "surprise_drop": 0.0,
+      "atp_per_token_mean": 0.00453,
+      "high_surprise_episodes_stored": 36,
+      "sleep_cycles_in_stage": 2,
+      "context_retention_tokens": 86.4,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.06599450045829514,
+        "soft_frac": 0.005499541704857928,
+        "hard_frac": 0.928505957836847,
+        "n_hard": 1013,
+        "n_soft": 6,
+        "mean_sleep_cycles": 3.998166799545288,
+        "mean_si_importance": 595.5875,
+        "estimated_half_life_ticks": 15379.14
+      },
+      "kl_divergence_bits": 1.281,
+      "debiased_wpli": 0.4352,
+      "fast_head_promoted_words": 25,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_1_seq4",
+        "stage_idx": 1,
+        "total_ticks": 117,
+        "sleep_cycles": 2,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she lived in the old castle . he went a bright bird in the high mountain . one time in the green park in the brave knight guarded the golden dragon . lily saw a small boat upon a time . tim found a magic stone near the wise king . mia baked a sweet cake upon a brave boy . a warm house walked to the deep forest . once upon a time girl lived a little stone . the tall tree was a brave boy walked a bright girl . then a small stone lived the silver crown . a magic stone near the blue river upon a day boy was a big girl . leo sailed a black stone went the happy dog . a blue boy lived walked a cold",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 86.4,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 66,
+          "repeat_run_max": 1
+        }
+      },
+      "elapsed_sec": 13.91
+    },
+    {
+      "stage_idx": 2,
+      "stage_name": "GPU Stage 2: Simple Clauses SVO (seq_len=8)",
+      "seq_len": 8,
+      "epochs": 1,
+      "epoch_surprise_curve": [
+        1.5994
+      ],
+      "surprise_start": 1.5994,
+      "surprise_end": 1.5994,
+      "surprise_drop": 0.0,
+      "atp_per_token_mean": 0.00417,
+      "high_surprise_episodes_stored": 17,
+      "sleep_cycles_in_stage": 2,
+      "context_retention_tokens": 93.6,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.05224564619615032,
+        "soft_frac": 0.0036663611365719525,
+        "hard_frac": 0.9440879926672777,
+        "n_hard": 1030,
+        "n_soft": 4,
+        "mean_sleep_cycles": 7.998167037963867,
+        "mean_si_importance": 320.0139,
+        "estimated_half_life_ticks": 29294.66
+      },
+      "kl_divergence_bits": 1.2761,
+      "debiased_wpli": 0.3569,
+      "fast_head_promoted_words": 49,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_2_seq8",
+        "stage_idx": 2,
+        "total_ticks": 306,
+        "sleep_cycles": 4,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she shared the sweet cake with mom . the old castle upon a time there was a brave boy . one day tim went to the high mountain . lily saw a bright bird in the tall tree . tim found a magic stone near the brave knight . leo sailed a small boat on lake . a golden key flew to the green park . a tiny rabbit hopped in green garden . he saw a bright boy walked to the park . the golden dragon flew to the deep forest . then the happy dog ran to the wise king . once upon a time boy was a little girl . the silver crown lived in the old castle . mia baked a sweet cake in the kind queen . a warm",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 93.6,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 73,
+          "repeat_run_max": 1
+        }
+      },
+      "elapsed_sec": 19.57
+    },
+    {
+      "stage_idx": 3,
+      "stage_name": "GPU Stage 3: Two-Clause Anaphora (seq_len=16)",
+      "seq_len": 16,
+      "epochs": 1,
+      "epoch_surprise_curve": [
+        1.3706
+      ],
+      "surprise_start": 1.3706,
+      "surprise_end": 1.3706,
+      "surprise_drop": 0.0,
+      "atp_per_token_mean": 0.0039,
+      "high_surprise_episodes_stored": 2,
+      "sleep_cycles_in_stage": 2,
+      "context_retention_tokens": 100.8,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.04857928505957837,
+        "soft_frac": 0.002749770852428964,
+        "hard_frac": 0.9486709440879927,
+        "n_hard": 1035,
+        "n_soft": 3,
+        "mean_sleep_cycles": 11.998167037963867,
+        "mean_si_importance": 167.1339,
+        "estimated_half_life_ticks": 43161.56
+      },
+      "kl_divergence_bits": 1.2744,
+      "debiased_wpli": 0.3296,
+      "fast_head_promoted_words": 64,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_3_seq16",
+        "stage_idx": 3,
+        "total_ticks": 426,
+        "sleep_cycles": 6,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she lived in the old castle . he saw a bright bird in the tall tree . one day tim went to the park . then found a magic stone near the blue river . lily saw a bright bird in the old castle . leo sailed a small boat on lake . mia baked a sweet cake with mom . a time there was a brave boy walked to the green garden . he watched the silver crown together every day . the golden dragon flew to the high mountain . it was a little girl lived in the warm knight . the brave knight guarded the wise king lived inside the happy dog . they played and danced together every day . shiny magic stone near the deep forest ran to the",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 100.8,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 79,
+          "repeat_run_max": 1
+        }
+      },
+      "elapsed_sec": 13.97
+    },
+    {
+      "stage_idx": 4,
+      "stage_name": "GPU Stage 4: Full Narrative Window (seq_len=64)",
+      "seq_len": 64,
+      "epochs": 1,
+      "epoch_surprise_curve": [
+        1.4564
+      ],
+      "surprise_start": 1.4564,
+      "surprise_end": 1.4564,
+      "surprise_drop": 0.0,
+      "atp_per_token_mean": 0.00301,
+      "high_surprise_episodes_stored": 1,
+      "sleep_cycles_in_stage": 2,
+      "context_retention_tokens": 108.0,
+      "grammar_validity": 1.0,
+      "ct_pnn_scaffold": {
+        "plastic_frac": 0.043996333638863426,
+        "soft_frac": 0.0018331805682859762,
+        "hard_frac": 0.9541704857928506,
+        "n_hard": 1041,
+        "n_soft": 2,
+        "mean_sleep_cycles": 15.998167037963867,
+        "mean_si_importance": 87.3417,
+        "estimated_half_life_ticks": 57184.54
+      },
+      "kl_divergence_bits": 1.2743,
+      "debiased_wpli": 0.3068,
+      "fast_head_promoted_words": 76,
+      "generation_checkpoint": {
+        "checkpoint_label": "Stage_4_seq64",
+        "stage_idx": 4,
+        "total_ticks": 741,
+        "sleep_cycles": 8,
+        "n_tokens_generated": 140,
+        "prompt": "once upon a time",
+        "generated_text": "once upon a time there was a little girl . she lived in a warm house with her friend . the brave knight guarded the silver crown . one day tim went to the green park . then found a magic stone near the blue river . the old castle inside a time there was a brave boy . he saw a bright bird in the tall tree . the golden dragon flew to the high mountain . the wise king lived in a small house . the happy dog ran to the deep forest . the park with his little cat lived the book . the lake to the green garden with a red ball outside the kind queen gave a golden key . leo sailed a small boat on the gentle owl sang on tall branch . a sweet cake with mom",
+        "metrics": {
+          "grammar_validity": 1.0,
+          "context_retention_tokens": 108.0,
+          "max_coherent_span": 144,
+          "unique_vocab_used": 83,
+          "repeat_run_max": 1
+        }
+      },
+      "elapsed_sec": 24.98
+    }
+  ],
+  "best_generation_checkpoint": {
+    "checkpoint_label": "Stage_4_seq64",
+    "stage_idx": 4,
+    "total_ticks": 741,
+    "sleep_cycles": 8,
+    "n_tokens_generated": 140,
+    "prompt": "once upon a time",
+    "generated_text": "once upon a time there was a little girl . she lived in a warm house with her friend . the brave knight guarded the silver crown . one day tim went to the green park . then found a magic stone near the blue river . the old castle inside a time there was a brave boy . he saw a bright bird in the tall tree . the golden dragon flew to the high mountain . the wise king lived in a small house . the happy dog ran to the deep forest . the park with his little cat lived the book . the lake to the green garden with a red ball outside the kind queen gave a golden key . leo sailed a small boat on the gentle owl sang on tall branch . a sweet cake with mom",
+    "metrics": {
+      "grammar_validity": 1.0,
+      "context_retention_tokens": 108.0,
+      "max_coherent_span": 144,
+      "unique_vocab_used": 83,
+      "repeat_run_max": 1
+    }
+  },
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v8_5_master_gpu.pt",
+  "elapsed_sec": 75.3
+}

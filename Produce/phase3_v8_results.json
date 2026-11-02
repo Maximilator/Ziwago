@@ -1,0 +1,60 @@
+{
+  "phase3_1_e2e_predictive_coding": {
+    "n_classes": 16,
+    "initial_accuracy": 0.0625,
+    "final_accuracy": 1.0,
+    "initial_kp_alignment_cosine": -0.0191,
+    "final_kp_alignment_cosine": 0.0447,
+    "apical_error_epoch1": 1.3786,
+    "apical_error_epoch25": 0.0833,
+    "used_backprop": false,
+    "used_dense_linear_readout": false
+  },
+  "phase3_2_closed_loop_embodied_foraging": {
+    "steps": 300,
+    "embodied_active_inference": {
+      "food_collected": 40,
+      "predator_hits": 3,
+      "mean_atp_reserve": 0.9056,
+      "final_atp_reserve": 0.848
+    },
+    "random_walk_baseline": {
+      "food_collected": 2,
+      "predator_hits": 80,
+      "mean_atp_reserve": 0.1112,
+      "final_atp_reserve": 0.05
+    },
+    "foraging_advantage_ratio": 20.0
+  },
+  "phase3_3_four_falsifiable_predictions": {
+    "prediction_1_jost_fusi_power_law": {
+      "alpha_exponent": 0.371,
+      "r2_power_law": 0.9987,
+      "r2_exponential": 0.7795,
+      "verified": true
+    },
+    "prediction_2_quadratic_halflife_pnn_sleep": {
+      "half_life_progression_over_sleep_cycles": [
+        727.76,
+        1471.21,
+        2046.9
+      ],
+      "verified": true
+    },
+    "prediction_3_psycholinguistic_spoonerisms": {
+      "head_high_ne_rate": 0.105,
+      "tail_high_ne_rate": 0.325,
+      "tail_low_ne_rate": 0.14,
+      "verified": true
+    },
+    "prediction_4_sleep_deprivation_collapse_and_rescue": {
+      "deprived_10k_atp": 0.0608,
+      "peak_hyperexcitable_sigma": 1.215,
+      "deprived_10k_speech_status": "SEVERE_DELIRIUM_PERSEVERATION_LOOP",
+      "rescued_atp": 0.985,
+      "rescued_sigma": 1.002,
+      "rescued_speech_status": "COHERENT_GRAMMATICAL",
+      "verified": true
+    }
+  }
+}

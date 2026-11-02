@@ -1,0 +1,349 @@
+{
+  "elapsed_sec": 43.03,
+  "D1_zone_hierarchy_scaling": {
+    "optimal_topology": "small_world_hub (Small-World Skip + Thalamic Pulvinar Hub-and-Spoke)",
+    "optimal_fanout_k": 3,
+    "critical_fanout_degradation_threshold": 5,
+    "zone_scaling_limit_all_to_all": 10,
+    "zone_scaling_limit_small_world_hub": 64,
+    "scaling_table": [
+      {
+        "n_zones": 3,
+        "topology": "all_to_all",
+        "routing_edges": 6,
+        "ms_per_tick": 19.033,
+        "free_energy_F": 0.9731,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.0672
+      },
+      {
+        "n_zones": 3,
+        "topology": "linear_chain",
+        "routing_edges": 4,
+        "ms_per_tick": 17.375,
+        "free_energy_F": 0.9724,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.071
+      },
+      {
+        "n_zones": 3,
+        "topology": "small_world_hub",
+        "routing_edges": 5,
+        "ms_per_tick": 18.085,
+        "free_energy_F": 0.9731,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.0619
+      },
+      {
+        "n_zones": 5,
+        "topology": "all_to_all",
+        "routing_edges": 20,
+        "ms_per_tick": 28.676,
+        "free_energy_F": 1.2312,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.0497
+      },
+      {
+        "n_zones": 5,
+        "topology": "linear_chain",
+        "routing_edges": 8,
+        "ms_per_tick": 28.24,
+        "free_energy_F": 1.1506,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.0386
+      },
+      {
+        "n_zones": 5,
+        "topology": "small_world_hub",
+        "routing_edges": 12,
+        "ms_per_tick": 28.799,
+        "free_energy_F": 0.9929,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.0407
+      },
+      {
+        "n_zones": 10,
+        "topology": "all_to_all",
+        "routing_edges": 90,
+        "ms_per_tick": 55.814,
+        "free_energy_F": 2.4761,
+        "sigma": 1.0707,
+        "thalamic_hub_load": 0.0466
+      },
+      {
+        "n_zones": 10,
+        "topology": "linear_chain",
+        "routing_edges": 18,
+        "ms_per_tick": 54.16,
+        "free_energy_F": 1.5712,
+        "sigma": 0.9707,
+        "thalamic_hub_load": 0.0311
+      },
+      {
+        "n_zones": 10,
+        "topology": "small_world_hub",
+        "routing_edges": 32,
+        "ms_per_tick": 55.876,
+        "free_energy_F": 1.0124,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.0222
+      },
+      {
+        "n_zones": 20,
+        "topology": "all_to_all",
+        "routing_edges": 380,
+        "ms_per_tick": 120.057,
+        "free_energy_F": 7.6519,
+        "sigma": 1.1907,
+        "thalamic_hub_load": 0.0382
+      },
+      {
+        "n_zones": 20,
+        "topology": "linear_chain",
+        "routing_edges": 38,
+        "ms_per_tick": 114.171,
+        "free_energy_F": 2.4194,
+        "sigma": 0.8907,
+        "thalamic_hub_load": 0.0166
+      },
+      {
+        "n_zones": 20,
+        "topology": "small_world_hub",
+        "routing_edges": 72,
+        "ms_per_tick": 125.103,
+        "free_energy_F": 1.0277,
+        "sigma": 1.0107,
+        "thalamic_hub_load": 0.0127
+      }
+    ],
+    "fanout_sweep_at_20_zones": [
+      {
+        "fanout_k": 1,
+        "routing_edges": 38,
+        "graph_diameter_hops": 19,
+        "ms_per_tick": 59.397,
+        "free_energy_F": 1.0869,
+        "sigma": 0.945,
+        "thalamic_hub_load": 0.0137,
+        "regime": "UNDER_CONNECTED_HIGH_LATENCY"
+      },
+      {
+        "fanout_k": 2,
+        "routing_edges": 56,
+        "graph_diameter_hops": 5,
+        "ms_per_tick": 59.914,
+        "free_energy_F": 1.0419,
+        "sigma": 0.975,
+        "thalamic_hub_load": 0.0163,
+        "regime": "UNDER_CONNECTED_HIGH_LATENCY"
+      },
+      {
+        "fanout_k": 3,
+        "routing_edges": 72,
+        "graph_diameter_hops": 3,
+        "ms_per_tick": 58.239,
+        "free_energy_F": 0.9969,
+        "sigma": 0.975,
+        "thalamic_hub_load": 0.019,
+        "regime": "BIOLOGICAL_SMALL_WORLD_OPTIMUM"
+      },
+      {
+        "fanout_k": 4,
+        "routing_edges": 84,
+        "graph_diameter_hops": 3,
+        "ms_per_tick": 62.866,
+        "free_energy_F": 0.9969,
+        "sigma": 0.975,
+        "thalamic_hub_load": 0.0217,
+        "regime": "BIOLOGICAL_SMALL_WORLD_OPTIMUM"
+      },
+      {
+        "fanout_k": 6,
+        "routing_edges": 88,
+        "graph_diameter_hops": 2,
+        "ms_per_tick": 69.721,
+        "free_energy_F": 1.0683,
+        "sigma": 1.025,
+        "thalamic_hub_load": 0.0259,
+        "regime": "THALAMIC_CROSSTALK_OVERLOAD"
+      },
+      {
+        "fanout_k": 10,
+        "routing_edges": 88,
+        "graph_diameter_hops": 2,
+        "ms_per_tick": 84.469,
+        "free_energy_F": 1.3114,
+        "sigma": 1.125,
+        "thalamic_hub_load": 0.0338,
+        "regime": "THALAMIC_CROSSTALK_OVERLOAD"
+      },
+      {
+        "fanout_k": 19,
+        "routing_edges": 88,
+        "graph_diameter_hops": 2,
+        "ms_per_tick": 120.77,
+        "free_energy_F": 2.0805,
+        "sigma": 1.35,
+        "thalamic_hub_load": 0.0515,
+        "regime": "THALAMIC_CROSSTALK_OVERLOAD"
+      }
+    ]
+  },
+  "D2_50k_sparse_encoder": {
+    "vocab_size": 50000,
+    "n_sdr": 2048,
+    "active_neurons_per_token": 40,
+    "sparsity_pct": 1.953,
+    "target_max_params": 1000000,
+    "target_max_ops_per_token": 1000,
+    "hashed_sdr_params": 65536,
+    "hashed_sdr_ops_per_token": 544,
+    "hashed_sdr_recall_at_1_on_50k": 1.0,
+    "mean_false_overlap_neurons_out_of_40": 0.822,
+    "encoders_comparison": [
+      {
+        "encoder": "Dense One-Hot + Projection (O(V))",
+        "parameters": 10000000,
+        "ops_per_token": 50200,
+        "latency_us_per_token": 156.53,
+        "recall_at_1_50k": 1.0,
+        "meets_1M_param_budget": false,
+        "meets_1000_ops_budget": false
+      },
+      {
+        "encoder": "Standard LCA Sparse SDR (Iterative O(N·D·steps))",
+        "parameters": 10409600,
+        "ops_per_token": 49152,
+        "latency_us_per_token": 213.76,
+        "recall_at_1_50k": 0.994,
+        "meets_1M_param_budget": false,
+        "meets_1000_ops_budget": false
+      },
+      {
+        "encoder": "HashedCorticalSDREncoder (Multi-Module Grid Hash O(log V))",
+        "parameters": 65536,
+        "ops_per_token": 544,
+        "latency_us_per_token": 7.65,
+        "recall_at_1_50k": 1.0,
+        "meets_1M_param_budget": true,
+        "meets_1000_ops_budget": true
+      }
+    ]
+  },
+  "D3_local_criticality_100k": {
+    "total_ticks": 100000,
+    "elapsed_sec": 2.44,
+    "target_max_diff": 0.05,
+    "mean_abs_diff_global_vs_local": 0.00968,
+    "max_abs_diff_global_vs_local": 0.02999,
+    "passed_under_005_threshold": true,
+    "milestones": [
+      {
+        "tick": 10000,
+        "global_sigma": 0.9691,
+        "mean_local_sigma": 0.9653,
+        "local_sigmas_per_column": {
+          "SENS": 0.9599,
+          "ASSOC": 0.9598,
+          "PFC": 0.9762
+        },
+        "abs_diff": 0.0038
+      },
+      {
+        "tick": 25000,
+        "global_sigma": 0.9704,
+        "mean_local_sigma": 0.9506,
+        "local_sigmas_per_column": {
+          "SENS": 0.9504,
+          "ASSOC": 0.9461,
+          "PFC": 0.9555
+        },
+        "abs_diff": 0.0198
+      },
+      {
+        "tick": 50000,
+        "global_sigma": 0.9698,
+        "mean_local_sigma": 0.9653,
+        "local_sigmas_per_column": {
+          "SENS": 0.9832,
+          "ASSOC": 0.9508,
+          "PFC": 0.9618
+        },
+        "abs_diff": 0.0045
+      },
+      {
+        "tick": 75000,
+        "global_sigma": 0.9624,
+        "mean_local_sigma": 0.963,
+        "local_sigmas_per_column": {
+          "SENS": 0.9582,
+          "ASSOC": 0.9429,
+          "PFC": 0.988
+        },
+        "abs_diff": 0.0007
+      },
+      {
+        "tick": 100000,
+        "global_sigma": 0.9668,
+        "mean_local_sigma": 0.9631,
+        "local_sigmas_per_column": {
+          "SENS": 0.938,
+          "ASSOC": 0.9901,
+          "PFC": 0.9611
+        },
+        "abs_diff": 0.0037
+      }
+    ]
+  },
+  "D4_pattern_diversity_saturation": {
+    "ticks_per_run": 50000,
+    "flat_v6_saturation_knee_patterns": 12500,
+    "compositional_v7_theoretical_capacity": 16777216,
+    "runs": [
+      {
+        "n_unique_patterns": 1000,
+        "ticks_simulated": 50000,
+        "unique_patterns_encountered": 1000,
+        "flat_v6_recall_quality": 0.9637,
+        "flat_v6_free_energy_F": 0.2326,
+        "compositional_v7_recall_quality": 0.994,
+        "compositional_v7_free_energy_F": 0.1651,
+        "quality_gain_v7_over_v6": 0.0303,
+        "elapsed_sec": 0.067
+      },
+      {
+        "n_unique_patterns": 10000,
+        "ticks_simulated": 50000,
+        "unique_patterns_encountered": 6358,
+        "flat_v6_recall_quality": 0.7225,
+        "flat_v6_free_energy_F": 0.5824,
+        "compositional_v7_recall_quality": 0.9758,
+        "compositional_v7_free_energy_F": 0.1806,
+        "quality_gain_v7_over_v6": 0.2533,
+        "elapsed_sec": 0.091
+      },
+      {
+        "n_unique_patterns": 100000,
+        "ticks_simulated": 50000,
+        "unique_patterns_encountered": 9506,
+        "flat_v6_recall_quality": 0.0406,
+        "flat_v6_free_energy_F": 1.5711,
+        "compositional_v7_recall_quality": 0.9557,
+        "compositional_v7_free_energy_F": 0.1977,
+        "quality_gain_v7_over_v6": 0.9151,
+        "elapsed_sec": 0.065
+      },
+      {
+        "n_unique_patterns": 1000000,
+        "ticks_simulated": 50000,
+        "unique_patterns_encountered": 9948,
+        "flat_v6_recall_quality": 0.032,
+        "flat_v6_free_energy_F": 1.5836,
+        "compositional_v7_recall_quality": 0.9179,
+        "compositional_v7_free_energy_F": 0.2298,
+        "quality_gain_v7_over_v6": 0.8859,
+        "elapsed_sec": 0.067
+      }
+    ]
+  }
+}
