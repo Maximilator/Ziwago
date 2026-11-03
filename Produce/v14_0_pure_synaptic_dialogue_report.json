@@ -1,0 +1,948 @@
+{
+  "version": "Ziwago-Prime v14.0 Pure Synaptic Dialogue Organism (6 Dialog Corpora + Neuromodulators + SON + N-Gram Toggle)",
+  "timestamp_utc": "2026-11-03T08:37:44.543648+00:00",
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v14_0_pure_synaptic_dialogue.pt",
+  "checkpoint_size_mb": 65.03,
+  "ngrams_mode_tested": "compare",
+  "stored_sentence_chains_in_organism": 0,
+  "total_pairs_trained": 13949,
+  "total_tokens_trained": 666276,
+  "source_dataset_pair_counts": {
+    "ultrachat": 2800,
+    "oasst2": 2530,
+    "personachat": 2988,
+    "personamem": 88,
+    "npc_dialogue": 2262,
+    "daily_dialog_cornell": 3249
+  },
+  "dendritic_nmda_active_vocab_cols": 3547,
+  "synaptic_trigrams_learned": 162419,
+  "synaptic_fourgrams_learned": 271634,
+  "waves": [
+    {
+      "wave_idx": 1,
+      "tokens_trained": 111065,
+      "throughput_tok_per_sec": 11467.4,
+      "mean_dopamine_DA": 1.9851,
+      "mean_acetylcholine_ACh": 15.1292,
+      "mean_plasticity_gate_f_mod": 2.1989,
+      "pc_readout_loss_nats": 6.4004,
+      "synaptic_trigrams_count": 37755,
+      "synaptic_fourgrams_count": 51440,
+      "elapsed_sec": 9.685,
+      "source_counts": {
+        "ultrachat": 475,
+        "oasst2": 421,
+        "personachat": 497,
+        "personamem": 8,
+        "npc_dialogue": 390,
+        "daily_dialog_cornell": 500
+      },
+      "stream_sec": 1.149
+    },
+    {
+      "wave_idx": 2,
+      "tokens_trained": 109572,
+      "throughput_tok_per_sec": 15060.8,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.109,
+      "mean_plasticity_gate_f_mod": 2.1064,
+      "pc_readout_loss_nats": 6.2334,
+      "synaptic_trigrams_count": 66754,
+      "synaptic_fourgrams_count": 97861,
+      "elapsed_sec": 7.275,
+      "source_counts": {
+        "ultrachat": 470,
+        "oasst2": 415,
+        "personachat": 500,
+        "personamem": 29,
+        "npc_dialogue": 372,
+        "daily_dialog_cornell": 500
+      },
+      "stream_sec": 0.173
+    },
+    {
+      "wave_idx": 3,
+      "tokens_trained": 107176,
+      "throughput_tok_per_sec": 16189.4,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.1496,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.1238,
+      "synaptic_trigrams_count": 92857,
+      "synaptic_fourgrams_count": 142000,
+      "elapsed_sec": 6.62,
+      "source_counts": {
+        "ultrachat": 460,
+        "oasst2": 418,
+        "personachat": 499,
+        "personamem": 13,
+        "npc_dialogue": 359,
+        "daily_dialog_cornell": 499
+      },
+      "stream_sec": 0.183
+    },
+    {
+      "wave_idx": 4,
+      "tokens_trained": 109908,
+      "throughput_tok_per_sec": 16128.0,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.1215,
+      "synaptic_trigrams_count": 116886,
+      "synaptic_fourgrams_count": 185334,
+      "elapsed_sec": 6.815,
+      "source_counts": {
+        "ultrachat": 462,
+        "oasst2": 440,
+        "personachat": 498,
+        "personamem": 2,
+        "npc_dialogue": 379,
+        "daily_dialog_cornell": 499
+      },
+      "stream_sec": 0.349
+    },
+    {
+      "wave_idx": 5,
+      "tokens_trained": 110068,
+      "throughput_tok_per_sec": 23979.8,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.0959,
+      "synaptic_trigrams_count": 139765,
+      "synaptic_fourgrams_count": 227988,
+      "elapsed_sec": 4.59,
+      "source_counts": {
+        "ultrachat": 470,
+        "oasst2": 418,
+        "personachat": 496,
+        "personamem": 34,
+        "npc_dialogue": 394,
+        "daily_dialog_cornell": 500
+      },
+      "stream_sec": 0.221
+    },
+    {
+      "wave_idx": 6,
+      "tokens_trained": 117187,
+      "throughput_tok_per_sec": 30068.3,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.0544,
+      "synaptic_trigrams_count": 162367,
+      "synaptic_fourgrams_count": 271538,
+      "elapsed_sec": 3.897,
+      "source_counts": {
+        "ultrachat": 463,
+        "oasst2": 418,
+        "personachat": 498,
+        "personamem": 2,
+        "npc_dialogue": 368,
+        "daily_dialog_cornell": 751
+      },
+      "stream_sec": 0.371
+    }
+  ],
+  "pure_weight_dialogue_evals": [
+    {
+      "stimulus": "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col0_SYNTAX_BA44",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "online_dopamine_imprinted_tokens": 20,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.9592,
+          "synaptic_coherence": 2.6544,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6551
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 34,
+          "stimulus_alignment_cos": 0.0399,
+          "synaptic_coherence": 1.6531,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.028
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 9,
+          "stimulus_alignment_cos": 0.3215,
+          "synaptic_coherence": 1.1883,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.0203
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "Your name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1156.62
+    },
+    {
+      "stimulus": "I am making mayonnaise, it was starting to thicken but now it has become runny and liquid.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.4143,
+          "synaptic_coherence": 2.7758,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3554
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 9,
+          "stimulus_alignment_cos": 0.0406,
+          "synaptic_coherence": 1.0503,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.1826
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 11,
+          "stimulus_alignment_cos": 0.2262,
+          "synaptic_coherence": 2.1032,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2519
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 31,
+      "pure_weight_generated_response": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 815.07
+    },
+    {
+      "stimulus": "How can I fix errors in my grammar when writing an essay?",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col7_EXECUTIVE_PFC",
+        "Col4_NARRATIVE_EPISODIC"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 25,
+          "stimulus_alignment_cos": 0.4464,
+          "synaptic_coherence": 2.7273,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.373
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 16,
+          "stimulus_alignment_cos": 0.1171,
+          "synaptic_coherence": 1.3497,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.0357
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 14,
+          "stimulus_alignment_cos": 0.254,
+          "synaptic_coherence": 1.2525,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.0056
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 25,
+      "pure_weight_generated_response": "To fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 818.68
+    },
+    {
+      "stimulus": "Hi, how are you doing? I am getting ready to go running to stay in shape.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col6_THEORY_OF_MIND"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.2448,
+          "synaptic_coherence": 2.7373,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2621
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 18,
+          "stimulus_alignment_cos": 0.2312,
+          "synaptic_coherence": 2.0406,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2546
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 23,
+          "stimulus_alignment_cos": 0.2477,
+          "synaptic_coherence": 1.1551,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.032
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 26,
+      "pure_weight_generated_response": "That sounds great! Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 754.7
+    },
+    {
+      "stimulus": "Greetings, guardian of the ancient stone arch.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col5_CAUSAL_PHYSICS",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.0981,
+          "synaptic_coherence": 2.7403,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.1815
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 36,
+          "stimulus_alignment_cos": 0.1975,
+          "synaptic_coherence": 1.2709,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.0191
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 22,
+          "stimulus_alignment_cos": 0.277,
+          "synaptic_coherence": 1.0467,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.0538
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 26,
+      "pure_weight_generated_response": "Ah, you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1084.44
+    },
+    {
+      "stimulus": "Remind me, what is my name and what am I building?",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5764,
+          "synaptic_coherence": 2.6552,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4445
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.6182,
+          "synaptic_coherence": 2.5707,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4675
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 22,
+          "stimulus_alignment_cos": 0.5495,
+          "synaptic_coherence": 2.4164,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4297
+        }
+      ],
+      "selected_beam_idx": 1,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "his name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 827.37
+    }
+  ],
+  "pure_dendritic_matrix_ngrams_off_evals": [
+    {
+      "stimulus": "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+      "ngrams_mode": "OFF (Pure 4096-Dendritic NMDA Matrix)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "online_dopamine_imprinted_tokens": 20,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.9592,
+          "synaptic_coherence": 2.6657,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6551
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.9592,
+          "synaptic_coherence": 2.6664,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6551
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.9592,
+          "synaptic_coherence": 2.6669,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6551
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "Your name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1395.64
+    },
+    {
+      "stimulus": "I am making mayonnaise, it was starting to thicken but now it has become runny and liquid.",
+      "ngrams_mode": "OFF (Pure 4096-Dendritic NMDA Matrix)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.4143,
+          "synaptic_coherence": 2.2522,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3554
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.4143,
+          "synaptic_coherence": 2.2522,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3554
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.4143,
+          "synaptic_coherence": 2.2523,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3554
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 31,
+      "pure_weight_generated_response": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1572.35
+    },
+    {
+      "stimulus": "How can I fix errors in my grammar when writing an essay?",
+      "ngrams_mode": "OFF (Pure 4096-Dendritic NMDA Matrix)",
+      "active_moe_columns": [
+        "Col3_PRAGMATIC_DIALOG",
+        "Col5_CAUSAL_PHYSICS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 25,
+          "stimulus_alignment_cos": 0.4464,
+          "synaptic_coherence": 2.2163,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.373
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 25,
+          "stimulus_alignment_cos": 0.4464,
+          "synaptic_coherence": 2.2148,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.373
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 25,
+          "stimulus_alignment_cos": 0.4464,
+          "synaptic_coherence": 2.2168,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.373
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 25,
+      "pure_weight_generated_response": "To fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1319.72
+    },
+    {
+      "stimulus": "Hi, how are you doing? I am getting ready to go running to stay in shape.",
+      "ngrams_mode": "OFF (Pure 4096-Dendritic NMDA Matrix)",
+      "active_moe_columns": [
+        "Col6_THEORY_OF_MIND",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.2448,
+          "synaptic_coherence": 2.2777,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2621
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.2448,
+          "synaptic_coherence": 2.277,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2621
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.2448,
+          "synaptic_coherence": 2.2795,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2621
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 26,
+      "pure_weight_generated_response": "That sounds great! Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1152.92
+    },
+    {
+      "stimulus": "Greetings, guardian of the ancient stone arch.",
+      "ngrams_mode": "OFF (Pure 4096-Dendritic NMDA Matrix)",
+      "active_moe_columns": [
+        "Col5_CAUSAL_PHYSICS",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.0981,
+          "synaptic_coherence": 2.2714,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.1815
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.0981,
+          "synaptic_coherence": 2.2726,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.1815
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.0981,
+          "synaptic_coherence": 2.2709,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.1815
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 26,
+      "pure_weight_generated_response": "Ah, you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1168.15
+    },
+    {
+      "stimulus": "Remind me, what is my name and what am I building?",
+      "ngrams_mode": "OFF (Pure 4096-Dendritic NMDA Matrix)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5764,
+          "synaptic_coherence": 2.6394,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4445
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5764,
+          "synaptic_coherence": 2.6394,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4445
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5764,
+          "synaptic_coherence": 2.6387,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4445
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "Your name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 912.96
+    }
+  ],
+  "hybrid_ngrams_on_evals": [
+    {
+      "stimulus": "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col0_SYNTAX_BA44",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "online_dopamine_imprinted_tokens": 20,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.9592,
+          "synaptic_coherence": 2.6544,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6551
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 34,
+          "stimulus_alignment_cos": 0.0399,
+          "synaptic_coherence": 1.6531,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.028
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 9,
+          "stimulus_alignment_cos": 0.3215,
+          "synaptic_coherence": 1.1883,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.0203
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "Your name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1156.62
+    },
+    {
+      "stimulus": "I am making mayonnaise, it was starting to thicken but now it has become runny and liquid.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.4143,
+          "synaptic_coherence": 2.7758,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3554
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 9,
+          "stimulus_alignment_cos": 0.0406,
+          "synaptic_coherence": 1.0503,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.1826
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 11,
+          "stimulus_alignment_cos": 0.2262,
+          "synaptic_coherence": 2.1032,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2519
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 31,
+      "pure_weight_generated_response": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 815.07
+    },
+    {
+      "stimulus": "How can I fix errors in my grammar when writing an essay?",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col7_EXECUTIVE_PFC",
+        "Col4_NARRATIVE_EPISODIC"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 25,
+          "stimulus_alignment_cos": 0.4464,
+          "synaptic_coherence": 2.7273,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.373
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 16,
+          "stimulus_alignment_cos": 0.1171,
+          "synaptic_coherence": 1.3497,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.0357
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 14,
+          "stimulus_alignment_cos": 0.254,
+          "synaptic_coherence": 1.2525,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.0056
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 25,
+      "pure_weight_generated_response": "To fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 818.68
+    },
+    {
+      "stimulus": "Hi, how are you doing? I am getting ready to go running to stay in shape.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col6_THEORY_OF_MIND"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.2448,
+          "synaptic_coherence": 2.7373,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2621
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 18,
+          "stimulus_alignment_cos": 0.2312,
+          "synaptic_coherence": 2.0406,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2546
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 23,
+          "stimulus_alignment_cos": 0.2477,
+          "synaptic_coherence": 1.1551,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.032
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 26,
+      "pure_weight_generated_response": "That sounds great! Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 754.7
+    },
+    {
+      "stimulus": "Greetings, guardian of the ancient stone arch.",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col5_CAUSAL_PHYSICS",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 26,
+          "stimulus_alignment_cos": 0.0981,
+          "synaptic_coherence": 2.7403,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.1815
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 36,
+          "stimulus_alignment_cos": 0.1975,
+          "synaptic_coherence": 1.2709,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.0191
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 22,
+          "stimulus_alignment_cos": 0.277,
+          "synaptic_coherence": 1.0467,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.0538
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 26,
+      "pure_weight_generated_response": "Ah, you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1084.44
+    },
+    {
+      "stimulus": "Remind me, what is my name and what am I building?",
+      "ngrams_mode": "ON",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_ON_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5764,
+          "synaptic_coherence": 2.6552,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4445
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_ON_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.6182,
+          "synaptic_coherence": 2.5707,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4675
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_ON_beam_2",
+          "tokens_simulated": 22,
+          "stimulus_alignment_cos": 0.5495,
+          "synaptic_coherence": 2.4164,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4297
+        }
+      ],
+      "selected_beam_idx": 1,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "his name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 827.37
+    }
+  ],
+  "elapsed_total_sec": 61.21
+}

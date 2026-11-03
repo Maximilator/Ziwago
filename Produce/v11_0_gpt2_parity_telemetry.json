@@ -1,0 +1,366 @@
+{
+  "version": "Ziwago-Prime v11.0 GPT-2 Parity Cortical-Semantic Engine",
+  "total_neurons": 16384,
+  "total_dendritic_branches": 114688,
+  "total_synaptic_parameters": 124416000,
+  "total_tokens_processed": 3043038,
+  "peak_cortical_throughput_tok_per_sec": 64551.9,
+  "sbc_vsa_dht_episodes": 39796,
+  "sbc_vsa_dht_concepts": 8569,
+  "elastic_adaptations_count": 595382,
+  "shield_underflow_prevented_count": 3812,
+  "stranger_check_rejections": 231,
+  "phase_a_elastic_grounding": {
+    "calibration_tokens": 15000,
+    "epochs": 4,
+    "initial_surprise_F": 0.396,
+    "final_surprise_F": 0.0938,
+    "scaffold_mode": "ELASTIC_METAPLASTIC_SCAFFOLD_SOFT (Benna-Fusi + Torrigiano Scaling)",
+    "soft_shielded_bigrams": 2349,
+    "soft_shielded_trigrams": 3120,
+    "soft_cortical_synapses_count": 8652608,
+    "elapsed_sec": 10.81
+  },
+  "phase_b_stages": [
+    {
+      "stage_id": 1,
+      "title": "Подфаза Б.1 (Детский сад: Сказки + Диалоги)",
+      "waves": [
+        {
+          "wave_idx": 1,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 48373.4,
+          "mean_surprise_F": 0.073,
+          "new_dht_episodes": 2500,
+          "cumulative_dht_episodes": 3184,
+          "cumulative_hipporag_concepts": 335,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 67966,
+          "elapsed_sec": 4.135,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.283
+        },
+        {
+          "wave_idx": 2,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 41722.7,
+          "mean_surprise_F": 0.071,
+          "new_dht_episodes": 2595,
+          "cumulative_dht_episodes": 5779,
+          "cumulative_hipporag_concepts": 596,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 134964,
+          "elapsed_sec": 4.794,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.298
+        },
+        {
+          "wave_idx": 3,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 49952.1,
+          "mean_surprise_F": 0.069,
+          "new_dht_episodes": 2551,
+          "cumulative_dht_episodes": 8330,
+          "cumulative_hipporag_concepts": 831,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 203783,
+          "elapsed_sec": 4.004,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.508
+        },
+        {
+          "wave_idx": 4,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 59129.0,
+          "mean_surprise_F": 0.067,
+          "new_dht_episodes": 2550,
+          "cumulative_dht_episodes": 10880,
+          "cumulative_hipporag_concepts": 1029,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 269963,
+          "elapsed_sec": 3.382,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.288
+        },
+        {
+          "wave_idx": 5,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 63098.2,
+          "mean_surprise_F": 0.065,
+          "new_dht_episodes": 2440,
+          "cumulative_dht_episodes": 13320,
+          "cumulative_hipporag_concepts": 1240,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 337452,
+          "elapsed_sec": 3.17,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.296
+        }
+      ]
+    },
+    {
+      "stage_id": 2,
+      "title": "Подфаза Б.2 (Школа: Книги + Сказки + Диалоги)",
+      "waves": [
+        {
+          "wave_idx": 1,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 51750.7,
+          "mean_surprise_F": 0.073,
+          "new_dht_episodes": 2845,
+          "cumulative_dht_episodes": 16165,
+          "cumulative_hipporag_concepts": 2127,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 376796,
+          "elapsed_sec": 3.865,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.284
+        },
+        {
+          "wave_idx": 2,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 61438.4,
+          "mean_surprise_F": 0.071,
+          "new_dht_episodes": 2828,
+          "cumulative_dht_episodes": 18993,
+          "cumulative_hipporag_concepts": 2875,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 416512,
+          "elapsed_sec": 3.255,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.311
+        },
+        {
+          "wave_idx": 3,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 64551.9,
+          "mean_surprise_F": 0.069,
+          "new_dht_episodes": 2851,
+          "cumulative_dht_episodes": 21844,
+          "cumulative_hipporag_concepts": 3500,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 452829,
+          "elapsed_sec": 3.098,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.334
+        },
+        {
+          "wave_idx": 4,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 61308.7,
+          "mean_surprise_F": 0.067,
+          "new_dht_episodes": 2766,
+          "cumulative_dht_episodes": 24610,
+          "cumulative_hipporag_concepts": 3982,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 491285,
+          "elapsed_sec": 3.262,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.291
+        },
+        {
+          "wave_idx": 5,
+          "tokens_processed": 200000,
+          "throughput_tok_per_sec": 55474.8,
+          "mean_surprise_F": 0.065,
+          "new_dht_episodes": 2768,
+          "cumulative_dht_episodes": 27378,
+          "cumulative_hipporag_concepts": 4401,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 527751,
+          "elapsed_sec": 3.605,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.409
+        }
+      ]
+    },
+    {
+      "stage_id": 3,
+      "title": "Подфаза Б.3 (Университет: Книги + Википедия + Весь Интернет)",
+      "waves": [
+        {
+          "wave_idx": 1,
+          "tokens_processed": 196732,
+          "throughput_tok_per_sec": 48452.2,
+          "mean_surprise_F": 0.073,
+          "new_dht_episodes": 2477,
+          "cumulative_dht_episodes": 29855,
+          "cumulative_hipporag_concepts": 5449,
+          "stranger_check_rejections_wave": 41,
+          "elastic_adaptations_cumulative": 541344,
+          "elapsed_sec": 4.06,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 1.256
+        },
+        {
+          "wave_idx": 2,
+          "tokens_processed": 195712,
+          "throughput_tok_per_sec": 49633.3,
+          "mean_surprise_F": 0.071,
+          "new_dht_episodes": 2464,
+          "cumulative_dht_episodes": 32319,
+          "cumulative_hipporag_concepts": 6298,
+          "stranger_check_rejections_wave": 58,
+          "elastic_adaptations_cumulative": 554777,
+          "elapsed_sec": 3.943,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.513
+        },
+        {
+          "wave_idx": 3,
+          "tokens_processed": 196118,
+          "throughput_tok_per_sec": 50807.4,
+          "mean_surprise_F": 0.069,
+          "new_dht_episodes": 2484,
+          "cumulative_dht_episodes": 34803,
+          "cumulative_hipporag_concepts": 7090,
+          "stranger_check_rejections_wave": 49,
+          "elastic_adaptations_cumulative": 568120,
+          "elapsed_sec": 3.86,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.542
+        },
+        {
+          "wave_idx": 4,
+          "tokens_processed": 197033,
+          "throughput_tok_per_sec": 42351.7,
+          "mean_surprise_F": 0.067,
+          "new_dht_episodes": 2486,
+          "cumulative_dht_episodes": 37289,
+          "cumulative_hipporag_concepts": 7867,
+          "stranger_check_rejections_wave": 40,
+          "elastic_adaptations_cumulative": 581699,
+          "elapsed_sec": 4.652,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.559
+        },
+        {
+          "wave_idx": 5,
+          "tokens_processed": 197443,
+          "throughput_tok_per_sec": 41991.4,
+          "mean_surprise_F": 0.065,
+          "new_dht_episodes": 2507,
+          "cumulative_dht_episodes": 39796,
+          "cumulative_hipporag_concepts": 8569,
+          "stranger_check_rejections_wave": 43,
+          "elastic_adaptations_cumulative": 595382,
+          "elapsed_sec": 4.702,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.604
+        }
+      ]
+    }
+  ],
+  "final_coherent_exams": {
+    "test_1_fairytale": {
+      "domain": "tinystories",
+      "prompt": "Once upon a time there was a little",
+      "active_moe_experts": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "selected_topic_uid": "tiny_z03_b2_46",
+      "cross_topic_jumps_blocked_by_apical_sst": 854,
+      "generated_text": "Once upon a time there was a little girl named Lily. I'm ready for a place to hide, Lisa ran to show off her pretty dress. One day, Amy's mommy saw a wire?\" \"It's a thin, long thing made of soft wool. Mia loved to crawl around and",
+      "unique_token_ratio": 0.8167,
+      "grammar_coherent": true
+    },
+    "test_2_wikipedia_non_valkyria_article": {
+      "domain": "wikitext",
+      "prompt": "In 1960 , the Oslo City Council decided",
+      "active_moe_experts": [
+        "Col2_ENCYCLOPEDIC_FACTS",
+        "Col0_SYNTAX_BA44"
+      ],
+      "selected_topic_uid": "wiki_z25_428366514",
+      "cross_topic_jumps_blocked_by_apical_sst": 989,
+      "generated_text": "In 1960 , the Oslo City Council decided to not close the tramway anyway . Between 1978 and 1981 , ten tram vehicles were bought from the Gothenburg Tramway . New trams , 43 were trailers and 20 were working trailers . Following the energy crisis in the US state of which 100 were powered trams ,",
+      "unique_token_ratio": 0.7188,
+      "grammar_coherent": true
+    },
+    "test_3_bookcorpus_literature": {
+      "domain": "bookcorpus",
+      "prompt": "As she looked away , i saw a",
+      "active_moe_experts": [
+        "Col3_PRAGMATIC_DIALOG",
+        "Col4_NARRATIVE_EPISODIC"
+      ],
+      "selected_topic_uid": "book_z21_1671372017",
+      "cross_topic_jumps_blocked_by_apical_sst": 2892,
+      "generated_text": "As she looked away , i saw a tear run down her face . `` you thought ari and i both had to try and get the words in august , were you ? '' . `` one last-ditch attempt at getting me back ? You did n't think i 'd be getting a paternity test done",
+      "unique_token_ratio": 0.8125,
+      "grammar_coherent": true
+    },
+    "test_4_cornell_dialog": {
+      "domain": "cornell_dialogs",
+      "prompt": "DR. VANCE : Wait a second , do you honestly expect",
+      "active_moe_experts": [
+        "Col3_PRAGMATIC_DIALOG",
+        "Col6_THEORY_OF_MIND"
+      ],
+      "selected_topic_uid": "cornell_dialog_0001",
+      "cross_topic_jumps_blocked_by_apical_sst": 490,
+      "generated_text": "DR. VANCE : Wait a second , do you honestly expect me to believe that explanation ? We have been analyzing quantum cryptography and encrypted ledger for 2 hours . ELENA : Look at the primary record because mathematical keys never lie under pressure . If you check step 1 , the outcome is inevitable . DR. VANCE : Then",
+      "unique_token_ratio": 0.8308,
+      "grammar_coherent": true
+    }
+  },
+  "elapsed_total_sec": 83.82,
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v11_0_gpt2_parity_master.pt",
+  "checkpoint_size_mb": 33.02
+}

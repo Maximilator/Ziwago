@@ -1,18 +1,74 @@
 {
-  "version": "Ziwago-Prime v10.0 (7-Level Poirazi Dendrites + 8x512 Cortical MoE + Honest 60/20/20 Curriculum)",
+  "version": "Ziwago-Prime v10.5 (7-Level Poirazi Dendrites + 8x512 Cortical MoE + Bio-RWKV 10k + Honest 60/20/20)",
   "dendrite_benchmark": {
     "n_neurons": 512,
     "n_in": 64,
     "benchmark_steps": 1000,
-    "scalar_dendrite_total_ms": 414.76,
-    "scalar_dendrite_ms_per_step": 0.4148,
-    "deep_7level_dendrite_total_ms": 643.26,
-    "deep_7level_dendrite_ms_per_step": 0.6433,
-    "compute_overhead_ratio": 1.55,
+    "scalar_dendrite_total_ms": 407.83,
+    "scalar_dendrite_ms_per_step": 0.4078,
+    "deep_7level_dendrite_total_ms": 616.78,
+    "deep_7level_dendrite_ms_per_step": 0.6168,
+    "compute_overhead_ratio": 1.51,
     "equivalent_mlp_depth_gain": "7x (Beniaguev et al., 2021)",
     "single_neuron_xor_accuracy_scalar": 0.5,
     "single_neuron_xor_accuracy_deep7": 1.0,
     "ca_nmda_plateau_fraction": 0.0003
+  },
+  "bio_rwkv_10k_ablation": {
+    "total_tokens_streamed": 20000,
+    "memory_complexity": "O(1) Constant State [64 floats]",
+    "total_time_ms_for_10k_tokens": 46.36,
+    "ms_per_token": 0.00232,
+    "speed_benchmark_20k": {
+      "step_by_step_tokens_per_sec": 4376.2,
+      "vectorized_chunk_tokens_per_sec": 431416.0,
+      "vectorized_ms_per_token": 0.00232
+    },
+    "point_1_graded_vs_hard_flush": {
+      "hard_flushes_count": 2,
+      "graded_flushes_count": 3326,
+      "mean_graded_gamma": 0.2689,
+      "transition_bridge_coherence_at_11k": 0.5726
+    },
+    "point_2_schmitt_trigger_hysteresis": {
+      "enter_dht_threshold": 0.7,
+      "exit_dht_threshold": 0.55,
+      "single_threshold_065_oscillations": 999,
+      "schmitt_hysteresis_oscillations": 0,
+      "chatter_events_suppressed": 1000
+    },
+    "point_3_snapshot_contract_ttl_and_sleep": {
+      "max_snapshots_ttl_cap": 16,
+      "buffer_len_after_30_flushes": 16,
+      "buffer_len_after_sleep_consolidation": 0,
+      "ppr_topic_summaries_stored": 2
+    },
+    "blind_spot_1_lc_ne_topic_flush": {
+      "topic_flushes_triggered": 2,
+      "archived_snapshots_in_dht": 2,
+      "naive_rwkv_old_topic_bleed_without_flush": 0.9995,
+      "bio_rwkv_old_topic_bleed_after_lc_ne_flush": 0.2677,
+      "new_topic_alignment_after_5_tokens": 0.652
+    },
+    "blind_spot_2_dht_arbitration": {
+      "dht_offload_saving_percent": 85.49,
+      "dht_exact_fact_probes": 2901,
+      "rwkv_macro_wave_trust_steps": 17099
+    },
+    "blind_spot_3_denominator_non_saturation": {
+      "naive_unbounded_denominator_at_10k": 999.98,
+      "bio_rwkv_denominator_at_100": 0.6371,
+      "bio_rwkv_denominator_at_5000": 0.6386,
+      "bio_rwkv_denominator_at_10000": 0.6834,
+      "bio_rwkv_denominator_at_20000": 0.6955,
+      "sharpness_at_100": 0.6987,
+      "sharpness_at_10000": 0.6992,
+      "sharpness_at_20000": 0.6993
+    },
+    "effective_context_retention_tokens": {
+      "baseline_without_bio_rwkv": 1015.8,
+      "v10_5_with_bio_rwkv_10k": 20000.0
+    }
   },
   "honest_curriculum_stats": {
     "total_tokens": 10500,
@@ -29,59 +85,59 @@
     "epoch_curves": [
       {
         "epoch": 1,
-        "mean_surprise_F": 1.4095,
-        "discrete_surprise_pin_rate": 0.7773,
-        "wikitext_surprise_F": 1.6313,
-        "cornell_dialogs_surprise_F": 0.7098,
-        "tinystories_surprise_F": 1.4396,
-        "mean_somatic_fep_error": 0.878,
-        "mean_apical_fep_error": 0.0042,
-        "block_sparse_32x32_flop_efficiency": 0.8796,
-        "mean_lag_dwpli": 0.7311,
+        "mean_surprise_F": 1.4119,
+        "discrete_surprise_pin_rate": 0.7782,
+        "wikitext_surprise_F": 1.6345,
+        "cornell_dialogs_surprise_F": 0.7108,
+        "tinystories_surprise_F": 1.441,
+        "mean_somatic_fep_error": 0.8772,
+        "mean_apical_fep_error": 0.0204,
+        "block_sparse_32x32_flop_efficiency": 0.8795,
+        "mean_lag_dwpli": 0.7325,
         "analytic_rehydrations_in_epoch": 121,
-        "elapsed_sec": 17.78
+        "elapsed_sec": 19.66
       },
       {
         "epoch": 2,
-        "mean_surprise_F": 0.5343,
-        "discrete_surprise_pin_rate": 0.417,
-        "wikitext_surprise_F": 0.645,
-        "cornell_dialogs_surprise_F": 0.1834,
-        "tinystories_surprise_F": 0.5512,
-        "mean_somatic_fep_error": 0.9663,
-        "mean_apical_fep_error": 0.0022,
-        "block_sparse_32x32_flop_efficiency": 0.8769,
-        "mean_lag_dwpli": 0.5575,
-        "analytic_rehydrations_in_epoch": 128,
-        "elapsed_sec": 18.06
+        "mean_surprise_F": 0.5361,
+        "discrete_surprise_pin_rate": 0.4185,
+        "wikitext_surprise_F": 0.6464,
+        "cornell_dialogs_surprise_F": 0.1847,
+        "tinystories_surprise_F": 0.5546,
+        "mean_somatic_fep_error": 0.9655,
+        "mean_apical_fep_error": 0.0202,
+        "block_sparse_32x32_flop_efficiency": 0.8789,
+        "mean_lag_dwpli": 0.5571,
+        "analytic_rehydrations_in_epoch": 130,
+        "elapsed_sec": 19.89
       },
       {
         "epoch": 3,
-        "mean_surprise_F": 0.3252,
+        "mean_surprise_F": 0.327,
         "discrete_surprise_pin_rate": 0.0021,
-        "wikitext_surprise_F": 0.3866,
-        "cornell_dialogs_surprise_F": 0.1272,
-        "tinystories_surprise_F": 0.3378,
-        "mean_somatic_fep_error": 0.9753,
-        "mean_apical_fep_error": 0.0018,
-        "block_sparse_32x32_flop_efficiency": 0.8869,
-        "mean_lag_dwpli": 0.5571,
-        "analytic_rehydrations_in_epoch": 129,
-        "elapsed_sec": 18.0
+        "wikitext_surprise_F": 0.3895,
+        "cornell_dialogs_surprise_F": 0.1278,
+        "tinystories_surprise_F": 0.3374,
+        "mean_somatic_fep_error": 0.9776,
+        "mean_apical_fep_error": 0.0219,
+        "block_sparse_32x32_flop_efficiency": 0.8833,
+        "mean_lag_dwpli": 0.547,
+        "analytic_rehydrations_in_epoch": 126,
+        "elapsed_sec": 19.55
       },
       {
         "epoch": 4,
-        "mean_surprise_F": 0.2289,
+        "mean_surprise_F": 0.23,
         "discrete_surprise_pin_rate": 0.0,
-        "wikitext_surprise_F": 0.2686,
-        "cornell_dialogs_surprise_F": 0.1035,
-        "tinystories_surprise_F": 0.2346,
-        "mean_somatic_fep_error": 0.9893,
-        "mean_apical_fep_error": 0.0017,
-        "block_sparse_32x32_flop_efficiency": 0.8852,
-        "mean_lag_dwpli": 0.5701,
-        "analytic_rehydrations_in_epoch": 124,
-        "elapsed_sec": 15.89
+        "wikitext_surprise_F": 0.2693,
+        "cornell_dialogs_surprise_F": 0.1055,
+        "tinystories_surprise_F": 0.2361,
+        "mean_somatic_fep_error": 0.992,
+        "mean_apical_fep_error": 0.022,
+        "block_sparse_32x32_flop_efficiency": 0.8871,
+        "mean_lag_dwpli": 0.5786,
+        "analytic_rehydrations_in_epoch": 125,
+        "elapsed_sec": 18.63
       }
     ],
     "moe_routing_telemetry": {
@@ -94,28 +150,43 @@
       "dormant_cold_state_saving_fraction": 0.75,
       "total_analytic_rehydrations": 502,
       "block_sparse_tile_size": "32x32",
-      "mean_block_sparse_32x32_flop_efficiency": 0.8622,
-      "lag_based_dwpli_mean": 0.5101,
+      "mean_block_sparse_32x32_flop_efficiency": 0.8684,
+      "lag_based_dwpli_mean": 0.5802,
       "reference_sweep_invariance_check": {
-        "dwpli_reference_0": 0.5101,
-        "dwpli_reference_shifted": 0.5101,
-        "max_reference_sweep_deviation": 2.5e-07,
+        "dwpli_reference_0": 0.5802,
+        "dwpli_reference_shifted": 0.5802,
+        "max_reference_sweep_deviation": 4e-08,
         "is_reference_invariant": true
       },
-      "discrete_pc_wall_hits": 284,
+      "discrete_pc_wall_hits": 288,
       "stranger_check_interventions": 0,
+      "bio_rwkv_telemetry": {
+        "total_steps": 312,
+        "topic_flushes_triggered": 288,
+        "hard_flushes_count": 288,
+        "graded_flushes_count": 21,
+        "hysteresis_chatter_prevented": 9,
+        "archived_topic_snapshots_count": 16,
+        "consolidated_topic_summaries_count": 1,
+        "sleep_consolidations_count": 0,
+        "dht_offload_saving_fraction": 0.0256,
+        "dht_probe_triggers": 304,
+        "last_denominator_mean": 1.087,
+        "last_sharpness_ratio": 0.7006,
+        "last_arbitration_mode": "DHT_EXACT_FACT_OVERRIDE"
+      },
       "expert_utilization_distribution": {
-        "Col0_SYNTAX_BA44": 0.1036,
-        "Col1_LEXICAL_SEMANTICS": 0.1381,
-        "Col2_ENCYCLOPEDIC_FACTS": 0.1547,
-        "Col3_PRAGMATIC_DIALOG": 0.1464,
-        "Col4_NARRATIVE_EPISODIC": 0.1133,
-        "Col5_CAUSAL_PHYSICS": 0.1298,
-        "Col6_THEORY_OF_MIND": 0.1492,
-        "Col7_EXECUTIVE_PFC": 0.0649
+        "Col0_SYNTAX_BA44": 0.1119,
+        "Col1_LEXICAL_SEMANTICS": 0.1354,
+        "Col2_ENCYCLOPEDIC_FACTS": 0.1519,
+        "Col3_PRAGMATIC_DIALOG": 0.1436,
+        "Col4_NARRATIVE_EPISODIC": 0.1119,
+        "Col5_CAUSAL_PHYSICS": 0.1285,
+        "Col6_THEORY_OF_MIND": 0.1478,
+        "Col7_EXECUTIVE_PFC": 0.0691
       }
     },
-    "total_train_sec": 69.74
+    "total_train_sec": 77.74
   },
   "domain_generations": {
     "wikitext": {
@@ -135,8 +206,8 @@
       "domain": "cornell_dialogs",
       "prompt": "DR. VANCE : Wait a second , do you honestly expect",
       "active_moe_experts": [
-        "Col0_SYNTAX_BA44",
-        "Col1_LEXICAL_SEMANTICS"
+        "Col1_LEXICAL_SEMANTICS",
+        "Col0_SYNTAX_BA44"
       ],
       "active_neurons_count": 1024,
       "discrete_wall_resets": 0,
@@ -162,7 +233,7 @@
   "checkpoint_size_mb": 0.75,
   "gpu_bundle_zip": {
     "zip_path": "/home/jupyter/Neuroweave Ziwago/Produce/ziwago_v10_moe_dendritic_gpu_bundle.zip",
-    "zip_size_mb": 0.97,
+    "zip_size_mb": 0.99,
     "files_count": 121
   }
 }

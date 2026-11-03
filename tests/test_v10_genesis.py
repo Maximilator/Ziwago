@@ -1467,4 +1467,45 @@ def test_ziwago_prime_v10_5_upgrade12_and_lab2_breakthroughs():
     assert tel["dormant_cold_state_saving_fraction"] == 0.75
 
 
+def test_ziwago_prime_bio_rwkv_10k_ablation_and_three_blind_spots():
+    """Проверяет реализацию Bio-RWKV (AstroNMDALinearRecurrence) на 20,000 токенах, включая 3 слепых пятна
+    и 4 пред-GPU контура стабильности:
+      1. Контур 1 (Graded vs Hard Flush): градиент gamma_flush in [0.20..0.65] при плавной смене темы на 2000 токенах
+         и резкий сброс (0.92) при скачке темы;
+      2. Контур 2 (Гистерезис Шмитта ACh-арбитража 0.55..0.70): 0 ложных переключений в зоне дрожания [0.61..0.68];
+      3. Контур 3 (Контракт archived_topic_snapshots): буфер ограничен TTL=16 и после фазы сна полностью сжимается
+         в PPR-резюме (buffer_len_after_sleep == 0);
+      4. Контур 4 (Оптимизация скорости и ненасыщающийся знаменатель D_t на 20,000 токенах): скорость > 35,000 ток/с."""
+    from train_ziwago_v10 import benchmark_bio_rwkv_ablation_10k
+
+    rep = benchmark_bio_rwkv_ablation_10k(d_model=64, total_steps=20_000)
+    b1 = rep["blind_spot_1_lc_ne_topic_flush"]
+    b2 = rep["blind_spot_2_dht_arbitration"]
+    b3 = rep["blind_spot_3_denominator_non_saturation"]
+    p1 = rep["point_1_graded_vs_hard_flush"]
+    p2 = rep["point_2_schmitt_trigger_hysteresis"]
+    p3 = rep["point_3_snapshot_contract_ttl_and_sleep"]
+    spd = rep["speed_benchmark_20k"]
+
+    assert b1["topic_flushes_triggered"] >= 1
+    assert b1["bio_rwkv_old_topic_bleed_after_lc_ne_flush"] < b1["naive_rwkv_old_topic_bleed_without_flush"]
+    assert b1["new_topic_alignment_after_5_tokens"] > 0.65
+    assert p1["graded_flushes_count"] >= 1
+    assert 0.20 <= p1["mean_graded_gamma"] <= 0.65
+    assert p1["transition_bridge_coherence_at_11k"] > 0.50
+
+    assert p2["single_threshold_065_oscillations"] > 500
+    assert p2["schmitt_hysteresis_oscillations"] == 0
+
+    assert p3["buffer_len_after_30_flushes"] == 16
+    assert p3["buffer_len_after_sleep_consolidation"] == 0
+    assert p3["ppr_topic_summaries_stored"] >= 1
+
+    assert b2["dht_offload_saving_percent"] >= 85.0
+    assert 0.20 <= b3["bio_rwkv_denominator_at_20000"] <= 1.50
+    assert b3["sharpness_at_20000"] >= 0.45
+    assert spd["vectorized_chunk_tokens_per_sec"] >= 35_000.0
+
+
+
 

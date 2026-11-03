@@ -1,0 +1,532 @@
+{
+  "version": "Ziwago-Prime v10.1 Ontogenetic 3-Phase Curriculum",
+  "status": "COMPLETED",
+  "device": "cpu",
+  "workers": 32,
+  "last_update_utc": "2026-11-03T01:23:35.439155+00:00",
+  "current_stage": 3,
+  "total_stages": 3,
+  "total_tokens_streamed": 180000,
+  "noise_filtered_tokens": 0,
+  "stages_completed": [
+    {
+      "stage_id": 1,
+      "stage_title": "Этап 1: Фундамент речи (Language & Pragmatics — Детский сад)",
+      "target_proportions": {
+        "tinystories": 0.6,
+        "cornell_dialogs": 0.4
+      },
+      "actual_proportions": {
+        "tinystories": 0.6,
+        "cornell_dialogs": 0.4
+      },
+      "domain_token_counts": {
+        "tinystories": 36000,
+        "cornell_dialogs": 24000
+      },
+      "max_proportion_error": 0.0,
+      "epochs_run": 4,
+      "epoch_curves": [
+        {
+          "stage_id": 1,
+          "epoch_in_stage": 1,
+          "mean_surprise_F": 0.6724,
+          "domain_surprise_F": {
+            "tinystories": 0.7577,
+            "cornell_dialogs": 0.5433
+          },
+          "discrete_surprise_pin_rate": 0.4039,
+          "mean_somatic_fep_error": 0.9206,
+          "mean_apical_fep_error": 0.0468,
+          "block_sparse_32x32_flop_efficiency": 0.8817,
+          "mean_lag_dwpli": 0.6656,
+          "analytic_rehydrations": 189,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 74.26
+        },
+        {
+          "stage_id": 1,
+          "epoch_in_stage": 2,
+          "mean_surprise_F": 0.1118,
+          "domain_surprise_F": {
+            "tinystories": 0.1216,
+            "cornell_dialogs": 0.0971
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9652,
+          "mean_apical_fep_error": 0.0371,
+          "block_sparse_32x32_flop_efficiency": 0.8795,
+          "mean_lag_dwpli": 0.5305,
+          "analytic_rehydrations": 203,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 69.58
+        },
+        {
+          "stage_id": 1,
+          "epoch_in_stage": 3,
+          "mean_surprise_F": 0.0475,
+          "domain_surprise_F": {
+            "tinystories": 0.0476,
+            "cornell_dialogs": 0.0473
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9917,
+          "mean_apical_fep_error": 0.0301,
+          "block_sparse_32x32_flop_efficiency": 0.8927,
+          "mean_lag_dwpli": 0.5701,
+          "analytic_rehydrations": 211,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 69.45
+        },
+        {
+          "stage_id": 1,
+          "epoch_in_stage": 4,
+          "mean_surprise_F": 0.0405,
+          "domain_surprise_F": {
+            "tinystories": 0.0403,
+            "cornell_dialogs": 0.0408
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9979,
+          "mean_apical_fep_error": 0.0302,
+          "block_sparse_32x32_flop_efficiency": 0.8939,
+          "mean_lag_dwpli": 0.5862,
+          "analytic_rehydrations": 212,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 77.18
+        }
+      ],
+      "gate_report": {
+        "passed": true,
+        "epoch": 4,
+        "mean_surprise_F": 0.0405,
+        "target_surprise_F": 0.25,
+        "grammar_score": 1.0,
+        "superacid_detected": false,
+        "context_retention_tokens": 588.0,
+        "target_context_retention": 512.0,
+        "checkpoint_saved_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v10_stage1.pt",
+        "checkpoint_size_mb": 1.55,
+        "reasons": [
+          "GATE 1 PASSED -> Saved ziwago_v10_stage1.pt (1.55 MB)"
+        ],
+        "generations": {
+          "tinystories_tale": {
+            "domain": "tinystories",
+            "prompt": "Once upon a time there was a little",
+            "active_moe_experts": [
+              "Col1_LEXICAL_SEMANTICS",
+              "Col4_NARRATIVE_EPISODIC"
+            ],
+            "generated_text": "Once upon a time there was a little girl named Lily. She loved to play with his friends. One day, she would go to the store and was always happy. He went to the park. John was happy to have a special surprise. Emily was so excited to see the",
+            "unique_token_ratio": 0.7143,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 0
+          },
+          "cornell_dialog": {
+            "domain": "cornell_dialogs",
+            "prompt": "DR. VANCE : Wait a second , do you honestly expect",
+            "active_moe_experts": [
+              "Col1_LEXICAL_SEMANTICS",
+              "Col0_SYNTAX_BA44"
+            ],
+            "generated_text": "DR. VANCE : Wait a second , do you honestly expect me to believe that explanation ? We have been analyzing ancient history and the Roman aqueduct for 3 hours . DR. VANCE : Then we agree : Look at the primary record because the inscription matched the dialect of the coastal kingdom . If",
+            "unique_token_ratio": 0.8361,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 1
+          },
+          "pragmatic_irony_probe": {
+            "domain": "cornell_dialogs",
+            "prompt": "DETECTIVE COLE : Listen carefully , we only have",
+            "active_moe_experts": [
+              "Col0_SYNTAX_BA44",
+              "Col1_LEXICAL_SEMANTICS"
+            ],
+            "generated_text": "DETECTIVE COLE : Listen carefully , we only have one chance to verify the evidence before dawn . We have been analyzing ancient history and the Roman aqueduct for 3 hours . DR. VANCE : Then we agree : Look at the primary record because the inscription matched the dialect of the coastal",
+            "unique_token_ratio": 0.8361,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 1
+          }
+        }
+      }
+    },
+    {
+      "stage_id": 2,
+      "stage_title": "Этап 2: Сложный язык (Literature & Style — Школа)",
+      "target_proportions": {
+        "bookcorpus": 0.6,
+        "tinystories": 0.2,
+        "cornell_dialogs": 0.2
+      },
+      "actual_proportions": {
+        "bookcorpus": 0.6,
+        "tinystories": 0.2,
+        "cornell_dialogs": 0.2
+      },
+      "domain_token_counts": {
+        "bookcorpus": 36000,
+        "tinystories": 12000,
+        "cornell_dialogs": 12000
+      },
+      "max_proportion_error": 0.0,
+      "epochs_run": 4,
+      "epoch_curves": [
+        {
+          "stage_id": 2,
+          "epoch_in_stage": 1,
+          "mean_surprise_F": 0.424,
+          "domain_surprise_F": {
+            "bookcorpus": 0.5712,
+            "tinystories": 0.3404,
+            "cornell_dialogs": 0.0688
+          },
+          "discrete_surprise_pin_rate": 0.3185,
+          "mean_somatic_fep_error": 0.9855,
+          "mean_apical_fep_error": 0.02,
+          "block_sparse_32x32_flop_efficiency": 0.8895,
+          "mean_lag_dwpli": 0.5783,
+          "analytic_rehydrations": 377,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 88.04
+        },
+        {
+          "stage_id": 2,
+          "epoch_in_stage": 2,
+          "mean_surprise_F": 0.0771,
+          "domain_surprise_F": {
+            "bookcorpus": 0.0903,
+            "tinystories": 0.0712,
+            "cornell_dialogs": 0.0436
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9891,
+          "mean_apical_fep_error": 0.0196,
+          "block_sparse_32x32_flop_efficiency": 0.8908,
+          "mean_lag_dwpli": 0.5825,
+          "analytic_rehydrations": 404,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 84.63
+        },
+        {
+          "stage_id": 2,
+          "epoch_in_stage": 3,
+          "mean_surprise_F": 0.0414,
+          "domain_surprise_F": {
+            "bookcorpus": 0.0421,
+            "tinystories": 0.0403,
+            "cornell_dialogs": 0.0405
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9895,
+          "mean_apical_fep_error": 0.0232,
+          "block_sparse_32x32_flop_efficiency": 0.8919,
+          "mean_lag_dwpli": 0.5756,
+          "analytic_rehydrations": 387,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 87.54
+        },
+        {
+          "stage_id": 2,
+          "epoch_in_stage": 4,
+          "mean_surprise_F": 0.0407,
+          "domain_surprise_F": {
+            "bookcorpus": 0.041,
+            "tinystories": 0.0402,
+            "cornell_dialogs": 0.0403
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9935,
+          "mean_apical_fep_error": 0.0248,
+          "block_sparse_32x32_flop_efficiency": 0.8923,
+          "mean_lag_dwpli": 0.5867,
+          "analytic_rehydrations": 387,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 84.52
+        }
+      ],
+      "gate_report": {
+        "passed": true,
+        "epoch": 4,
+        "mean_surprise_F": 0.0407,
+        "target_surprise_F": 0.15,
+        "grammar_score": 1.0,
+        "superacid_detected": false,
+        "context_retention_tokens": 1646.4,
+        "target_context_retention": 1500.0,
+        "checkpoint_saved_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v10_stage2.pt",
+        "checkpoint_size_mb": 2.62,
+        "reasons": [
+          "GATE 2 PASSED -> Saved ziwago_v10_stage2.pt (2.62 MB)"
+        ],
+        "generations": {
+          "tinystories_tale": {
+            "domain": "tinystories",
+            "prompt": "Once upon a time there was a little",
+            "active_moe_experts": [
+              "Col1_LEXICAL_SEMANTICS",
+              "Col4_NARRATIVE_EPISODIC"
+            ],
+            "generated_text": "Once upon a time there was a little girl named Lily. She was so happy and he smiled from ear to ear. The cat loved to feel the music through the string. The cat could feel the wind in his hair. As he was lying there, a small boy named Tim",
+            "unique_token_ratio": 0.6964,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 0
+          },
+          "cornell_dialog": {
+            "domain": "cornell_dialogs",
+            "prompt": "DR. VANCE : Wait a second , do you honestly expect",
+            "active_moe_experts": [
+              "Col0_SYNTAX_BA44",
+              "Col1_LEXICAL_SEMANTICS"
+            ],
+            "generated_text": "DR. VANCE : Wait a second , do you honestly expect me to believe that explanation ? We have been analyzing ancient history and the Roman aqueduct for 3 hours . DR. VANCE : Then we agree : Look at the primary record because the inscription matched the dialect of the coastal kingdom . If",
+            "unique_token_ratio": 0.8361,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 1
+          },
+          "bookcorpus_literature": {
+            "domain": "bookcorpus",
+            "prompt": "I wish I had a better answer to that question .",
+            "active_moe_experts": [
+              "Col1_LEXICAL_SEMANTICS",
+              "Col5_CAUSAL_PHYSICS"
+            ],
+            "generated_text": "I wish I had a better answer to that question . Starlings , new york is not the place where i was standing in a forest , so should n't have to be a new spring to his step . I could see the creature ahead of me . I 'm sorry i interrupted your conversation . He was the one who comes",
+            "unique_token_ratio": 0.7761,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 0
+          }
+        }
+      }
+    },
+    {
+      "stage_id": 3,
+      "stage_title": "Этап 3: Факты и реальность (Encyclopedia & Noise — Университет)",
+      "target_proportions": {
+        "bookcorpus": 0.4,
+        "wikitext": 0.3,
+        "openwebtext": 0.3
+      },
+      "actual_proportions": {
+        "bookcorpus": 0.4,
+        "wikitext": 0.3,
+        "openwebtext": 0.3
+      },
+      "domain_token_counts": {
+        "bookcorpus": 24000,
+        "wikitext": 18000,
+        "openwebtext": 18000
+      },
+      "max_proportion_error": 0.0,
+      "epochs_run": 4,
+      "epoch_curves": [
+        {
+          "stage_id": 3,
+          "epoch_in_stage": 1,
+          "mean_surprise_F": 0.6727,
+          "domain_surprise_F": {
+            "bookcorpus": 0.5088,
+            "wikitext": 0.7219,
+            "openwebtext": 0.8418
+          },
+          "discrete_surprise_pin_rate": 0.5733,
+          "mean_somatic_fep_error": 0.9895,
+          "mean_apical_fep_error": 0.0245,
+          "block_sparse_32x32_flop_efficiency": 0.8864,
+          "mean_lag_dwpli": 0.5768,
+          "analytic_rehydrations": 338,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 93.45
+        },
+        {
+          "stage_id": 3,
+          "epoch_in_stage": 2,
+          "mean_surprise_F": 0.0942,
+          "domain_surprise_F": {
+            "bookcorpus": 0.0807,
+            "wikitext": 0.0932,
+            "openwebtext": 0.1132
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9907,
+          "mean_apical_fep_error": 0.0274,
+          "block_sparse_32x32_flop_efficiency": 0.8871,
+          "mean_lag_dwpli": 0.5865,
+          "analytic_rehydrations": 360,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 86.03
+        },
+        {
+          "stage_id": 3,
+          "epoch_in_stage": 3,
+          "mean_surprise_F": 0.0414,
+          "domain_surprise_F": {
+            "bookcorpus": 0.0414,
+            "wikitext": 0.0407,
+            "openwebtext": 0.0422
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9892,
+          "mean_apical_fep_error": 0.0264,
+          "block_sparse_32x32_flop_efficiency": 0.8841,
+          "mean_lag_dwpli": 0.5622,
+          "analytic_rehydrations": 359,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 86.55
+        },
+        {
+          "stage_id": 3,
+          "epoch_in_stage": 4,
+          "mean_surprise_F": 0.0406,
+          "domain_surprise_F": {
+            "bookcorpus": 0.0406,
+            "wikitext": 0.0403,
+            "openwebtext": 0.0409
+          },
+          "discrete_surprise_pin_rate": 0.0,
+          "mean_somatic_fep_error": 0.9891,
+          "mean_apical_fep_error": 0.024,
+          "block_sparse_32x32_flop_efficiency": 0.8861,
+          "mean_lag_dwpli": 0.5791,
+          "analytic_rehydrations": 366,
+          "noise_filtered_tokens_cumulative": 0,
+          "elapsed_sec": 86.86
+        }
+      ],
+      "gate_report": {
+        "passed": true,
+        "epoch": 4,
+        "mean_surprise_F": 0.0406,
+        "target_surprise_F": 0.12,
+        "grammar_score": 1.0,
+        "superacid_detected": false,
+        "context_retention_tokens": 1646.4,
+        "target_context_retention": 1550.0,
+        "checkpoint_saved_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v10_stage3.pt",
+        "checkpoint_size_mb": 4.43,
+        "reasons": [
+          "GATE 3 PASSED -> Saved ziwago_v10_stage3.pt (4.43 MB)"
+        ],
+        "generations": {
+          "tinystories_tale": {
+            "domain": "tinystories",
+            "prompt": "Once upon a time there was a little",
+            "active_moe_experts": [
+              "Col1_LEXICAL_SEMANTICS",
+              "Col4_NARRATIVE_EPISODIC"
+            ],
+            "generated_text": "Once upon a time there was a little girl named Lily. She was so happy and he smiled from ear to ear. The cat loved to feel the music through the string. The cat could feel the wind in their hair as they raced to the finish line. In the end,",
+            "unique_token_ratio": 0.7321,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 0
+          },
+          "cornell_dialog": {
+            "domain": "cornell_dialogs",
+            "prompt": "DR. VANCE : Wait a second , do you honestly expect",
+            "active_moe_experts": [
+              "Col0_SYNTAX_BA44",
+              "Col3_PRAGMATIC_DIALOG"
+            ],
+            "generated_text": "DR. VANCE : Wait a second , do you honestly expect me to believe that explanation ? We have been analyzing ancient history and the Roman aqueduct for 3 hours . DR. VANCE : Then we agree : Look at the primary record because the muddy footprints stopped right beside the fireplace . If you",
+            "unique_token_ratio": 0.8361,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 1
+          },
+          "wikitext_encyclopedia": {
+            "domain": "wikitext",
+            "prompt": "The Valkyria Chronicles III game system",
+            "active_moe_experts": [
+              "Col4_NARRATIVE_EPISODIC",
+              "Col0_SYNTAX_BA44"
+            ],
+            "generated_text": "The Valkyria Chronicles III game system in the tower building and the surrounding buildings were traded to the city of Little Rock and vicinity by donation , purchases , and impressments . He was waived , sent to command the district of Arkansas in May , 1862 , at Little Bear and his wife Mary Eleanor ( Oswald ) Barker on",
+            "unique_token_ratio": 0.7812,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 1
+          },
+          "bookcorpus_style_exam": {
+            "domain": "bookcorpus",
+            "prompt": "Starlings , New York is not the place",
+            "active_moe_experts": [
+              "Col1_LEXICAL_SEMANTICS",
+              "Col3_PRAGMATIC_DIALOG"
+            ],
+            "generated_text": "Starlings , New York is not the place where you want to go to the park ? I asked , trying to catch his breath . All four of us . Seths face reached a new undiscovered level of red , i didnt want to be that half-ling . What does this all mean ? She",
+            "unique_token_ratio": 0.8226,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 0
+          },
+          "openwebtext_resilience_exam": {
+            "domain": "openwebtext",
+            "prompt": "Former secretary of state Hillary Clinton meets",
+            "active_moe_experts": [
+              "Col2_ENCYCLOPEDIC_FACTS",
+              "Col5_CAUSAL_PHYSICS"
+            ],
+            "generated_text": "Former secretary of state Hillary Clinton meets voters at a campaign rally in St. Louis on Saturday. (Melina Mara/The Washington Post) - Russias postal service was hit by Wannacry ransomware last week and some of its computers are still down, three employees in Moscow said, the",
+            "unique_token_ratio": 0.9322,
+            "grammar_coherent": true,
+            "superacid_detected": false,
+            "discrete_wall_resets": 0
+          }
+        }
+      }
+    }
+  ],
+  "moe_routing_telemetry": {
+    "total_columns": 8,
+    "neurons_per_column": 512,
+    "total_cortical_neurons": 4096,
+    "total_dendritic_branches": 28672,
+    "top_k_active": 2,
+    "active_neurons_per_tick": 1024,
+    "dormant_cold_state_saving_fraction": 0.75,
+    "total_analytic_rehydrations": 3848,
+    "block_sparse_tile_size": "32x32",
+    "mean_block_sparse_32x32_flop_efficiency": 0.8582,
+    "lag_based_dwpli_mean": 0.5967,
+    "reference_sweep_invariance_check": {
+      "dwpli_reference_0": 0.5967,
+      "dwpli_reference_shifted": 0.5967,
+      "max_reference_sweep_deviation": 7.48e-06,
+      "is_reference_invariant": true
+    },
+    "discrete_pc_wall_hits": 2718,
+    "stranger_check_interventions": 189,
+    "bio_rwkv_telemetry": {
+      "total_steps": 2170,
+      "topic_flushes_triggered": 2137,
+      "hard_flushes_count": 2137,
+      "graded_flushes_count": 22,
+      "hysteresis_chatter_prevented": 15,
+      "archived_topic_snapshots_count": 6,
+      "consolidated_topic_summaries_count": 16,
+      "sleep_consolidations_count": 76,
+      "dht_offload_saving_fraction": 0.0018,
+      "dht_probe_triggers": 2166,
+      "last_denominator_mean": 1.087,
+      "last_sharpness_ratio": 0.7006,
+      "last_arbitration_mode": "DHT_EXACT_FACT_OVERRIDE"
+    },
+    "expert_utilization_distribution": {
+      "Col0_SYNTAX_BA44": 0.1211,
+      "Col1_LEXICAL_SEMANTICS": 0.1284,
+      "Col2_ENCYCLOPEDIC_FACTS": 0.1292,
+      "Col3_PRAGMATIC_DIALOG": 0.1211,
+      "Col4_NARRATIVE_EPISODIC": 0.1294,
+      "Col5_CAUSAL_PHYSICS": 0.1247,
+      "Col6_THEORY_OF_MIND": 0.1221,
+      "Col7_EXECUTIVE_PFC": 0.124
+    }
+  },
+  "elapsed_total_sec": 1005.57
+}

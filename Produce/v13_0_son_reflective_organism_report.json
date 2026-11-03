@@ -1,0 +1,237 @@
+{
+  "version": "Ziwago-Prime v13.0 SON Reflective Organism & Paired Stimulus-Response Dialogue Engine",
+  "timestamp_utc": "2026-11-03T07:21:49.448089+00:00",
+  "total_neurons": 17408,
+  "son_neurons": 1024,
+  "total_paired_dialogues_in_memory": 5694,
+  "son_vte_simulations_run": 5,
+  "son_motor_stops_triggered": 5,
+  "dialogue_results": [
+    {
+      "stimulus": "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col0_SYNTAX_BA44"
+      ],
+      "oneshot_consolidated_tokens": 20,
+      "vte_candidates_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "episodic_self_other:oneshot_ep_05693",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.125,
+          "son_free_energy_F": -0.6437
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "episodic_self_other:oneshot_q_anchor_05693",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.3093,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.125,
+          "son_free_energy_F": -0.2638
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "cornell_dialogs:cornell_pair_L4479_L4480",
+          "tokens_simulated": 7,
+          "stimulus_alignment_cos": 0.4882,
+          "synaptic_coherence": 0.8548,
+          "conflict_energy": 0.125,
+          "son_free_energy_F": 0.0386
+        }
+      ],
+      "selected_vte_route": "episodic_self_other:oneshot_ep_05693",
+      "stopped_naturally_by_son_eos": true,
+      "son_final_free_energy_F": 0.4343,
+      "son_final_confidence": 0.641,
+      "son_optimal_temperature": 0.7615,
+      "generated_tokens_count": 20,
+      "response_text": "Your name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "latency_ms": 455.94
+    },
+    {
+      "stimulus": "Can we make this quick? Roxanne Korrine and Andrew Barrett are having an incredibly horrendous public break-up on the quad.",
+      "active_moe_columns": [
+        "Col7_EXECUTIVE_PFC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "oneshot_consolidated_tokens": 0,
+      "vte_candidates_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "cornell_dialogs:cornell_pair_L194_L195",
+          "tokens_simulated": 17,
+          "stimulus_alignment_cos": 0.9739,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.1267,
+          "son_free_energy_F": -0.6286
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "cornell_dialogs:cornell_pair_L151_L152",
+          "tokens_simulated": 15,
+          "stimulus_alignment_cos": 0.4681,
+          "synaptic_coherence": 0.9312,
+          "conflict_energy": 0.1267,
+          "son_free_energy_F": 0.0236
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "cornell_dialogs:cornell_pair_L64635_L64636",
+          "tokens_simulated": 21,
+          "stimulus_alignment_cos": 0.5157,
+          "synaptic_coherence": 0.863,
+          "conflict_energy": 0.1267,
+          "son_free_energy_F": 0.0213
+        }
+      ],
+      "selected_vte_route": "cornell_dialogs:cornell_pair_L194_L195",
+      "stopped_naturally_by_son_eos": true,
+      "son_final_free_energy_F": 0.5454,
+      "son_final_confidence": 0.5451,
+      "son_optimal_temperature": 0.7951,
+      "generated_tokens_count": 17,
+      "response_text": "Well, I thought we'd start with pronunciation, if that's okay with you.",
+      "latency_ms": 260.1
+    },
+    {
+      "stimulus": "Gosh, if only we could find Kat a boyfriend...",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "oneshot_consolidated_tokens": 0,
+      "vte_candidates_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "cornell_dialogs:cornell_pair_L207_L208",
+          "tokens_simulated": 8,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.25,
+          "son_free_energy_F": -0.5875
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "bookcorpus:sentpair_book_z17_1356711074",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.4488,
+          "synaptic_coherence": 1.1821,
+          "conflict_energy": 0.25,
+          "son_free_energy_F": 0.0019
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "cornell_dialogs:cornell_pair_L634_L635",
+          "tokens_simulated": 13,
+          "stimulus_alignment_cos": 0.3544,
+          "synaptic_coherence": 1.0877,
+          "conflict_energy": 0.25,
+          "son_free_energy_F": 0.0869
+        }
+      ],
+      "selected_vte_route": "cornell_dialogs:cornell_pair_L207_L208",
+      "stopped_naturally_by_son_eos": true,
+      "son_final_free_energy_F": 0.5292,
+      "son_final_confidence": 0.5633,
+      "son_optimal_temperature": 0.7887,
+      "generated_tokens_count": 8,
+      "response_text": "Let me see what I can do.",
+      "latency_ms": 286.37
+    },
+    {
+      "stimulus": "Once upon a time there was a little girl named Lily.",
+      "active_moe_columns": [
+        "Col7_EXECUTIVE_PFC",
+        "Col6_THEORY_OF_MIND"
+      ],
+      "oneshot_consolidated_tokens": 0,
+      "vte_candidates_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "tinystories:sentpair_tiny_z00_b0_4",
+          "tokens_simulated": 10,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.1251,
+          "son_free_energy_F": -0.6437
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "tinystories:sentpair_tiny_z00_b0_44",
+          "tokens_simulated": 12,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.1251,
+          "son_free_energy_F": -0.6437
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "tinystories:sentpair_tiny_z03_b0_2",
+          "tokens_simulated": 11,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.1251,
+          "son_free_energy_F": -0.6437
+        }
+      ],
+      "selected_vte_route": "tinystories:sentpair_tiny_z00_b0_4",
+      "stopped_naturally_by_son_eos": true,
+      "son_final_free_energy_F": 0.4993,
+      "son_final_confidence": 0.585,
+      "son_optimal_temperature": 0.7811,
+      "generated_tokens_count": 10,
+      "response_text": "Lily liked to pretend she was a popular princess.",
+      "latency_ms": 231.13
+    },
+    {
+      "stimulus": "Remind me, what is my name and what am I building?",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "oneshot_consolidated_tokens": 0,
+      "vte_candidates_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "episodic_self_other:oneshot_ep_05693",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.3508,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.25,
+          "son_free_energy_F": -0.2304
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "episodic_self_other:oneshot_q_anchor_05693",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.0673,
+          "synaptic_coherence": 2.0,
+          "conflict_energy": 0.25,
+          "son_free_energy_F": -0.0745
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "bookcorpus:sentpair_book_z03_255612405",
+          "tokens_simulated": 11,
+          "stimulus_alignment_cos": 0.3239,
+          "synaptic_coherence": 1.4239,
+          "conflict_energy": 0.25,
+          "son_free_energy_F": -0.014
+        }
+      ],
+      "selected_vte_route": "episodic_self_other:oneshot_ep_05693",
+      "stopped_naturally_by_son_eos": true,
+      "son_final_free_energy_F": 0.5481,
+      "son_final_confidence": 0.5403,
+      "son_optimal_temperature": 0.7967,
+      "generated_tokens_count": 20,
+      "response_text": "Your name is Alex, and You are building a biological neural network with dendritic predictive coding.",
+      "latency_ms": 264.69
+    }
+  ],
+  "elapsed_total_sec": 31.25
+}

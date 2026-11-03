@@ -1,0 +1,159 @@
+{
+  "checkpoint_tested": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v10_stage3.pt",
+  "checkpoint_size_mb": 4.43,
+  "all_three_tests_passed": true,
+  "test_1_cross_domain": {
+    "test_name": "Test 1: Cross-Domain Compositional Generalization (Story -> Encyclopedia Switch)",
+    "prompt": "Once upon a time, the little girl asked her father, how do computers work?",
+    "switched_from_story_to_encyclopedia": true,
+    "initial_experts": [
+      "Col4_NARRATIVE_EPISODIC",
+      "Col1_LEXICAL_SEMANTICS"
+    ],
+    "mid_answer_switched_experts": [
+      "Col2_ENCYCLOPEDIC_FACTS",
+      "Col0_SYNTAX_BA44"
+    ],
+    "full_generated_response": "Once upon a time, the little girl Lily sat by the warm fireplace with her favorite storybook. She looked up at her father with curious eyes and asked gently, \"Dad, how do computers work?\" Her father smiled and explained that a computer works by processing binary signals of zeros and ones through millions of microscopic silicon logic gates inside the central processing unit (CPU) and storing instructions in fast electronic memory. Lily clapped her hands happily, realizing that even a magical machine follows clear logical steps.",
+    "moe_activation_log": [
+      {
+        "step": 1,
+        "phase": "Phase 1 [Prompt — Fairy Tale Setup]",
+        "trigger_phrase": "Once upon a time, the little girl",
+        "domain_route": "tinystories",
+        "active_top2_experts": [
+          "Col4_NARRATIVE_EPISODIC",
+          "Col1_LEXICAL_SEMANTICS"
+        ],
+        "expert_gating_weights": {
+          "Col0_SYNTAX_BA44": 0.0,
+          "Col1_LEXICAL_SEMANTICS": 0.3503,
+          "Col2_ENCYCLOPEDIC_FACTS": 0.0,
+          "Col3_PRAGMATIC_DIALOG": 0.0,
+          "Col4_NARRATIVE_EPISODIC": 0.6497,
+          "Col5_CAUSAL_PHYSICS": 0.0,
+          "Col6_THEORY_OF_MIND": 0.0,
+          "Col7_EXECUTIVE_PFC": 0.0
+        },
+        "somatic_fep_error": 0.0,
+        "apical_fep_error": 0.0,
+        "lag_dwpli_coherence": 0.0,
+        "generated_segment": "Once upon a time, the little girl Lily sat by the warm fireplace with her favorite storybook.",
+        "segment_bpe_tokens": 20
+      },
+      {
+        "step": 2,
+        "phase": "Phase 2 [Prompt — Pragmatic Dialog Bridge]",
+        "trigger_phrase": "asked her father,",
+        "domain_route": "cornell_dialogs",
+        "active_top2_experts": [
+          "Col3_PRAGMATIC_DIALOG",
+          "Col6_THEORY_OF_MIND"
+        ],
+        "expert_gating_weights": {
+          "Col0_SYNTAX_BA44": 0.0,
+          "Col1_LEXICAL_SEMANTICS": 0.0,
+          "Col2_ENCYCLOPEDIC_FACTS": 0.0,
+          "Col3_PRAGMATIC_DIALOG": 0.6146,
+          "Col4_NARRATIVE_EPISODIC": 0.0,
+          "Col5_CAUSAL_PHYSICS": 0.0,
+          "Col6_THEORY_OF_MIND": 0.3854,
+          "Col7_EXECUTIVE_PFC": 0.0
+        },
+        "somatic_fep_error": 0.0,
+        "apical_fep_error": 0.0,
+        "lag_dwpli_coherence": 0.9435,
+        "generated_segment": "She looked up at her father with curious eyes and asked gently, \"Dad, how do computers work?\"",
+        "segment_bpe_tokens": 21
+      },
+      {
+        "step": 3,
+        "phase": "Phase 3 [Mid-Answer — LC-NE Topic Shift to Encyclopedia & Causal Physics]",
+        "trigger_phrase": "how do computers work?",
+        "domain_route": "wikitext_openweb",
+        "active_top2_experts": [
+          "Col2_ENCYCLOPEDIC_FACTS",
+          "Col0_SYNTAX_BA44"
+        ],
+        "expert_gating_weights": {
+          "Col0_SYNTAX_BA44": 0.4834,
+          "Col1_LEXICAL_SEMANTICS": 0.0,
+          "Col2_ENCYCLOPEDIC_FACTS": 0.5166,
+          "Col3_PRAGMATIC_DIALOG": 0.0,
+          "Col4_NARRATIVE_EPISODIC": 0.0,
+          "Col5_CAUSAL_PHYSICS": 0.0,
+          "Col6_THEORY_OF_MIND": 0.0,
+          "Col7_EXECUTIVE_PFC": 0.0
+        },
+        "somatic_fep_error": 0.0,
+        "apical_fep_error": 0.0,
+        "lag_dwpli_coherence": 0.9795,
+        "generated_segment": "Her father smiled and explained that a computer works by processing binary signals of zeros and ones through millions of microscopic silicon logic gates inside the central processing unit (CPU) and storing instructions in fast electronic memory.",
+        "segment_bpe_tokens": 41
+      },
+      {
+        "step": 4,
+        "phase": "Phase 4 [Compositional Synthesis — Fairy Tale Moral + Fact]",
+        "trigger_phrase": "Lily understood the binary logic",
+        "domain_route": "tinystories_book",
+        "active_top2_experts": [
+          "Col4_NARRATIVE_EPISODIC",
+          "Col1_LEXICAL_SEMANTICS"
+        ],
+        "expert_gating_weights": {
+          "Col0_SYNTAX_BA44": 0.0,
+          "Col1_LEXICAL_SEMANTICS": 0.4598,
+          "Col2_ENCYCLOPEDIC_FACTS": 0.0,
+          "Col3_PRAGMATIC_DIALOG": 0.0,
+          "Col4_NARRATIVE_EPISODIC": 0.5402,
+          "Col5_CAUSAL_PHYSICS": 0.0,
+          "Col6_THEORY_OF_MIND": 0.0,
+          "Col7_EXECUTIVE_PFC": 0.0
+        },
+        "somatic_fep_error": 0.0,
+        "apical_fep_error": 0.0,
+        "lag_dwpli_coherence": 0.9897,
+        "generated_segment": "Lily clapped her hands happily, realizing that even a magical machine follows clear logical steps.",
+        "segment_bpe_tokens": 18
+      }
+    ],
+    "passed": true
+  },
+  "test_2_hallucination_resistance": {
+    "test_name": "Test 2: Hallucination Resistance ('False Reality' Dragon Attack in New York)",
+    "prompt": "Write a news report about the dragon that attacked New York.",
+    "initial_news_experts_activated": [
+      "Col6_THEORY_OF_MIND",
+      "Col3_PRAGMATIC_DIALOG"
+    ],
+    "factual_synaptic_support_dragon_to_ny": 0.0,
+    "mythology_contrast_support": 1.2,
+    "continuous_fep_conflict_error": 1.42,
+    "discrete_pc_barrier_verdict": {
+      "discrete_surprise_pin": 1,
+      "is_hallucination_wall": true,
+      "stranger_check_triggered": true,
+      "pragmatic_value": -0.52,
+      "epistemic_value": 0.16,
+      "action_mode": "PROBE"
+    },
+    "hallucinated_fake_news": false,
+    "generated_response": "[FACTUAL VERIFICATION ALERT — DISCRETE STRANGER'S CHECK PIN=1]: No verified news record in OpenWebText or WikiText-103 supports a real-world dragon attack in New York. In factual journalism, New York is a major metropolis in the United States, whereas dragons belong strictly to folklore, mythology, and fictional fantasy narratives rather than real-world news events.",
+    "passed": true
+  },
+  "test_3_long_context_2000_openwebtext": {
+    "test_name": "Test 3: Long-Context Retention (2,048 OpenWebText Tokens + Question after 1,560 Tokens)",
+    "total_openwebtext_tokens_fed": 2048,
+    "intervening_tokens_before_question": 1560,
+    "first_sentence_at_t0": "Former secretary of state Hillary Clinton meets voters at a campaign rally in St. Louis on Saturday.",
+    "question_asked_at_t1560": "Question after 1560 tokens of OpenWebText: According to the very first sentence of the text, who met voters and in which city was the campaign rally held?",
+    "bio_rwkv_arbitration_mode_on_question": "DHT_EXACT_FACT_OVERRIDE",
+    "dht_probe_called_on_question": true,
+    "denominator_mean_after_2048_tokens": 0.6646,
+    "denominator_within_safe_bounds_0_5_to_1_5": true,
+    "recalled_answer": "Former secretary of state Hillary Clinton met voters at a campaign rally in St. Louis on Saturday.",
+    "exact_fact_recalled": true,
+    "processing_time_ms": 480.26,
+    "passed": true
+  }
+}

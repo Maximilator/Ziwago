@@ -1,0 +1,128 @@
+{
+  "version": "Ziwago-Prime v10.3 Two-Phase Ontogeny (Structural Grounding + Full Knowledge Assimilation)",
+  "status": "COMPLETED",
+  "last_update_utc": "2026-11-03T03:18:18.735616+00:00",
+  "master_checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v10_3_knowledge_master.pt",
+  "master_checkpoint_size_mb": 26.45,
+  "total_knowledge_tokens_assimilated": 1487934,
+  "total_dht_episodes": 16813,
+  "total_hipporag_concepts": 14831,
+  "total_col2_encyclopedic_hard_synapses": 882643,
+  "total_stranger_check_rejections": 161,
+  "grammar_overwrite_attempts_blocked": 288386,
+  "grammar_hard_overwrite_violations": 0,
+  "phase_a_structural_grounding": {
+    "tokens_per_epoch": 10000,
+    "epochs_run": 4,
+    "initial_surprise_F": 0.6618,
+    "final_surprise_F": 0.0407,
+    "exited_under_0_05": true,
+    "frozen_grammar_hard_bigrams": 3417,
+    "frozen_grammar_hard_trigrams": 5115,
+    "cortical_ba44_hard_synapses": 668626,
+    "synaptic_intelligence_mean_omega": 0.994,
+    "elapsed_sec": 48.06
+  },
+  "phase_b_substages": [
+    {
+      "substage_id": 1,
+      "substage_title": "Этап 1: Фундамент речи (Language & Pragmatics — Детский сад)",
+      "waves_completed": 5,
+      "tokens_assimilated": 500000,
+      "mean_surprise_F": 0.0578,
+      "new_dht_episodes_stored": 4285,
+      "cumulative_dht_episodes": 4285,
+      "cumulative_hipporag_concepts": 3677,
+      "col2_encyclopedic_hard_synapses": 0,
+      "stranger_check_noise_rejections": 0,
+      "grammar_hard_overwrite_violations": 0,
+      "elapsed_sec": 369.88
+    },
+    {
+      "substage_id": 2,
+      "substage_title": "Этап 2: Сложный язык (Literature & Style — Школа)",
+      "waves_completed": 5,
+      "tokens_assimilated": 500000,
+      "mean_surprise_F": 0.0623,
+      "new_dht_episodes_stored": 6094,
+      "cumulative_dht_episodes": 10379,
+      "cumulative_hipporag_concepts": 8401,
+      "col2_encyclopedic_hard_synapses": 329354,
+      "stranger_check_noise_rejections": 0,
+      "grammar_hard_overwrite_violations": 0,
+      "elapsed_sec": 441.6
+    },
+    {
+      "substage_id": 3,
+      "substage_title": "Этап 3: Факты и реальность (Encyclopedia & Noise — Университет)",
+      "waves_completed": 5,
+      "tokens_assimilated": 500000,
+      "mean_surprise_F": 0.0723,
+      "new_dht_episodes_stored": 6434,
+      "cumulative_dht_episodes": 16813,
+      "cumulative_hipporag_concepts": 14831,
+      "col2_encyclopedic_hard_synapses": 882643,
+      "stranger_check_noise_rejections": 161,
+      "grammar_hard_overwrite_violations": 0,
+      "elapsed_sec": 543.9
+    }
+  ],
+  "final_three_exams": {
+    "all_three_tests_passed": true,
+    "grammar_preserved_100_percent": true,
+    "test_1_fairytale_tinystories": {
+      "domain": "tinystories",
+      "prompt": "Once upon a time there was a little",
+      "active_moe_experts": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col4_NARRATIVE_EPISODIC"
+      ],
+      "generated_text": "Once upon a time there was a little boy named Tim. He liked it. It was a big, pretty castle. The queen went to the park. One day, a little girl named Lily. She was three years old and loved to play with his friends. They played and had fun. The sun was very hot",
+      "unique_token_ratio": 0.7188,
+      "grammar_coherent": true,
+      "superacid_detected": false,
+      "discrete_wall_resets": 0
+    },
+    "test_2_wikipedia_fact_erudition": {
+      "domain": "wikitext",
+      "prompt": "The Valkyria Chronicles III game system",
+      "active_moe_experts": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "generated_text": "The Valkyria Chronicles III game system , the Bulls , and that the statute governing special elections was unconstitutional . Kevin M. Gold instead suggests that this was due to the United States . The route to each story location on the album , which was the first time in franchise history . They were then placed in charge of the most common class of",
+      "unique_token_ratio": 0.7794,
+      "grammar_coherent": true,
+      "superacid_detected": false,
+      "discrete_wall_resets": 0,
+      "sbc_vsa_dht_ppr_top_episodes": [
+        10853,
+        10843,
+        10828,
+        10996,
+        10877
+      ],
+      "sbc_vsa_dht_concept_chain": [
+        "Chronicles",
+        "Titled",
+        "Service",
+        "Russell",
+        "Newell"
+      ]
+    },
+    "test_3_cornell_pragmatic_dialog": {
+      "domain": "cornell_dialogs",
+      "prompt": "DR. VANCE : Wait a second , do you honestly expect",
+      "active_moe_experts": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col0_SYNTAX_BA44"
+      ],
+      "generated_text": "DR. VANCE : Wait a second , do you honestly expect me to believe that explanation ? We have been analyzing orbital mechanics and the lunar module for 4 hours . DR. VANCE : Exactly my point when you strip away the noise , the cause and effect are obvious . If you check step 6 , I admit your logic holds up , even",
+      "unique_token_ratio": 0.8116,
+      "grammar_coherent": true,
+      "superacid_detected": false,
+      "discrete_wall_resets": 1
+    }
+  },
+  "elapsed_total_sec": 1431.41
+}

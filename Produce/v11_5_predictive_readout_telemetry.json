@@ -1,0 +1,351 @@
+{
+  "version": "Ziwago-Prime v11.5 Predictive Cortical Readout & PFC Entity Binding",
+  "total_neurons": 16384,
+  "total_dendritic_branches": 114688,
+  "total_synaptic_parameters": 124416000,
+  "total_tokens_processed": 1878252,
+  "peak_throughput_tok_per_sec": 54928.4,
+  "pc_readout_initial_loss_nats": 6.3098,
+  "pc_readout_final_loss_nats": 5.8002,
+  "pc_readout_total_matrix_updates": 245060,
+  "sbc_vsa_dht_episodes": 24442,
+  "sbc_vsa_dht_concepts": 5899,
+  "phase_a_elastic_grounding": {
+    "calibration_tokens": 15000,
+    "epochs": 2,
+    "initial_surprise_F": 0.396,
+    "final_surprise_F": 0.2451,
+    "scaffold_mode": "ELASTIC_METAPLASTIC_SCAFFOLD_SOFT (Benna-Fusi + Torrigiano Scaling)",
+    "soft_shielded_bigrams": 3872,
+    "soft_shielded_trigrams": 5445,
+    "soft_cortical_synapses_count": 8652608,
+    "elapsed_sec": 5.04
+  },
+  "phase_b_stages": [
+    {
+      "stage_id": 1,
+      "title": "Подфаза Б.1 (Детский сад: Сказки + Диалоги)",
+      "waves": [
+        {
+          "wave_idx": 1,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 44108.6,
+          "mean_surprise_F": 0.073,
+          "new_dht_episodes": 1916,
+          "cumulative_dht_episodes": 2944,
+          "cumulative_hipporag_concepts": 241,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 61275,
+          "elapsed_sec": 3.401,
+          "pc_readout_loss_nats": 2.6369,
+          "pc_readout_total_updates": 76800,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.254
+        },
+        {
+          "wave_idx": 2,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 48089.7,
+          "mean_surprise_F": 0.071,
+          "new_dht_episodes": 1893,
+          "cumulative_dht_episodes": 4837,
+          "cumulative_hipporag_concepts": 445,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 124020,
+          "elapsed_sec": 3.119,
+          "pc_readout_loss_nats": 2.4287,
+          "pc_readout_total_updates": 92160,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.242
+        },
+        {
+          "wave_idx": 3,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 44254.2,
+          "mean_surprise_F": 0.069,
+          "new_dht_episodes": 1937,
+          "cumulative_dht_episodes": 6774,
+          "cumulative_hipporag_concepts": 661,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 185976,
+          "elapsed_sec": 3.39,
+          "pc_readout_loss_nats": 2.3716,
+          "pc_readout_total_updates": 107520,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.267
+        },
+        {
+          "wave_idx": 4,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 47119.0,
+          "mean_surprise_F": 0.067,
+          "new_dht_episodes": 1869,
+          "cumulative_dht_episodes": 8643,
+          "cumulative_hipporag_concepts": 799,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 248298,
+          "elapsed_sec": 3.183,
+          "pc_readout_loss_nats": 2.2977,
+          "pc_readout_total_updates": 122880,
+          "shares": {
+            "tinystories": 0.6,
+            "cornell_dialogs": 0.4
+          },
+          "stream_sec": 0.472
+        }
+      ]
+    },
+    {
+      "stage_id": 2,
+      "title": "Подфаза Б.2 (Школа: Книги + Сказки + Диалоги)",
+      "waves": [
+        {
+          "wave_idx": 1,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 52513.0,
+          "mean_surprise_F": 0.073,
+          "new_dht_episodes": 2106,
+          "cumulative_dht_episodes": 10749,
+          "cumulative_hipporag_concepts": 1526,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 285803,
+          "elapsed_sec": 2.856,
+          "pc_readout_loss_nats": 3.4462,
+          "pc_readout_total_updates": 138215,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.294
+        },
+        {
+          "wave_idx": 2,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 35761.9,
+          "mean_surprise_F": 0.071,
+          "new_dht_episodes": 2099,
+          "cumulative_dht_episodes": 12848,
+          "cumulative_hipporag_concepts": 2115,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 324304,
+          "elapsed_sec": 4.194,
+          "pc_readout_loss_nats": 3.0001,
+          "pc_readout_total_updates": 153570,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.264
+        },
+        {
+          "wave_idx": 3,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 49033.2,
+          "mean_surprise_F": 0.069,
+          "new_dht_episodes": 2100,
+          "cumulative_dht_episodes": 14948,
+          "cumulative_hipporag_concepts": 2600,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 359215,
+          "elapsed_sec": 3.059,
+          "pc_readout_loss_nats": 3.4795,
+          "pc_readout_total_updates": 168925,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.296
+        },
+        {
+          "wave_idx": 4,
+          "tokens_processed": 150000,
+          "throughput_tok_per_sec": 53763.8,
+          "mean_surprise_F": 0.067,
+          "new_dht_episodes": 2096,
+          "cumulative_dht_episodes": 17044,
+          "cumulative_hipporag_concepts": 3011,
+          "stranger_check_rejections_wave": 0,
+          "elastic_adaptations_cumulative": 396023,
+          "elapsed_sec": 2.79,
+          "pc_readout_loss_nats": 3.0728,
+          "pc_readout_total_updates": 184265,
+          "shares": {
+            "bookcorpus": 0.6,
+            "tinystories": 0.2,
+            "cornell_dialogs": 0.2
+          },
+          "stream_sec": 0.287
+        }
+      ]
+    },
+    {
+      "stage_id": 3,
+      "title": "Подфаза Б.3 (Университет: Книги + Википедия + Весь Интернет)",
+      "waves": [
+        {
+          "wave_idx": 1,
+          "tokens_processed": 147480,
+          "throughput_tok_per_sec": 45480.6,
+          "mean_surprise_F": 0.073,
+          "new_dht_episodes": 1851,
+          "cumulative_dht_episodes": 18895,
+          "cumulative_hipporag_concepts": 3862,
+          "stranger_check_rejections_wave": 33,
+          "elastic_adaptations_cumulative": 409335,
+          "elapsed_sec": 3.243,
+          "pc_readout_loss_nats": 5.7982,
+          "pc_readout_total_updates": 199445,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.652
+        },
+        {
+          "wave_idx": 2,
+          "tokens_processed": 146443,
+          "throughput_tok_per_sec": 51109.0,
+          "mean_surprise_F": 0.071,
+          "new_dht_episodes": 1860,
+          "cumulative_dht_episodes": 20755,
+          "cumulative_hipporag_concepts": 4593,
+          "stranger_check_rejections_wave": 43,
+          "elastic_adaptations_cumulative": 422267,
+          "elapsed_sec": 2.865,
+          "pc_readout_loss_nats": 5.8375,
+          "pc_readout_total_updates": 214505,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.47
+        },
+        {
+          "wave_idx": 3,
+          "tokens_processed": 146730,
+          "throughput_tok_per_sec": 50384.3,
+          "mean_surprise_F": 0.069,
+          "new_dht_episodes": 1820,
+          "cumulative_dht_episodes": 22575,
+          "cumulative_hipporag_concepts": 5271,
+          "stranger_check_rejections_wave": 39,
+          "elastic_adaptations_cumulative": 435393,
+          "elapsed_sec": 2.912,
+          "pc_readout_loss_nats": 5.7067,
+          "pc_readout_total_updates": 229825,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.444
+        },
+        {
+          "wave_idx": 4,
+          "tokens_processed": 147599,
+          "throughput_tok_per_sec": 54928.4,
+          "mean_surprise_F": 0.067,
+          "new_dht_episodes": 1867,
+          "cumulative_dht_episodes": 24442,
+          "cumulative_hipporag_concepts": 5899,
+          "stranger_check_rejections_wave": 30,
+          "elastic_adaptations_cumulative": 448382,
+          "elapsed_sec": 2.687,
+          "pc_readout_loss_nats": 5.8002,
+          "pc_readout_total_updates": 245060,
+          "shares": {
+            "bookcorpus": 0.4,
+            "wikitext": 0.3,
+            "openwebtext": 0.3
+          },
+          "stream_sec": 0.475
+        }
+      ]
+    }
+  ],
+  "final_gpt2_grade_exams": {
+    "test_1_fairytale_entity_consistency": {
+      "domain": "tinystories",
+      "prompt": "Once upon a time there was a little girl named Lily.",
+      "active_moe_experts": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "bound_protagonist_in_pfc_who_slot": "Lily",
+      "character_names_in_output": [
+        "lily"
+      ],
+      "single_consistent_protagonist": true,
+      "alien_character_names_inhibited": 337,
+      "cross_topic_jumps_blocked_by_apical_sst": 898,
+      "generated_text": "Once upon a time there was a little girl named Lily. \"Wow, that place in real life. As she closed her eyes and saw lots of smoke coming out of bed and looked like a fun way and created something special and exciting. On his way, he was a girl named Lily. She wished she could visit that place in real",
+      "unique_token_ratio": 0.6912,
+      "grammar_coherent": true
+    },
+    "test_2_wikipedia_article_synthesis": {
+      "domain": "wikitext",
+      "prompt": "In May 1945 , when Nazi Germany surrendered",
+      "active_moe_experts": [
+        "Col2_ENCYCLOPEDIC_FACTS",
+        "Col0_SYNTAX_BA44"
+      ],
+      "bound_protagonist_in_pfc_who_slot": null,
+      "character_names_in_output": [],
+      "single_consistent_protagonist": true,
+      "alien_character_names_inhibited": 0,
+      "cross_topic_jumps_blocked_by_apical_sst": 2042,
+      "generated_text": "In May 1945 , when Nazi Germany surrendered , and regretted not doing so to some extent . In later life , when interviewed in the world , but did not make a big show . In 15 , and was named after the surrender of Germany , and at the Royal Navy . He had a maximum thickness of 9.58 WR",
+      "unique_token_ratio": 0.7188,
+      "grammar_coherent": true
+    },
+    "test_3_bookcorpus_novel_scene": {
+      "domain": "bookcorpus",
+      "prompt": "Each time they visited , they stole away",
+      "active_moe_experts": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col4_NARRATIVE_EPISODIC"
+      ],
+      "bound_protagonist_in_pfc_who_slot": null,
+      "character_names_in_output": [],
+      "single_consistent_protagonist": true,
+      "alien_character_names_inhibited": 0,
+      "cross_topic_jumps_blocked_by_apical_sst": 3892,
+      "generated_text": "Each time they visited , they stole away iambe 's thin wrist and tugged her down dust-roughened stairs , around the corner of the storehouse and deep into the living with me again , and a pair of blue eyes . Now , callithoe breathed in the coolness , the humid",
+      "unique_token_ratio": 0.8125,
+      "grammar_coherent": true
+    },
+    "test_4_cornell_pragmatic_dialog": {
+      "domain": "cornell_dialogs",
+      "prompt": "DR. VANCE : Wait a second , do you honestly expect",
+      "active_moe_experts": [
+        "Col3_PRAGMATIC_DIALOG",
+        "Col0_SYNTAX_BA44"
+      ],
+      "bound_protagonist_in_pfc_who_slot": null,
+      "character_names_in_output": [],
+      "single_consistent_protagonist": true,
+      "alien_character_names_inhibited": 0,
+      "cross_topic_jumps_blocked_by_apical_sst": 348,
+      "generated_text": "DR. VANCE : Wait a second , do you honestly expect me to believe that explanation ? We have been analyzing culinary irony and the burned souffle for 8 hours . ELENA : Look at the primary record because opening the oven door too early collapsed the warm air . If you check step 1 , the outcome is inevitable . DR",
+      "unique_token_ratio": 0.8507,
+      "grammar_coherent": true
+    }
+  },
+  "elapsed_total_sec": 67.12,
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v11_5_gpt2_parity_master.pt",
+  "checkpoint_size_mb": 33.02
+}
