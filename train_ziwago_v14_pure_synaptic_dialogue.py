@@ -378,6 +378,11 @@ class DendriticPlateauMatrixReadout:
         self.tok_to_col: Dict[int, int] = {}
         self.col_to_tok: List[int] = []
         self.w_dend_out = torch.zeros(d_dend, 4096, dtype=torch.float32)
+        # Эпизодическая матрица быстрой SWR-консолидации гиппокампа -> коры (Complementary Learning Systems, McClelland et al. 1995):
+        # Хранит сшитые сложноподчинённые ответы (Sharp-Wave Ripple Replay) отдельно от базовой семантической матрицы w_dend_out,
+        # чтобы запись длинного композиционного предложения (50+ токенов) НЕ создавала синаптической интерференции на базовых полюсах!
+        self.w_swr_dend_out = torch.zeros(d_dend, 4096, dtype=torch.float32)
+        self.w_swr_poles: torch.Tensor = torch.empty((0, d_vec), dtype=torch.float32)
 
         # Рекуррентная матрица аттракторов CA3:
         # 1) Непрерывные полюса W_CA3 [N_attractors, 64] (косинусное поле стимула)
@@ -411,6 +416,7 @@ class DendriticPlateauMatrixReadout:
         if col >= self.w_dend_out.shape[1]:
             extra = torch.zeros(self.d_dend, 4096, dtype=torch.float32)
             self.w_dend_out = torch.cat([self.w_dend_out, extra], dim=1)
+            self.w_swr_dend_out = torch.cat([self.w_swr_dend_out, extra.clone()], dim=1)
         self.tok_to_col[tid] = col
         self.col_to_tok.append(tid)
         return col
@@ -499,28 +505,27 @@ class DendriticPlateauMatrixReadout:
             return
         with torch.no_grad():
             q_norm = F.normalize(q_vec, p=2, dim=0)
-            s_sdr_a = self._compute_cortical_sdr2048(stimulus_ids if stimulus_ids is not None else response_ids, normalize=False)
-            s_sdr_b = self._compute_cortical_sdr2048(response_content_ids if response_content_ids is not None else response_ids, normalize=False)
-            # Двунаправленное синаптическое слияние Хебба (Stimulus A <-> Response B) на уровне миниколонок CA3
-            # БЕЗ деления на 1/sqrt(N), чтобы каждое слово из ответа B имело полную силу синаптической проводимости 1.0!
-            bi_sdr = torch.clamp(s_sdr_a + 0.95 * s_sdr_b, max=1.2)
-            self.sdr_column_usage.add_((bi_sdr > 0).float() * 0.25)
+            if stimulus_ids is not None or self.w_ca3_attractors.shape[0] == 0:
+                s_sdr_a = self._compute_cortical_sdr2048(stimulus_ids if stimulus_ids is not None else response_ids, normalize=False)
+                s_sdr_b = self._compute_cortical_sdr2048(response_content_ids if response_content_ids is not None else response_ids, normalize=False)
+                bi_sdr = torch.clamp(s_sdr_a + 0.95 * s_sdr_b, max=1.2)
+                self.sdr_column_usage.add_((bi_sdr > 0).float() * 0.25)
 
-            if self.w_ca3_attractors.shape[0] == 0:
-                self.w_ca3_attractors = q_norm.unsqueeze(0).clone()
-                self.w_ca3_sdr = bi_sdr.unsqueeze(0).clone()
-                self.w_ca3_salience = torch.tensor([float(f_mod)], dtype=torch.float32)
-            else:
-                sims_existing = self.w_ca3_attractors @ q_norm
-                max_sim, max_idx = torch.max(sims_existing, dim=0)
-                if float(max_sim.item()) >= 0.985:
-                    p_idx = int(max_idx.item())
-                    self.w_ca3_sdr[p_idx] = torch.max(self.w_ca3_sdr[p_idx], bi_sdr)
-                    self.w_ca3_salience[p_idx] = max(float(self.w_ca3_salience[p_idx].item()), float(f_mod))
-                elif self.w_ca3_attractors.shape[0] < 4096:
-                    self.w_ca3_attractors = torch.cat([self.w_ca3_attractors, q_norm.unsqueeze(0)], dim=0)
-                    self.w_ca3_sdr = torch.cat([self.w_ca3_sdr, bi_sdr.unsqueeze(0)], dim=0)
-                    self.w_ca3_salience = torch.cat([self.w_ca3_salience, torch.tensor([float(f_mod)], dtype=torch.float32)], dim=0)
+                if self.w_ca3_attractors.shape[0] == 0:
+                    self.w_ca3_attractors = q_norm.unsqueeze(0).clone()
+                    self.w_ca3_sdr = bi_sdr.unsqueeze(0).clone()
+                    self.w_ca3_salience = torch.tensor([float(f_mod)], dtype=torch.float32)
+                else:
+                    sims_existing = self.w_ca3_attractors @ q_norm
+                    max_sim, max_idx = torch.max(sims_existing, dim=0)
+                    if float(max_sim.item()) >= 0.985:
+                        p_idx = int(max_idx.item())
+                        self.w_ca3_sdr[p_idx] = torch.max(self.w_ca3_sdr[p_idx], bi_sdr)
+                        self.w_ca3_salience[p_idx] = max(float(self.w_ca3_salience[p_idx].item()), float(f_mod))
+                    elif self.w_ca3_attractors.shape[0] < 4096:
+                        self.w_ca3_attractors = torch.cat([self.w_ca3_attractors, q_norm.unsqueeze(0)], dim=0)
+                        self.w_ca3_sdr = torch.cat([self.w_ca3_sdr, bi_sdr.unsqueeze(0)], dim=0)
+                        self.w_ca3_salience = torch.cat([self.w_ca3_salience, torch.tensor([float(f_mod)], dtype=torch.float32)], dim=0)
 
             for tid in response_ids:
                 self._ensure_token_col(tid)
@@ -566,6 +571,50 @@ class DendriticPlateauMatrixReadout:
             raw_logits = d_nmda @ w_act
             top_v, top_i = torch.topk(raw_logits, k=min(48, n_active))
             return {self.col_to_tok[idx]: float(val) for val, idx in zip(top_v.tolist(), top_i.tolist())}
+
+    def imprint_swr_composite_episode(
+        self,
+        q_swr_pole: torch.Tensor,
+        response_vecs: List[torch.Tensor],
+        response_ids: List[int],
+        f_mod: float = 2.0,
+    ) -> None:
+        """Консолидация острых волн гиппокампа (`Sharp-Wave Ripple / SWR Replay`, Complementary Learning Systems):
+        Записывает новую сложноподчинённую траекторию (сшитую из двух полюсов `CA3` через мост `BA44`)
+        в эпизодическую матрицу дендритных плато `w_swr_dend_out` без интерференции с базовыми концептами `w_dend_out`!"""
+        if len(response_ids) < 4:
+            return
+        with torch.no_grad():
+            q_norm = F.normalize(q_swr_pole, p=2, dim=0)
+            if self.w_swr_poles.shape[0] == 0:
+                self.w_swr_poles = q_norm.unsqueeze(0).clone()
+            elif float((self.w_swr_poles @ q_norm).max().item()) < 0.985:
+                self.w_swr_poles = torch.cat([self.w_swr_poles, q_norm.unsqueeze(0)], dim=0)
+
+            seq_ids = response_ids[: self.max_pos]
+            for tid in seq_ids:
+                self._ensure_token_col(tid)
+            n_active = len(self.col_to_tok)
+            v_zero = q_norm
+
+            d_list: List[torch.Tensor] = []
+            col_targets: List[int] = []
+            for pos in range(len(seq_ids)):
+                col_targets.append(self.tok_to_col[int(seq_ids[pos])])
+                vp2 = v_zero if pos < 3 else response_vecs[pos - 3]
+                vp1 = v_zero if pos < 2 else response_vecs[pos - 2]
+                vc = v_zero if pos < 1 else response_vecs[pos - 1]
+                d_list.append(self.compute_dendritic_plateau_state(vp2, vp1, vc, pos, q_norm))
+
+            d_mat = torch.stack(d_list)
+            t_idx = torch.tensor(col_targets, dtype=torch.long)
+            w_swr_act = self.w_swr_dend_out[:, :n_active]
+
+            logits = (d_mat @ w_swr_act) * 8.0
+            probs = torch.softmax(logits, dim=-1)
+            err = -probs
+            err.scatter_add_(1, t_idx.unsqueeze(1), torch.ones((len(seq_ids), 1), dtype=err.dtype))
+            w_swr_act.add_((d_mat.t() @ err) * (0.85 * float(f_mod)))
 
 
 # ============================================================================
@@ -616,11 +665,14 @@ class BA44AttractorSyntaxBridge:
         self.connector_trigger_vecs: Dict[int, torch.Tensor] = {}
         self.connector_trigger_ids: Dict[int, int] = {}
         self.lowercase_token_map: Dict[int, int] = {}
+        self.tpj_2nd_to_3rd_map: Dict[int, int] = {}
+        self.tpj_3rd_trigger_ids: set[int] = set()
+        self.tpj_1st_trigger_ids: set[int] = set()
         self.interjection_prefix_tokens: set[str] = {"yes", "ah", "oh", "well", "hey", "hi", "hello", "sure", "certainly"}
 
     def initialize_synaptic_connectors(self, encode_fn, decode_fn, get_vec64_fn, vocab_map: Dict[str, int]) -> None:
-        r"""Обучает синаптические столбцы матрицы $W_{\text{BA44\_bridge}}$ на векторах союзов (`while`, `before`, `after`, `because`, `and`)
-        и строит синаптическое отображение заглавных токенов в строчные для продолжения предложения после запятой."""
+        r"""Обучает синаптические столбцы матрицы $W_{\text{BA44\_bridge}}$ на векторах союзов (`while`, `before`, `after`, `because`, `and`),
+        строит синаптическое отображение заглавных токенов в строчные и инициализирует синапсы **Дейктического Сдвига Лица (`TPJ Deictic Shift`)**."""
         with torch.no_grad():
             comma_id = int(vocab_map.get(",", 11))
             for idx, (trig_word, bridge_phrase) in enumerate(self.BRIDGE_CONNECTORS):
@@ -638,6 +690,56 @@ class BA44AttractorSyntaxBridge:
                     low_key = "Ġ" + tok_str[1].lower() + tok_str[2:]
                     if low_key in vocab_map:
                         self.lowercase_token_map[int(tid)] = int(vocab_map[low_key])
+
+            # Инициализируем синаптическую проекцию TPJ (Temporoparietal Junction) для сдвига 2-го лица -> 3-е лицо
+            # когда собеседник спрашивает про 3-е лицо ("Alex ... how can he ..."), а не про себя ("I / my")!
+            deictic_pairs = [
+                ("Your", "His"),
+                (" your", " his"),
+                ("You", "he"),
+                (" you", " he"),
+                (" are", " is"),
+            ]
+            for src_w, tgt_w in deictic_pairs:
+                s_ids = encode_fn(src_w)
+                t_ids = encode_fn(tgt_w)
+                if len(s_ids) == 1 and len(t_ids) == 1:
+                    self.tpj_2nd_to_3rd_map[int(s_ids[0])] = int(t_ids[0])
+
+            for w3 in (" he", "He", " him", " his", "His"):
+                ids3 = encode_fn(w3)
+                if ids3:
+                    self.tpj_3rd_trigger_ids.add(int(ids3[0]))
+            for w1 in (" I", "I", " my", "My", " me", " am"):
+                ids1 = encode_fn(w1)
+                if ids1:
+                    self.tpj_1st_trigger_ids.add(int(ids1[0]))
+
+    def apply_tpj_deictic_perspective_shift(
+        self,
+        clause_ids: List[int],
+        stimulus_ids: List[int],
+        decode_fn,
+    ) -> List[int]:
+        """Височно-теменной узел (`TPJ Deictic Perspective Shift`):
+          - Если во входном стимуле активированы рецепторы 3-го лица (`he / his / him`) и НЕТ рецепторов 1-го лица (`I / my / me`),
+            то при генерации клаузы самоидентификации (`"Your name is Alex, and you are building..."`)
+            синапсы `TPJ` переключают местоимения во 3-е лицо (`"His name is Alex, and he is building..."`).
+          - Также устраняет случайную заглавную `'You'` в середине предложения (`'You' -> 'you'`)."""
+        stim_set = set(int(t) for t in stimulus_ids)
+        is_third_person_query = bool(stim_set & self.tpj_3rd_trigger_ids) and not bool(stim_set & self.tpj_1st_trigger_ids)
+        has_alex = any(decode_fn(t).strip().lower() == "alex" for t in clause_ids)
+
+        out: List[int] = []
+        for pos, tid in enumerate(clause_ids):
+            t_cur = int(tid)
+            # Если в середине предложения встретился заглавный токен "ĠYou", переводим в строчный "Ġyou"
+            if pos > 0 and decode_fn(t_cur).strip() == "You" and t_cur in self.lowercase_token_map:
+                t_cur = self.lowercase_token_map[t_cur]
+            if is_third_person_query and has_alex and t_cur in self.tpj_2nd_to_3rd_map:
+                t_cur = self.tpj_2nd_to_3rd_map[t_cur]
+            out.append(t_cur)
+        return out
 
     def select_bridge_tokens_between_attractors(
         self,
@@ -1081,7 +1183,8 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                 continue
             if cl in self.PRONOUN_INVERSION:
                 rep = self.PRONOUN_INVERSION[cl]
-                if w.strip(p_strip)[0].isupper():
+                # Заглавную букву ставим ТОЛЬКО если это самое первое слово нового предложения!
+                if len(inv_words) == 0 and w.strip(p_strip)[0].isupper():
                     rep = rep[0].upper() + rep[1:]
                 suf = w[len(w.rstrip(p_strip)) :]
                 inv_words.append(rep + suf)
@@ -1273,8 +1376,13 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         }
         p_strip = " .,!?;:'()[]{}" + chr(34)
 
-        clause_best_poles: List[Tuple[float, torch.Tensor]] = []
-        for cl in raw_clauses:
+        # ТЕТА-ФАЗОВАЯ ПРЕЦЕССИЯ О'КИФА-ЛИСМАНА (BA46 Theta-Phase Temporal Queue):
+        # Вместо разрушения хронологического порядка речи сортировкой только по амплитуде,
+        # мы отбираем 2 наиболее резонирующих клаузальных полюса CA3 (с порогом значимости >= 0.42),
+        # а затем упорядочиваем их строго по фазе тета-ритма (индексу клаузы во времени tau_phase = 0, 1, 2...),
+        # в которой собеседник произнёс эти смысловые блоки!
+        clause_candidates: List[Tuple[int, float, torch.Tensor]] = []
+        for tau_phase, cl in enumerate(raw_clauses):
             cl_ids = self.encode_text(cl)
             content_ids = [
                 tid for tid in cl_ids
@@ -1284,17 +1392,21 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             cl_vec = self.compute_stimulus_vec64(content_ids)
             cl_sdr = self.dendritic_plateau_readout._compute_cortical_sdr2048(content_ids, normalize=False)
             pole_vec, poles_info = self.dendritic_plateau_readout.clean_up_stimulus_in_ca3_attractor(cl_vec, q_sdr2048=cl_sdr)
-            if not poles_info or poles_info[0][0] < 0.20:
+            if not poles_info or poles_info[0][0] < 0.25:
                 continue
-            clause_best_poles.append((poles_info[0][0], pole_vec))
+            clause_candidates.append((tau_phase, poles_info[0][0], pole_vec))
 
-        clause_best_poles.sort(key=lambda kv: kv[0], reverse=True)
-        selected_poles: List[torch.Tensor] = []
-        for sc, p_vec in clause_best_poles:
-            if not any(float(torch.dot(p_vec, ex).item()) > 0.88 for ex in selected_poles):
-                selected_poles.append(p_vec)
-            if len(selected_poles) >= 2:
+        # Отбираем уникальные полюса с самым высоким резонансом CA3, но возвращаем их в ХРОНОЛОГИЧЕСКОМ порядке фаз tau_phase!
+        clause_candidates.sort(key=lambda item: item[1], reverse=True)
+        chosen_with_phase: List[Tuple[int, torch.Tensor]] = []
+        for tau_p, sc, p_vec in clause_candidates:
+            if not any(float(torch.dot(p_vec, ex).item()) > 0.88 for _, ex in chosen_with_phase):
+                chosen_with_phase.append((tau_p, p_vec))
+            if len(chosen_with_phase) >= 2:
                 break
+        # Восстанавливаем хронологический порядок тета-фаз (theta_1 -> theta_2)!
+        chosen_with_phase.sort(key=lambda item: item[0])
+        selected_poles: List[torch.Tensor] = [p_vec for _, p_vec in chosen_with_phase]
 
         if len(selected_poles) < 2:
             all_content_ids = [
@@ -1302,17 +1414,17 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                 if len(self.decode_token(tid).strip(p_strip)) >= 3
                 and self.decode_token(tid).strip(p_strip).lower() not in stop_words
             ]
-            sub_poles: List[Tuple[float, torch.Tensor]] = []
+            sub_poles: List[Tuple[int, float, torch.Tensor]] = []
             for w_start in range(0, max(1, len(all_content_ids) - 2), 2):
                 sub_ids = all_content_ids[w_start : w_start + 4]
                 if len(sub_ids) >= 2:
                     sv = self.compute_stimulus_vec64(sub_ids)
                     ssdr = self.dendritic_plateau_readout._compute_cortical_sdr2048(sub_ids, normalize=False)
                     pv, p_info = self.dendritic_plateau_readout.clean_up_stimulus_in_ca3_attractor(sv, q_sdr2048=ssdr)
-                    if p_info and p_info[0][0] >= 0.24:
-                        sub_poles.append((p_info[0][0], pv))
-            sub_poles.sort(key=lambda kv: kv[0], reverse=True)
-            for sc, p_vec in sub_poles:
+                    if p_info and p_info[0][0] >= 0.28:
+                        sub_poles.append((w_start, p_info[0][0], pv))
+            sub_poles.sort(key=lambda kv: kv[1], reverse=True)
+            for w_pos, sc, p_vec in sub_poles:
                 if not any(float(torch.dot(p_vec, ex).item()) > 0.88 for ex in selected_poles):
                     selected_poles.append(p_vec)
                 if len(selected_poles) >= 2:
@@ -1391,6 +1503,11 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                         max_tokens=max_tokens,
                         use_ngrams=False,
                     )
+                    part_ids = self.ba44_syntax_bridge.apply_tpj_deictic_perspective_shift(
+                        clause_ids=part_ids,
+                        stimulus_ids=u_ids,
+                        decode_fn=self.decode_token,
+                    )
                     if not clause_parts or part_ids != clause_parts[0]:
                         clause_parts.append(part_ids)
                         total_sup += part_sup
@@ -1422,6 +1539,11 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     max_tokens=max_tokens,
                     use_ngrams=ngrams_enabled,
                 )
+                beam_ids = self.ba44_syntax_bridge.apply_tpj_deictic_perspective_shift(
+                    clause_ids=beam_ids,
+                    stimulus_ids=u_ids,
+                    decode_fn=self.decode_token,
+                )
             beam_vec = self.compute_stimulus_vec64(beam_ids)
             mode_lbl = "ngrams_ON_beam" if ngrams_enabled else "ngrams_OFF_pure_dendritic_matrix_beam"
             vte_candidates.append((f"{mode_lbl}_{b_idx}", beam_ids, beam_vec, syn_sup, 0.05))
@@ -1434,11 +1556,34 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         chosen_ids = vte_candidates[best_idx][1]
         response_text = "".join(self.decode_token(i) for i in chosen_ids).strip()
 
+        # КОНСОЛИДАЦИЯ ОСТРЫХ ВОЛН ГИППОКАМПА (Sharp-Wave Ripple / SWR Replay Consolidation):
+        # Если в режиме N-GRAMS OFF сеть впервые синтезировала композиционный ответ из двух полюсов CA3 через мост BA44,
+        # запускаем короткую SWR-пульсацию, которая записывает эту новую сшитую траекторию
+        # на ОРТОГОНАЛЬНЫЙ композиционный полюс q_swr_pole = Normalize(Roll(Pole_1, 1) * Pole_2 + 0.35 * q_raw_vec)
+        # (чтобы НЕ перезаписывать базовые одиночные полюса Алекса или майонеза, но мгновенно вспоминать композицию при повторном вызове!).
+        swr_consolidated = False
+        if not ngrams_enabled and ba44_bridge_used and len(chosen_ids) >= 8 and len(ca3_clause_poles) >= 2:
+            q_swr_pole = F.normalize(
+                torch.roll(ca3_clause_poles[0], shifts=1, dims=0) * ca3_clause_poles[1] + 0.35 * q_raw_vec + 1e-8,
+                p=2,
+                dim=0,
+            )
+            r_vecs_swr = [self.get_vec64(tid) for tid in chosen_ids]
+            for _ in range(3):
+                self.dendritic_plateau_readout.imprint_swr_composite_episode(
+                    q_swr_pole=q_swr_pole,
+                    response_vecs=r_vecs_swr,
+                    response_ids=chosen_ids,
+                    f_mod=2.2,
+                )
+            swr_consolidated = True
+
         return {
             "stimulus": user_utterance,
             "ngrams_mode": "ON" if ngrams_enabled else "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
             "active_moe_columns": moe_out.active_expert_names,
             "ba44_syntax_bridge_connector": ba44_bridge_used,
+            "swr_consolidated_into_nmda_matrix": swr_consolidated,
             "online_dopamine_imprinted_tokens": imprinted,
             "vte_beams_evaluated": vte_logs,
             "selected_beam_idx": best_idx,

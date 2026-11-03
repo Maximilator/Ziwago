@@ -233,8 +233,22 @@ def test_v14_0_pure_synaptic_dialogue_organism():
     res_q4 = org.pure_neural_generate_response(unseen_q4, max_tokens=36, use_ngrams=False)
     out_q4 = res_q4["pure_weight_generated_response"]
     assert "egg yolk" in out_q4 and "Echoing Glade" in out_q4
-    assert ", while you have arrived" in out_q4
+    assert ", while it is possible to fix runny mayonnaise" in out_q4
     assert res_q4["ba44_syntax_bridge_connector"] == ", while"
+    assert res_q4["swr_consolidated_into_nmda_matrix"] is True
+
+    # Verify TPJ Deictic Perspective Shift (3rd person "His name is Alex, and he is building...")
+    _ = org.pure_neural_generate_response(
+        "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+        max_tokens=36,
+        use_ngrams=False,
+    )
+    unseen_q1 = "Alex is hungry in the lab while building a biological neural network—how can he fix runny liquid mayonnaise?"
+    res_q1 = org.pure_neural_generate_response(unseen_q1, max_tokens=36, use_ngrams=False)
+    out_q1 = res_q1["pure_weight_generated_response"]
+    assert out_q1.startswith("His name is Alex, and he is building")
+    assert ", while it is possible to fix runny mayonnaise" in out_q1
+
 
 
 
