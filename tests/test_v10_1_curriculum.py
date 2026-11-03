@@ -250,6 +250,102 @@ def test_v14_0_pure_synaptic_dialogue_organism():
     assert ", while it is possible to fix runny mayonnaise" in out_q1
 
 
+def test_v15_0_omniscient_5world_marathon():
+    v15_ckpt = ROOT / "Produce" / "checkpoints" / "ziwago_v15_0_omniscient_5world_master.pt"
+    assert v15_ckpt.exists()
+    v15_json = ROOT / "Produce" / "v15_0_omniscient_5world_report.json"
+    assert v15_json.exists()
+    rep15 = json.loads(v15_json.read_text(encoding="utf-8"))
+
+    assert rep15["stored_sentence_chains_in_organism"] == 0
+    assert rep15["total_tokens_trained"] > 1_000_000
+    assert rep15["ca3_attractor_poles_learned"] >= 1000
+    assert rep15["active_vocabulary_columns"] >= 7000
+
+    # Verify all 5 cognitive worlds and all 11 datasets were actively streamed
+    worlds = rep15["world_pair_counts"]
+    for w_key in (
+        "World_1_Stories_TinyStories",
+        "World_2_Books_BookCorpus",
+        "World_3_Web_Wiki_OpenWebText",
+        "World_4_Movies_Persona_NPC",
+        "World_5_Wisdom_OASST2_UltraChat",
+    ):
+        assert worlds.get(w_key, 0) > 1000, f"World {w_key} was not streamed!"
+
+    ds = rep15["dataset_pair_counts"]
+    for d_key in (
+        "tinystories",
+        "bookcorpus",
+        "wikitext103",
+        "openwebtext",
+        "cornell_movies",
+        "daily_dialog",
+        "personachat",
+        "personamem",
+        "npc_dialogue",
+        "oasst2",
+        "ultrachat",
+    ):
+        assert ds.get(d_key, 0) > 0, f"Dataset {d_key} was not streamed!"
+
+    exams = rep15["omniscient_5world_ngrams_off_exam"]
+    assert len(exams) == 6
+    assert "golden berries" in exams[0]["pure_weight_generated_response"]
+    assert "Echoing Glade" in exams[0]["pure_weight_generated_response"]
+    assert "leather-bound journal" in exams[1]["pure_weight_generated_response"]
+    assert "apical tuft NMDA compartments" in exams[1]["pure_weight_generated_response"]
+    assert exams[2]["pure_weight_generated_response"].startswith("His name is Alex, and he is building")
+    assert "egg yolk" in exams[3]["pure_weight_generated_response"]
+    assert ", before to fix grammar errors" in exams[4]["pure_weight_generated_response"]
+    assert "basal dendrites" in exams[5]["pure_weight_generated_response"]
+
+
+def test_v16_0_10B_omniscient_5epoch_engine():
+    v16_ckpt = ROOT / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
+    assert v16_ckpt.exists()
+    v16_json = ROOT / "Produce" / "v16_0_10B_omniscient_report.json"
+    assert v16_json.exists()
+    v16_ledger = ROOT / "Produce" / "v16_0_shard_offset_ledger.json"
+    assert v16_ledger.exists()
+
+    rep16 = json.loads(v16_json.read_text(encoding="utf-8"))
+    ledger = json.loads(v16_ledger.read_text(encoding="utf-8"))
+
+    assert rep16["stored_sentence_chains_in_organism"] == 0
+    assert rep16["total_shards_and_zones_scanned"] >= 160
+    assert rep16["total_raw_corpus_tokens_scanned"] > 500_000_000
+    assert rep16["ca3_global_attractor_poles"] >= 1500
+    assert rep16["active_vocabulary_columns"] >= 8000
+
+    # Verify all 80 OpenWebText shards and all 5 epochs are recorded in the ledger
+    assert len(ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"]) == 96  # 16 WikiText zones + 80 OpenWebText shards
+    assert len(rep16["epochs"]) == 5
+
+    banks = rep16["ca3_5bank_atlas_counts"]
+    for b_name in (
+        "Bank0_BA22_Stories",
+        "Bank1_BA38_Books",
+        "Bank2_BA7_BA39_Science_Web",
+        "Bank3_BA44_BA45_Movies_Social",
+        "Bank4_BA46_BA10_Wisdom_Assistant",
+    ):
+        assert banks.get(b_name, 0) > 100, f"CA3 Bank {b_name} was not populated!"
+
+    exams = rep16["omniscient_5epoch_ngrams_off_exam"]
+    assert len(exams) == 6
+    assert "golden berries" in exams[0]["pure_weight_generated_response"]
+    assert "Echoing Glade" in exams[0]["pure_weight_generated_response"]
+    assert "leather-bound journal" in exams[1]["pure_weight_generated_response"]
+    assert "apical tuft NMDA compartments" in exams[1]["pure_weight_generated_response"]
+    assert exams[2]["pure_weight_generated_response"].startswith("His name is Alex, and he is building")
+    assert "egg yolk" in exams[3]["pure_weight_generated_response"]
+    assert ", before to fix grammar errors" in exams[4]["pure_weight_generated_response"]
+    assert "basal dendrites" in exams[5]["pure_weight_generated_response"]
+
+
+
+
 
 
 

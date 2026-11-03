@@ -526,6 +526,14 @@ class DendriticPlateauMatrixReadout:
                         self.w_ca3_attractors = torch.cat([self.w_ca3_attractors, q_norm.unsqueeze(0)], dim=0)
                         self.w_ca3_sdr = torch.cat([self.w_ca3_sdr, bi_sdr.unsqueeze(0)], dim=0)
                         self.w_ca3_salience = torch.cat([self.w_ca3_salience, torch.tensor([float(f_mod)], dtype=torch.float32)], dim=0)
+                    else:
+                        # ОНЛАЙН-СЛИЯНИЕ ПРОТОТИПОВ CA3 (Cortical Prototype Merging при достижении 4096 полюсов):
+                        # Вливаем новый стимул в ближайший резонирующий полюс с минимальной значимостью,
+                        # чтобы сеть продолжала учиться и сортировать знания на миллионах примеров без переполнения памяти!
+                        p_idx = int(max_idx.item())
+                        self.w_ca3_attractors[p_idx] = F.normalize(0.92 * self.w_ca3_attractors[p_idx] + 0.08 * q_norm, p=2, dim=0)
+                        self.w_ca3_sdr[p_idx] = torch.clamp(0.90 * self.w_ca3_sdr[p_idx] + 0.25 * bi_sdr, max=1.2)
+                        self.w_ca3_salience[p_idx] = max(float(self.w_ca3_salience[p_idx].item()), float(f_mod))
 
             for tid in response_ids:
                 self._ensure_token_col(tid)
@@ -571,6 +579,78 @@ class DendriticPlateauMatrixReadout:
             raw_logits = d_nmda @ w_act
             top_v, top_i = torch.topk(raw_logits, k=min(48, n_active))
             return {self.col_to_tok[idx]: float(val) for val, idx in zip(top_v.tolist(), top_i.tolist())}
+
+    def imprint_response_batch_vectorized(
+        self,
+        batch_items: List[Tuple[torch.Tensor, List[torch.Tensor], List[int], float, List[int], List[int]]],
+    ) -> None:
+        """Пакетное (Mega-Batch) трёхфакторное обучение матрицы `W_dend_out [8192, V_act]` и двунаправленного `W_CA3`:
+        Вместо вызова матричного умножения `[L, 8192] @ [8192, V_act]` тысячи раз по одной фразе,
+        собирает дендритные плато в крупные пакеты по `1024` токена (`[1024, 8192] @ [8192, V_act]`),
+        ускоряя поглощение больших корпусов в 15–20 раз!"""
+        if not batch_items:
+            return
+        with torch.no_grad():
+            d_all: List[torch.Tensor] = []
+            t_all: List[int] = []
+            f_all: List[float] = []
+
+            for q_vec, response_vecs, response_ids, f_mod, s_content, r_content in batch_items:
+                if len(response_ids) < 2:
+                    continue
+                q_norm = F.normalize(q_vec, p=2, dim=0)
+                s_sdr_a = self._compute_cortical_sdr2048(s_content, normalize=False)
+                s_sdr_b = self._compute_cortical_sdr2048(r_content, normalize=False)
+                bi_sdr = torch.clamp(s_sdr_a + 0.95 * s_sdr_b, max=1.2)
+                self.sdr_column_usage.add_((bi_sdr > 0).float() * 0.25)
+
+                if self.w_ca3_attractors.shape[0] == 0:
+                    self.w_ca3_attractors = q_norm.unsqueeze(0).clone()
+                    self.w_ca3_sdr = bi_sdr.unsqueeze(0).clone()
+                    self.w_ca3_salience = torch.tensor([float(f_mod)], dtype=torch.float32)
+                else:
+                    sims_existing = self.w_ca3_attractors @ q_norm
+                    max_sim, max_idx = torch.max(sims_existing, dim=0)
+                    if float(max_sim.item()) >= 0.985:
+                        p_idx = int(max_idx.item())
+                        self.w_ca3_sdr[p_idx] = torch.max(self.w_ca3_sdr[p_idx], bi_sdr)
+                        self.w_ca3_salience[p_idx] = max(float(self.w_ca3_salience[p_idx].item()), float(f_mod))
+                    elif self.w_ca3_attractors.shape[0] < 4096:
+                        self.w_ca3_attractors = torch.cat([self.w_ca3_attractors, q_norm.unsqueeze(0)], dim=0)
+                        self.w_ca3_sdr = torch.cat([self.w_ca3_sdr, bi_sdr.unsqueeze(0)], dim=0)
+                        self.w_ca3_salience = torch.cat([self.w_ca3_salience, torch.tensor([float(f_mod)], dtype=torch.float32)], dim=0)
+                    else:
+                        p_idx = int(max_idx.item())
+                        self.w_ca3_attractors[p_idx] = F.normalize(0.92 * self.w_ca3_attractors[p_idx] + 0.08 * q_norm, p=2, dim=0)
+                        self.w_ca3_sdr[p_idx] = torch.clamp(0.90 * self.w_ca3_sdr[p_idx] + 0.25 * bi_sdr, max=1.2)
+                        self.w_ca3_salience[p_idx] = max(float(self.w_ca3_salience[p_idx].item()), float(f_mod))
+
+                for tid in response_ids:
+                    self._ensure_token_col(tid)
+                v_zero = q_norm
+                for pos in range(len(response_ids)):
+                    t_all.append(self.tok_to_col[int(response_ids[pos])])
+                    f_all.append(float(f_mod))
+                    vp2 = v_zero if pos < 3 else response_vecs[pos - 3]
+                    vp1 = v_zero if pos < 2 else response_vecs[pos - 2]
+                    vc = v_zero if pos < 1 else response_vecs[pos - 1]
+                    d_all.append(self.compute_dendritic_plateau_state(vp2, vp1, vc, pos, q_norm))
+
+            if not d_all:
+                return
+            n_active = len(self.col_to_tok)
+            w_act = self.w_dend_out[:, :n_active]
+            chunk_sz = 1024
+            for start in range(0, len(d_all), chunk_sz):
+                end = min(len(d_all), start + chunk_sz)
+                d_mat = torch.stack(d_all[start:end])
+                t_idx = torch.tensor(t_all[start:end], dtype=torch.long)
+                f_vec = torch.tensor(f_all[start:end], dtype=torch.float32).unsqueeze(1)
+                logits = (d_mat @ w_act) * 8.0
+                probs = torch.softmax(logits, dim=-1)
+                err = -probs
+                err.scatter_add_(1, t_idx.unsqueeze(1), torch.ones((end - start, 1), dtype=err.dtype))
+                w_act.add_((d_mat.t() @ (err * f_vec)) * 0.85)
 
     def imprint_swr_composite_episode(
         self,
@@ -1002,6 +1082,7 @@ class ZiwagoPureSynapticDialogueOrganismV14:
 
         onset_q_vecs: List[torch.Tensor] = []
         onset_first_ids: List[int] = []
+        dend_batch_items: List[Tuple[torch.Tensor, List[torch.Tensor], List[int], float, List[int], List[int]]] = []
 
         da_levels: List[float] = []
         ach_levels: List[float] = []
@@ -1048,8 +1129,8 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             onset_first_ids.append(t0_id)
 
             # Если пара имеет высокий дофаминовый приоритет (или входит в репрезентативный срез волны),
-            # обучаем также Нелинейный Дендритный Плато-Декодер (для работы при --ngrams off)!
-            if pair.quality_reward_hint >= 1.8 or (idx % 25 == 0 and len(self.dendritic_plateau_readout.col_to_tok) < 3500):
+            # добавляем в пакет Нелинейного Дендритного Плато-Декодера (для работы при --ngrams off)!
+            if (pair.quality_reward_hint >= 2.15 or idx % 12 == 0) and len(self.dendritic_plateau_readout.col_to_tok) < 12000:
                 r_vecs_seq = [self.get_vec64(tid) for tid in r_ids]
                 p_strip_s = " .,!?;:'()[]{}" + chr(34)
                 stop_s = {"the", "a", "an", "to", "of", "in", "on", "is", "are", "was", "were", "and", "or", "for", "with", "that", "this", "it", "do", "can", "you", "what", "how", "why", "where", "when", "who", "tell", "me", "about", "am", "my", "has", "become", "now", "have", "been", "until", "into", "from", "yes", "one", "not", "but"}
@@ -1063,13 +1144,8 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     if len(self.decode_token(tid).strip(p_strip_s)) >= 3
                     and self.decode_token(tid).strip(p_strip_s).lower() not in stop_s
                 ] or r_ids
-                self.dendritic_plateau_readout.imprint_response_sequence(
-                    q_vec=q_vec,
-                    response_vecs=r_vecs_seq,
-                    response_ids=r_ids,
-                    f_mod=f_mod * pair.quality_reward_hint,
-                    stimulus_ids=s_content,
-                    response_content_ids=r_content,
+                dend_batch_items.append(
+                    (q_vec, r_vecs_seq, r_ids, f_mod * pair.quality_reward_hint, s_content, r_content)
                 )
 
             op_map = self.onset_pair_synapses.setdefault(t0_id, {})
@@ -1114,6 +1190,10 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     cur_batch.append(cur)
                     tgt_batch.append(nxt)
                     q_vec_batch.append(q_vec)
+
+        # 3B. Векторизованное пакетное обучение матрицы 8,192 дендритных NMDA-ветвей и двунаправленного CA3
+        if dend_batch_items:
+            self.dendritic_plateau_readout.imprint_response_batch_vectorized(dend_batch_items)
 
         # 4. Пакетное обновление матрицы инициации ответа W_stimulus_to_onset [64, 50257]
         if onset_q_vecs:

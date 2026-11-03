@@ -1,0 +1,466 @@
+{
+  "version": "15.0",
+  "architecture": "Ziwago-Prime v15.0 Omniscient 5-World Biological Organism (8192-NMDA Matrix + Bidirectional CA3 + BA44 Syntax Bridge + TPJ Deictic Shift + SWS/SWR)",
+  "total_neurons": 17408,
+  "stored_sentence_chains_in_organism": 0,
+  "total_pairs_trained": 26978,
+  "total_tokens_trained": 1201855,
+  "world_pair_counts": {
+    "World_1_Stories_TinyStories": 4500,
+    "World_2_Books_BookCorpus": 4500,
+    "World_3_Web_Wiki_OpenWebText": 6000,
+    "World_4_Movies_Persona_NPC": 7500,
+    "World_5_Wisdom_OASST2_UltraChat": 7504
+  },
+  "dataset_pair_counts": {
+    "tinystories": 4500,
+    "bookcorpus": 4500,
+    "wikitext103": 3000,
+    "openwebtext": 3000,
+    "cornell_movies": 1870,
+    "daily_dialog": 1870,
+    "personachat": 1870,
+    "personamem": 1870,
+    "npc_dialogue": 1890,
+    "oasst2": 3754,
+    "ultrachat": 3750
+  },
+  "ca3_attractor_poles_learned": 1313,
+  "active_vocabulary_columns": 7984,
+  "sws_homeostasis_cycles": [
+    {
+      "ca3_poles_sorted": 534,
+      "w_dend_out_norm_before": 244.55,
+      "w_dend_out_norm_after": 240.3
+    },
+    {
+      "ca3_poles_sorted": 1050,
+      "w_dend_out_norm_before": 321.14,
+      "w_dend_out_norm_after": 315.72
+    },
+    {
+      "ca3_poles_sorted": 1311,
+      "w_dend_out_norm_before": 347.8,
+      "w_dend_out_norm_after": 342.07
+    }
+  ],
+  "wave_logs": [
+    {
+      "wave_idx": 1,
+      "tokens_trained": 120300,
+      "throughput_tok_per_sec": 9772.5,
+      "mean_dopamine_DA": 1.9885,
+      "mean_acetylcholine_ACh": 15.7372,
+      "mean_plasticity_gate_f_mod": 2.1993,
+      "pc_readout_loss_nats": 6.3542,
+      "synaptic_trigrams_count": 40073,
+      "synaptic_fourgrams_count": 52265,
+      "elapsed_sec": 12.31,
+      "stream_sec": 1.075
+    },
+    {
+      "wave_idx": 2,
+      "tokens_trained": 120894,
+      "throughput_tok_per_sec": 13199.6,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.135,
+      "mean_plasticity_gate_f_mod": 2.0529,
+      "pc_readout_loss_nats": 6.2284,
+      "synaptic_trigrams_count": 72188,
+      "synaptic_fourgrams_count": 100639,
+      "elapsed_sec": 9.159,
+      "stream_sec": 1.114
+    },
+    {
+      "wave_idx": 3,
+      "tokens_trained": 118976,
+      "throughput_tok_per_sec": 14109.6,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.1499,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.2473,
+      "synaptic_trigrams_count": 101788,
+      "synaptic_fourgrams_count": 147612,
+      "elapsed_sec": 8.432,
+      "stream_sec": 1.152
+    },
+    {
+      "wave_idx": 4,
+      "tokens_trained": 119788,
+      "throughput_tok_per_sec": 13604.1,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.2298,
+      "synaptic_trigrams_count": 129153,
+      "synaptic_fourgrams_count": 193389,
+      "elapsed_sec": 8.805,
+      "stream_sec": 1.257
+    },
+    {
+      "wave_idx": 5,
+      "tokens_trained": 122689,
+      "throughput_tok_per_sec": 14079.7,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.2006,
+      "synaptic_trigrams_count": 155470,
+      "synaptic_fourgrams_count": 239443,
+      "elapsed_sec": 8.714,
+      "stream_sec": 1.266
+    },
+    {
+      "wave_idx": 6,
+      "tokens_trained": 118652,
+      "throughput_tok_per_sec": 12839.4,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.1052,
+      "synaptic_trigrams_count": 179065,
+      "synaptic_fourgrams_count": 281931,
+      "elapsed_sec": 9.241,
+      "stream_sec": 1.281
+    },
+    {
+      "wave_idx": 7,
+      "tokens_trained": 118020,
+      "throughput_tok_per_sec": 12544.9,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.0251,
+      "synaptic_trigrams_count": 201499,
+      "synaptic_fourgrams_count": 323644,
+      "elapsed_sec": 9.408,
+      "stream_sec": 1.313
+    },
+    {
+      "wave_idx": 8,
+      "tokens_trained": 121127,
+      "throughput_tok_per_sec": 11908.2,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.0409,
+      "synaptic_trigrams_count": 223604,
+      "synaptic_fourgrams_count": 350000,
+      "elapsed_sec": 10.172,
+      "stream_sec": 1.348
+    },
+    {
+      "wave_idx": 9,
+      "tokens_trained": 121427,
+      "throughput_tok_per_sec": 12012.8,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.083,
+      "synaptic_trigrams_count": 243340,
+      "synaptic_fourgrams_count": 350000,
+      "elapsed_sec": 10.108,
+      "stream_sec": 1.322
+    },
+    {
+      "wave_idx": 10,
+      "tokens_trained": 118730,
+      "throughput_tok_per_sec": 11611.5,
+      "mean_dopamine_DA": 2.0,
+      "mean_acetylcholine_ACh": 19.15,
+      "mean_plasticity_gate_f_mod": 1.98,
+      "pc_readout_loss_nats": 6.0715,
+      "synaptic_trigrams_count": 263523,
+      "synaptic_fourgrams_count": 350000,
+      "elapsed_sec": 10.225,
+      "stream_sec": 1.39
+    }
+  ],
+  "omniscient_5world_ngrams_off_exam": [
+    {
+      "exam_domain": "Cross-World 1 (Stories + NPC)",
+      "stimulus": "Once upon a time, a curious little fox found a shiny brass key near the old oak tree, while the guardian at the Echoing Glade waited for the traveler.",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "ba44_syntax_bridge_connector": ", while",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 47,
+          "stimulus_alignment_cos": 0.4527,
+          "synaptic_coherence": 2.9001,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3765
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 47,
+          "stimulus_alignment_cos": 0.4527,
+          "synaptic_coherence": 2.9002,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3765
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 47,
+          "stimulus_alignment_cos": 0.4527,
+          "synaptic_coherence": 2.9007,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3765
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 47,
+      "pure_weight_generated_response": "The little fox used the brass key to unlock the hidden wooden chest and shared the golden berries with her friends, while you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1627.14
+    },
+    {
+      "exam_domain": "Cross-World 2 (Books + Neuroscience)",
+      "stimulus": "The autumn wind swept across the cobblestone courtyard at dusk, while biological pyramidal neurons in the neocortex integrated sensory spikes.",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col6_THEORY_OF_MIND",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "ba44_syntax_bridge_connector": ", while",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 58,
+          "stimulus_alignment_cos": 0.4172,
+          "synaptic_coherence": 2.9421,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3569
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 58,
+          "stimulus_alignment_cos": 0.4172,
+          "synaptic_coherence": 2.9422,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3569
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 58,
+          "stimulus_alignment_cos": 0.4172,
+          "synaptic_coherence": 2.942,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3569
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 58,
+      "pure_weight_generated_response": "Shadows lengthened beneath the stone arches while the old scholar closed his leather-bound journal and stepped into the lantern light, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1878.71
+    },
+    {
+      "exam_domain": "Cross-World 3 (TPJ 3rd-Person + Culinary)",
+      "stimulus": "Alex is hungry in the lab while building a biological neural network—how can he fix runny liquid mayonnaise?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "ba44_syntax_bridge_connector": ", while",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 50,
+          "stimulus_alignment_cos": 0.7132,
+          "synaptic_coherence": 2.9457,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.5197
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 50,
+          "stimulus_alignment_cos": 0.7132,
+          "synaptic_coherence": 2.9456,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.5197
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 50,
+          "stimulus_alignment_cos": 0.7132,
+          "synaptic_coherence": 2.9457,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.5197
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 50,
+      "pure_weight_generated_response": "His name is Alex, and he is building a biological neural network with dendritic predictive coding, while it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1658.85
+    },
+    {
+      "exam_domain": "Cross-World 4 (Bidirectional CA3 Response-to-Stimulus)",
+      "stimulus": "Why does the guardian at the Echoing Glade tell Alex to check subject-verb agreement while whisking egg yolk?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col5_CAUSAL_PHYSICS",
+        "Col5_CAUSAL_PHYSICS"
+      ],
+      "ba44_syntax_bridge_connector": ", while",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 56,
+          "stimulus_alignment_cos": 0.1913,
+          "synaptic_coherence": 2.8993,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2327
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 56,
+          "stimulus_alignment_cos": 0.1913,
+          "synaptic_coherence": 2.8993,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2327
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 56,
+          "stimulus_alignment_cos": 0.1913,
+          "synaptic_coherence": 2.899,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2327
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 56,
+      "pure_weight_generated_response": "Ah, you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge, while it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2046.87
+    },
+    {
+      "exam_domain": "Cross-World 5 (Theta-Phase + 'before' Bridge)",
+      "stimulus": "Can running outdoors clear the mind before fixing runny mayonnaise and writing an essay without grammar errors?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col6_THEORY_OF_MIND",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "ba44_syntax_bridge_connector": ", before",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2843,
+          "synaptic_coherence": 2.8991,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2839
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2843,
+          "synaptic_coherence": 2.8993,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2839
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2843,
+          "synaptic_coherence": 2.8994,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2839
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 48,
+      "pure_weight_generated_response": "Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind, before to fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1721.56
+    },
+    {
+      "exam_domain": "World 3 Pure Science Recall",
+      "stimulus": "How do biological pyramidal neurons in the neocortex integrate bottom-up sensory input with top-down predictions?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col4_NARRATIVE_EPISODIC"
+      ],
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.5665,
+          "synaptic_coherence": 2.9629,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.439
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.5665,
+          "synaptic_coherence": 2.963,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.439
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.5665,
+          "synaptic_coherence": 2.9633,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.439
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 31,
+      "pure_weight_generated_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 965.74
+    }
+  ],
+  "checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v15_0_omniscient_5world_master.pt",
+  "checkpoint_size_mb": 267.09,
+  "elapsed_sec": 126.89
+}
