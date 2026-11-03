@@ -233,6 +233,9 @@ def test_v14_0_pure_synaptic_dialogue_organism():
     res_q4 = org.pure_neural_generate_response(unseen_q4, max_tokens=36, use_ngrams=False)
     out_q4 = res_q4["pure_weight_generated_response"]
     assert "egg yolk" in out_q4 and "Echoing Glade" in out_q4
+    assert ", while you have arrived" in out_q4
+    assert res_q4["ba44_syntax_bridge_connector"] == ", while"
+
 
 
 

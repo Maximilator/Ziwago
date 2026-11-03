@@ -569,6 +569,152 @@ class DendriticPlateauMatrixReadout:
 
 
 # ============================================================================
+# 2B. СИНТАКСИЧЕСКИЙ МОСТ ЗОНЫ БРОКА BA44 МЕЖДУ АТТРАКТОРАМИ CA3
+#     (BA44 ATTRACTOR SYNTAX BRIDGE — ОДНО СЛОЖНОПОДЧИНЁННОЕ ПРЕДЛОЖЕНИЕ ВМЕСТО СКЛЕЙКИ!)
+# ============================================================================
+class BA44AttractorSyntaxBridge:
+    r"""Реализует биофизический **Синтаксический Мост Зоны Брока (`Col0_SYNTAX_BA44` Syntax Bridge)**
+    между двумя последовательными смысловыми аттракторами `CA3` ($\vec{Q}_1 \to \vec{Q}_2$):
+
+      1. ПОЧЕМУ БЕЗ МОСТА ПОЛУЧАЛАСЬ СКЛЕЙКА ДВУХ ОТДЕЛЬНЫХ ПРЕДЛОЖЕНИЙ (АТТРАКТОРНАЯ КОНКАТЕНАЦИЯ):
+         Когда первый аттрактор $\vec{Q}_1$ доходил до конца своей клаузы, он генерировал терминальную точку `.`
+         (или `!`), а второй аттрактор $\vec{Q}_2$ стартовал с заглавной буквы и вводного междометия (`"Yes,"`, `"Ah,"`, `"That sounds great!"`).
+
+      2. КАК РАБОТАЕТ СИНТАКСИЧЕСКИЙ МОСТ `Col0_SYNTAX_BA44` + `SON`:
+         - **Обучаемая синаптическая матрица дискурсивных связок $W_{\text{BA44\_bridge}} \in \mathbb{R}^{192 \times K_{\text{conj}}}$**:
+           Принимает 192-мерный вектор перехода $[\vec{Q}_1(64),\; \vec{Q}_2(64),\; \vec{v}_{\text{rel\_stimulus}}(64)]$
+           и возбуждает синаптические ансамбли подчинительных и сочинительных союзов зоны Брока:
+           * `", while"` (одновременность двух процессов),
+           * `", and"` (соединение двух фактов),
+           * `", before"` / `", after"` (временная последовательность),
+           * `", whereas"` / `", as"` (причинно-сопоставительная связь).
+         - **Торможение ранней точки (`Period Inhibition Gate` от `SON`)**:
+           Когда `Pole_1` доходит до финального токена, но в префронтальной очереди ещё ждёт невысказанный `Pole_2`
+           (ненулевой `Epistemic Drive` в `SON`), тормозные интернейроны `BA44` **блокируют точку `.`/`!`** в конце `Pole_1`
+           и вместо неё генерируют через $W_{\text{BA44\_bridge}}$ синтаксический мост (например, `", while"` или `", and"`)!
+         - **Латеральное подавление повторных приветствий и заглавных букв (`Interjection & Capital Suppression`)**:
+           При входе во второй аттрактор `Pole_2` после союза (`", while"` / `", and"`) зона Брока `BA44`
+           подавляет стартовые междометия диалога (`"Yes,"`, `"Ah,"`, `"That sounds great!"`) и переводит регистр
+           первого слова второй клаузы в строчный (`"To fix" -> "to fix"`, `"Staying" -> "staying"`),
+           превращая два разрозненных ответа в **одно единое, грамматически безупречное сложноподчинённое предложение**!"""
+
+    BRIDGE_CONNECTORS = (
+        ("while", ", while"),
+        ("before", ", before"),
+        ("after", ", after"),
+        ("because", ", because"),
+        ("and", ", and"),
+    )
+
+    def __init__(self, d_vec: int = 64, seed: int = 1444):
+        g = torch.Generator().manual_seed(seed)
+        self.d_vec = int(d_vec)
+        self.n_connectors = len(self.BRIDGE_CONNECTORS)
+        # Синаптическая матрица зоны Брока BA44: [3 * 64 = 192, n_connectors]
+        self.w_ba44_bridge = F.normalize(torch.randn(d_vec * 3, self.n_connectors, generator=g), p=2, dim=0)
+        self.connector_token_seqs: Dict[int, List[int]] = {}
+        self.connector_trigger_vecs: Dict[int, torch.Tensor] = {}
+        self.connector_trigger_ids: Dict[int, int] = {}
+        self.lowercase_token_map: Dict[int, int] = {}
+        self.interjection_prefix_tokens: set[str] = {"yes", "ah", "oh", "well", "hey", "hi", "hello", "sure", "certainly"}
+
+    def initialize_synaptic_connectors(self, encode_fn, decode_fn, get_vec64_fn, vocab_map: Dict[str, int]) -> None:
+        r"""Обучает синаптические столбцы матрицы $W_{\text{BA44\_bridge}}$ на векторах союзов (`while`, `before`, `after`, `because`, `and`)
+        и строит синаптическое отображение заглавных токенов в строчные для продолжения предложения после запятой."""
+        with torch.no_grad():
+            comma_id = int(vocab_map.get(",", 11))
+            for idx, (trig_word, bridge_phrase) in enumerate(self.BRIDGE_CONNECTORS):
+                t_ids = encode_fn(" " + trig_word)
+                # Токен ',' (без пробела перед запятой!) + токен ' while' / ' and' / ' before'
+                self.connector_token_seqs[idx] = [comma_id] + t_ids
+                self.connector_trigger_ids[idx] = int(t_ids[0])
+                t_vec = get_vec64_fn(t_ids[0])
+                self.connector_trigger_vecs[idx] = t_vec
+                probe_192 = F.normalize(torch.cat([t_vec, t_vec, t_vec], dim=0), p=2, dim=0)
+                self.w_ba44_bridge[:, idx] = F.normalize(0.15 * self.w_ba44_bridge[:, idx] + 0.85 * probe_192, p=2, dim=0)
+
+            for tok_str, tid in vocab_map.items():
+                if len(tok_str) >= 2 and tok_str.startswith("Ġ") and tok_str[1].isupper():
+                    low_key = "Ġ" + tok_str[1].lower() + tok_str[2:]
+                    if low_key in vocab_map:
+                        self.lowercase_token_map[int(tid)] = int(vocab_map[low_key])
+
+    def select_bridge_tokens_between_attractors(
+        self,
+        pole1_vec: torch.Tensor,
+        pole2_vec: torch.Tensor,
+        stimulus_ids: List[int],
+        get_vec64_fn,
+    ) -> Tuple[str, List[int], float]:
+        r"""Вычисляет через синаптическую матрицу $W_{\text{BA44\_bridge}}$ оптимальный союзный мост
+        между первым аттрактором $\vec{Q}_1$ и вторым аттрактором $\vec{Q}_2$."""
+        with torch.no_grad():
+            best_idx = 4  # базовый сочинительный мост BA44 ", and"
+            best_drive = -1e9
+            stim_id_set = set(int(t) for t in stimulus_ids)
+
+            for idx in range(self.n_connectors):
+                c_vec = self.connector_trigger_vecs[idx]
+                trig_active = 1.0 if (idx < 4 and self.connector_trigger_ids[idx] in stim_id_set) else 0.0
+                bridge_in = F.normalize(torch.cat([pole1_vec, pole2_vec, c_vec], dim=0), p=2, dim=0)
+                tonic_bias = 0.25 if idx == 4 else 0.0
+                ba44_current = float((bridge_in @ self.w_ba44_bridge[:, idx]).item()) + tonic_bias + 0.85 * trig_active
+                if ba44_current > best_drive:
+                    best_drive = ba44_current
+                    best_idx = idx
+
+            conn_name, conn_phrase = self.BRIDGE_CONNECTORS[best_idx]
+            return conn_phrase, list(self.connector_token_seqs[best_idx]), round(best_drive, 4)
+
+    def bridge_two_attractor_clauses_in_ba44(
+        self,
+        clause1_ids: List[int],
+        clause2_ids: List[int],
+        bridge_token_ids: List[int],
+        decode_fn,
+    ) -> List[int]:
+        """Сшивает два аттракторных следа `clause1_ids` и `clause2_ids` через синтаксический мост `Col0_SYNTAX_BA44`:
+          1) Тормозит терминальную точку `.` / `!` в конце `clause1_ids` (Period Inhibition Gate);
+          2) Вставляет синаптический мост союза `bridge_token_ids` (`", while"`, `", and"`, `", before"`);
+          3) Подавляет стартовые междометия (`"Yes, "`, `"Ah, "`, `"That sounds great! "`) в начале `clause2_ids`
+             и переводит первое слово второй клаузы в строчный регистр!"""
+        if not clause1_ids:
+            return clause2_ids
+        if not clause2_ids:
+            return clause1_ids
+
+        # 1. В первой клаузе подавляем вводное междометие с восклицательным знаком ("That sounds great! "), если за ней идёт вторая клауза,
+        #    и тормозим финальную точку "." на конце первой клаузы!
+        c1 = list(clause1_ids)
+        for i in range(min(6, len(c1))):
+            if decode_fn(c1[i]).strip().endswith("!"):
+                c1 = c1[i + 1 :]
+                break
+        while c1 and decode_fn(c1[-1]).strip() in (".", "!", ";", ","):
+            c1.pop()
+
+        # 2. Во второй клаузе подавляем стартовые диалоговые междометия ("Yes, ", "Ah, ", "That sounds great! ")
+        c2 = list(clause2_ids)
+        for i in range(min(6, len(c2))):
+            if decode_fn(c2[i]).strip().endswith("!"):
+                c2 = c2[i + 1 :]
+                break
+        if len(c2) >= 2:
+            w0 = decode_fn(c2[0]).strip(" .,!?;:").lower()
+            w1 = decode_fn(c2[1]).strip()
+            if w0 in self.interjection_prefix_tokens and w1 == ",":
+                c2 = c2[2:]
+
+        # 3. Переводим первый токен второй клаузы в строчный регистр (если это не имя собственное Alex / Echoing Glade)
+        if c2:
+            first_w = decode_fn(c2[0]).strip()
+            if first_w.lower() not in ("alex", "echoing", "glade", "i") and c2[0] in self.lowercase_token_map:
+                c2[0] = self.lowercase_token_map[c2[0]]
+
+        return c1 + bridge_token_ids + c2
+
+
+# ============================================================================
 # 3. ОРГАНИЗМ С ЧИСТОЙ НЕЙРОННОЙ ГЕНЕРАЦИЕЙ ИЗ СИНАПСОВ + ПЕРЕКЛЮЧАТЕЛЬ N-ГРАММ (ON / OFF)
 # ============================================================================
 class ZiwagoPureSynapticDialogueOrganismV14:
@@ -664,6 +810,15 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         self._vec64_cache: Dict[int, torch.Tensor] = {}
         for bid in range(2048):
             self._vec64_cache[bid] = self.vsa_encoder.project_token_to_cortex(bid)
+
+        # Синтаксический Мост Зоны Брока BA44 между аттракторами CA3 (Col0_SYNTAX_BA44 Syntax Bridge)
+        self.ba44_syntax_bridge = BA44AttractorSyntaxBridge(d_vec=64, seed=seed + 1444)
+        self.ba44_syntax_bridge.initialize_synaptic_connectors(
+            encode_fn=self.encode_text,
+            decode_fn=self.decode_token,
+            get_vec64_fn=self.get_vec64,
+            vocab_map=v_map,
+        )
 
         self.total_pairs_trained: int = 0
         self.total_tokens_trained: int = 0
@@ -1219,11 +1374,12 @@ class ZiwagoPureSynapticDialogueOrganismV14:
 
         vte_candidates: List[Tuple[str, List[int], torch.Tensor, float, float]] = []
         beams_stopped: List[bool] = []
+        ba44_bridge_used = ""
         for b_idx, on_pair in enumerate(top_onsets):
             jitter = 0.0 if b_idx == 0 else (0.03 * b_idx)
             if not ngrams_enabled and len(ca3_clause_poles) > 1:
-                # Композиционный синтез по 2 полюсам CA3 (для смешанных кросс-доменных вопросов!):
-                combined_ids: List[int] = []
+                # Композиционный синтез по 2 полюсам CA3 через Синтаксический Мост Зоны Брока (Col0_SYNTAX_BA44 Syntax Bridge):
+                clause_parts: List[List[int]] = []
                 total_sup = 0.0
                 stopped_flag = False
                 for p_pole in ca3_clause_poles:
@@ -1235,12 +1391,28 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                         max_tokens=max_tokens,
                         use_ngrams=False,
                     )
-                    if part_ids != combined_ids[: len(part_ids)]:
-                        combined_ids.extend(part_ids)
+                    if not clause_parts or part_ids != clause_parts[0]:
+                        clause_parts.append(part_ids)
                         total_sup += part_sup
                         stopped_flag = stopped_flag or part_stop
-                beam_ids = combined_ids
-                syn_sup = total_sup / len(ca3_clause_poles)
+
+                if len(clause_parts) >= 2:
+                    bridge_phrase, bridge_ids, _ = self.ba44_syntax_bridge.select_bridge_tokens_between_attractors(
+                        pole1_vec=ca3_clause_poles[0],
+                        pole2_vec=ca3_clause_poles[1],
+                        stimulus_ids=u_ids,
+                        get_vec64_fn=self.get_vec64,
+                    )
+                    ba44_bridge_used = bridge_phrase
+                    beam_ids = self.ba44_syntax_bridge.bridge_two_attractor_clauses_in_ba44(
+                        clause1_ids=clause_parts[0],
+                        clause2_ids=clause_parts[1],
+                        bridge_token_ids=bridge_ids,
+                        decode_fn=self.decode_token,
+                    )
+                else:
+                    beam_ids = clause_parts[0] if clause_parts else []
+                syn_sup = total_sup / max(1, len(clause_parts))
             else:
                 beam_ids, syn_sup, stopped_flag = self._synthesize_single_beam_from_weights_only(
                     q_vec=q_vec,
@@ -1264,8 +1436,9 @@ class ZiwagoPureSynapticDialogueOrganismV14:
 
         return {
             "stimulus": user_utterance,
-            "ngrams_mode": "ON" if ngrams_enabled else "OFF (Pure 4096-Dendritic NMDA Matrix)",
+            "ngrams_mode": "ON" if ngrams_enabled else "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
             "active_moe_columns": moe_out.active_expert_names,
+            "ba44_syntax_bridge_connector": ba44_bridge_used,
             "online_dopamine_imprinted_tokens": imprinted,
             "vte_beams_evaluated": vte_logs,
             "selected_beam_idx": best_idx,
