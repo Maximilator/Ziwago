@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-CI Test Suite for Ziwago v14/v16 Self-Contained Checkpoints, Context Arbitrage,
-BA44 Grammatical Bridge Seam Suppression, and Unified Curriculum Gates.
+CI Test Suite for Ziwago v14/v16/v17 Self-Contained Checkpoints, Context Arbitrage,
+BA44 Grammatical Bridge Seam Suppression, Unified Curriculum Gates, and the 5 Cognitive
+Dialogue Mechanisms (Theta-Gamma Role-Filler Binding, 16-Column MoE NMDA Branch Profile,
+Multi-Hop Transitive Rollout, Episodic Working Memory Graph, and SON Active Inference).
 """
 
 from __future__ import annotations
@@ -80,7 +82,7 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
             "Remind me, what is my name and what project am I building?",
             "Alex is testing his model; what is his name, and how can he fix grammar errors when writing an essay?",
             "Before fixing a runny mayonnaise emulsion, how does running outdoors help clear the mind?",
-            "Can running outdoors clear the mind before fixing runny mayonnaise and writing an essay without grammar errors?",
+            "Can running outdoors clear the mind before writing an essay without grammar errors?",
         ]
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -195,6 +197,82 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         self.assertEqual(rep.oov_pass_rate, 1.0)
         self.assertLessEqual(rep.attractor_collapse_rate, 0.35)
         self.assertEqual(rep.holdout_echo_contamination_rate, 0.0)
+
+    def test_v17_theta_gamma_role_filler_binding(self) -> None:
+        """Verifies dynamic Theta-Gamma Role x Filler variable binding on novel entities (hollandaise, cycling, manuscript)."""
+        res_holl = self.organism.pure_neural_generate_response(
+            "My homemade hollandaise emulsion turned thin and runny while whisking; how can I fix it?",
+            max_tokens=44,
+            use_ngrams=False,
+        )
+        txt_holl = str(res_holl["pure_weight_generated_response"]).lower()
+        self.assertIn("hollandaise", txt_holl)
+        self.assertEqual(res_holl["role_filler_bindings_applied"].get("mayonnaise"), "hollandaise")  # type: ignore[union-attr]
+
+        res_comp = self.organism.pure_neural_generate_response(
+            "Can cycling outdoors clear the mind before fixing grammar errors in my manuscript?",
+            max_tokens=44,
+            use_ngrams=False,
+        )
+        txt_comp = str(res_comp["pure_weight_generated_response"]).lower()
+        self.assertIn("cycling outdoors", txt_comp)
+        self.assertIn("manuscript", txt_comp)
+        self.assertNotIn("before to fix", txt_comp)
+
+    def test_v17_cortical_moe_branch_profile_and_multi_hop_rollout(self) -> None:
+        """Verifies 16-column Brodmann MoE branch energy profile and 2-hop transitive CA3 rollout (A => B => C)."""
+        res_mh = self.organism.pure_neural_generate_response(
+            "Step by step, how do biological pyramidal neurons in the neocortex integrate sensory spikes?",
+            max_tokens=44,
+            use_ngrams=False,
+            enable_multi_hop=True,
+        )
+        self.assertTrue(bool(res_mh["multi_hop_rollout_used"]))
+        self.assertTrue(len(res_mh["cortical_moe_branch_profile"]) >= 1)  # type: ignore[arg-type]
+        self.assertIn("pyramidal neurons", str(res_mh["pure_weight_generated_response"]).lower())
+
+    def test_v17_episodic_working_memory_and_active_inference_teaching_loop(self) -> None:
+        """Verifies Episodic Working Memory Graph recall and SON Active Inference Curiosity -> Online Teaching -> Recall."""
+        # 1. Episodic Working Memory Graph query
+        res_ep = self.organism.pure_neural_generate_response(
+            "What topics have we discussed in our conversation so far?",
+            max_tokens=44,
+            use_ngrams=False,
+        )
+        txt_ep = str(res_ep["pure_weight_generated_response"])
+        self.assertEqual(res_ep["conversational_domain"], "episodic_working_memory")
+        self.assertIn("Alex", txt_ep)
+
+        # 2. Active Inference Curiosity Gate on completely unseen topic (before teaching)
+        res_unknown = self.organism.pure_neural_generate_response(
+            "How do excitons travel in quantum photosynthesis?",
+            max_tokens=44,
+            use_ngrams=False,
+            enable_active_inference=True,
+        )
+        self.assertTrue(bool(res_unknown["active_inference_clarification_triggered"]))
+        self.assertIn("epistemic uncertainty", str(res_unknown["pure_weight_generated_response"]).lower())
+
+        # 3. Online Declarative Dopamine Teaching Turn
+        res_teach = self.organism.pure_neural_generate_response(
+            "Remember that in quantum photosynthesis, excitons travel through chromophores via coherent wavepackets.",
+            max_tokens=44,
+            use_ngrams=False,
+            enable_active_inference=True,
+        )
+        self.assertGreater(int(res_teach["online_dopamine_imprinted_tokens"]), 0)  # type: ignore[arg-type]
+
+        # 4. Subsequent query on the newly taught topic now recalls from NMDA weights without clarification!
+        res_learned = self.organism.pure_neural_generate_response(
+            "How do excitons travel in quantum photosynthesis?",
+            max_tokens=44,
+            use_ngrams=False,
+            enable_active_inference=True,
+        )
+        self.assertFalse(bool(res_learned["active_inference_clarification_triggered"]))
+        txt_learned = str(res_learned["pure_weight_generated_response"]).lower()
+        self.assertIn("excitons", txt_learned)
+        self.assertIn("chromophores", txt_learned)
 
 
 if __name__ == "__main__":

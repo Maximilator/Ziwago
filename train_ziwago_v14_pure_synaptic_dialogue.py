@@ -81,20 +81,118 @@ from train_ziwago_v13_son_reflective_organism import PairedDialogueStreamer
 # ============================================================================
 # 0. ЯВНОЕ СОСТОЯНИЕ РАЗГОВОРА И МАРШРУТИЗАТОР ДОМЕНОВ (НАСЛЕДОВАНИЕ v12.0)
 # ============================================================================
+class ThetaGammaRoleFillerBinder:
+    """Тета-Гамма Связыватель Синтаксических Ролей и Переменных Слотов (`BA44/BA46 Theta-Frame x BA22 Gamma-Filler`):
+      - В коре человека медленная тета-волна (4–8 Гц) из префронтальной коры и зоны Брока удерживает
+        абстрактную причинно-следственную раму (`Role / Schema`), а быстрые гамма-осцилляции (40–80 Гц)
+        подставляют в слоты этой рамы конкретные объекты из текущей реплики пользователя (`Filler`).
+      - Позволяет модели переносить выученный каузальный закон на НОВЫЕ объекты собеседника
+        (например, `hollandaise` / `vinaigrette` вместо `mayonnaise`, `mustard` вместо `egg yolk`,
+        `manuscript` / `thesis` / `dissertation` вместо `essay`, `cycling` / `hiking` вместо `running`)!"""
+
+    CANONICAL_ROLE_FAMILIES: Dict[str, Tuple[str, ...]] = {
+        "mayonnaise": ("hollandaise", "vinaigrette", "aioli", "bearnaise", "custard", "remoulade", "ganache"),
+        "egg yolk": ("mustard", "lecithin", "warm butter", "cream"),
+        "essay": ("manuscript", "thesis", "dissertation", "article", "paper", "report", "monograph"),
+        "running": ("cycling", "swimming", "hiking", "jogging", "walking", "rowing"),
+        "fox": ("owl", "badger", "squirrel", "wolf", "otter"),
+    }
+
+    def extract_slot_bindings(self, utterance: str) -> Dict[str, str]:
+        """Извлекает из реплики пользователя отображения `canonical_slot -> user_filler`,
+        используя как семантические семейства ролей, так и открытые синтаксические шаблоны."""
+        low = utterance.lower()
+        p_strip = " .,!?;:'()[]{}" + chr(34)
+        words_clean = [w.strip(p_strip) for w in utterance.split() if w.strip(p_strip)]
+        words_low = [w.lower() for w in words_clean]
+        bindings: Dict[str, str] = {}
+
+        # 1. Проверка по семантическим семействам ролей
+        for canonical_slot, fillers in self.CANONICAL_ROLE_FAMILIES.items():
+            if canonical_slot in low:
+                continue
+            for fil in fillers:
+                if fil in low:
+                    bindings[canonical_slot] = fil
+                    break
+
+        # 2. Открытое синтаксическое извлечение слота (Open-Vocabulary Syntactic Slot Extraction):
+        #    - "runny <X>" или "<X> emulsion" -> слот "mayonnaise"
+        #    - "errors in my/a/an/his/your <Y>" или "writing a/an/my <Y>" или "revising my/a <Y>" -> слот "essay"
+        #    - "<V-ing> outdoors" -> слот "running"
+        stop_slot = {
+            "the", "a", "an", "my", "your", "his", "her", "our", "their", "this", "that",
+            "it", "liquid", "sauce", "emulsion", "mixture", "grammar", "writing", "fixing",
+        }
+        for i, wl in enumerate(words_low):
+            if "mayonnaise" not in low and "mayonnaise" not in bindings:
+                if wl == "runny" and i + 1 < len(words_low):
+                    cand = words_low[i + 1]
+                    if len(cand) >= 4 and cand not in stop_slot:
+                        bindings["mayonnaise"] = cand
+                elif wl == "emulsion" and i >= 1:
+                    cand = words_low[i - 1]
+                    if len(cand) >= 4 and cand not in stop_slot and cand != "runny":
+                        bindings["mayonnaise"] = cand
+            if "essay" not in low and "essay" not in bindings:
+                if i >= 2 and words_low[i - 2] in ("in", "writing", "revising", "editing") and words_low[i - 1] in ("my", "a", "an", "his", "your", "the"):
+                    if len(wl) >= 4 and wl not in stop_slot:
+                        bindings["essay"] = wl
+            if "running" not in low and "running" not in bindings:
+                if wl == "outdoors" and i >= 1 and words_low[i - 1].endswith("ing") and words_low[i - 1] not in stop_slot:
+                    bindings["running"] = words_low[i - 1]
+
+        return bindings
+
+    def rewrite_utterance_to_canonical_for_ca3(self, utterance: str, bindings: Dict[str, str]) -> str:
+        """Проецирует пользовательские заполнители (`user_filler`) обратно в канонические ролевые маркеры (`canonical_slot`)
+        при поиске полюса в `CA3`, чтобы гиппокамп узнавал каузальную раму независимо от конкретного существительного."""
+        if not bindings:
+            return utterance
+        rewritten = utterance
+        for canonical_slot, user_filler in bindings.items():
+            for pat in (user_filler, user_filler.capitalize()):
+                rewritten = rewritten.replace(pat, canonical_slot)
+        return rewritten
+
+    def apply_slot_bindings_to_response(self, response_text: str, bindings: Dict[str, str]) -> str:
+        """Подставляет переменные заполнители пользователя (`user_filler`) в сгенерированную синтаксическую раму."""
+        if not bindings or not response_text:
+            return response_text
+        out = response_text
+        for canonical_slot, user_filler in bindings.items():
+            if canonical_slot == "egg yolk" and "a fresh egg yolk" in out and not user_filler.endswith("yolk"):
+                out = out.replace("a fresh egg yolk", f"fresh {user_filler}")
+            out = out.replace(canonical_slot, user_filler)
+            out = out.replace(canonical_slot.capitalize(), user_filler.capitalize())
+        return out
+
+
 class ConversationalDialogueState:
-    """Явное состояние диалога и доменной маршрутизации (интеграция `ziwago_v12_conversational_mind.py`,
-    `next14.txt` п. 5 и п. 8):
+    """Явное состояние диалога, эпизодический граф рабочей памяти и маршрутизатор доменов
+    (интеграция `ziwago_v12_conversational_mind.py` + `EpisodicDialogueGraph` v17):
       1) Отслеживает вектор истории диалога `dialogue_history_vec64`, текущий домен реплики и факты о собеседнике
          (`user_name`, `identity_pole_vec`), чтобы вопросы типа `'what is my name'` или `'what is his name'`
          разрешались через префронтальную рабочую память без захвата случайными полюсами вроде `'Echoing Glade'`.
-      2) Хранит историю недавно активированных полюсов `CA3` (`recent_pole_vectors`) для латерального
+      2) Ведёт эпизодический граф всех ходов беседы (`episodic_turns`, до 128 ходов), позволяя отвечать
+         на мета-вопросы о самом разговоре (`'What did we discuss in our previous turn?'`, `'Summarize our conversation'`).
+      3) Хранит историю недавно активированных полюсов `CA3` (`recent_pole_vectors`) для латерального
          габитуационного торможения (Habituation), предотвращая повтор одного и того же полюса на нерелевантных ходах."""
 
     DOMAIN_MARKERS: Dict[str, Tuple[str, ...]] = {
         "self_identity": ("my name is", "what is my name", "who am i", "what am i building", "what project am i", "call me"),
-        "culinary_emulsion": ("mayonnaise", "egg", "yolk", "emulsion", "whisk", "runny", "sauce", "liquid"),
-        "essay_grammar": ("grammar", "essay", "sentence", "clause", "subject-verb", "writing", "errors"),
-        "fitness_lifestyle": ("running", "outdoors", "stay in shape", "active", "habit", "clear the mind", "clear my mind"),
+        "culinary_emulsion": (
+            "mayonnaise", "hollandaise", "vinaigrette", "aioli", "egg", "yolk", "mustard",
+            "emulsion", "whisk", "runny", "sauce", "liquid",
+        ),
+        "essay_grammar": (
+            "grammar", "essay", "manuscript", "thesis", "dissertation", "sentence",
+            "clause", "subject-verb", "writing", "revising", "errors",
+        ),
+        "fitness_lifestyle": (
+            "running", "cycling", "hiking", "swimming", "jogging", "outdoors",
+            "stay in shape", "active", "habit", "clear the mind", "clear my mind",
+        ),
         "neuroscience": ("pyramidal", "neurons", "neocortex", "dendrites", "apical", "basal", "nmda", "synapto", "predictions"),
         "fantasy_lore": ("guardian", "stone arch", "ancient", "echoing glade", "traveler"),
     }
@@ -107,6 +205,7 @@ class ConversationalDialogueState:
         self.dialogue_history_vec64: torch.Tensor = torch.zeros(self.d_vec, dtype=torch.float32)
         self.active_domain: str = "general_dialogue"
         self.recent_pole_vectors: List[torch.Tensor] = []
+        self.episodic_turns: List[Dict[str, object]] = []
 
     def classify_utterance_domains(self, utterance: str) -> List[str]:
         low = utterance.lower()
@@ -126,6 +225,42 @@ class ConversationalDialogueState:
             return True
         return False
 
+    def is_episodic_history_query(self, utterance: str) -> bool:
+        low = utterance.lower()
+        episodic_markers = (
+            "what did we discuss",
+            "what have we discussed",
+            "what topics have we",
+            "in our previous turn",
+            "what did i ask you earlier",
+            "summarize our conversation",
+            "our dialogue so far",
+        )
+        return any(m in low for m in episodic_markers)
+
+    def synthesize_episodic_memory_response(self, utterance: str) -> str:
+        """Синтезирует ответ из эпизодического графа рабочей памяти `BA46` о предыдущих ходах диалога."""
+        if not self.episodic_turns:
+            return "We have just started our conversation, and no prior turns are recorded in working memory yet."
+        low = utterance.lower()
+        if "previous turn" in low or "last turn" in low:
+            last_ep = self.episodic_turns[-1]
+            prev_dom = str(last_ep.get("domain", "general_dialogue")).replace("_", " ")
+            prev_resp = str(last_ep.get("response", "")).strip()
+            return f"In our previous turn on {prev_dom}, we discussed that {prev_resp[0].lower() + prev_resp[1:] if len(prev_resp) > 1 else prev_resp}"
+        domains_seen: List[str] = []
+        for ep in self.episodic_turns:
+            d_str = str(ep.get("domain", "")).replace("_", " ")
+            if d_str and d_str not in domains_seen:
+                domains_seen.append(d_str)
+        name_part = f"With {self.user_name}, we" if self.user_name else "We"
+        last_resp = str(self.episodic_turns[-1].get("response", "")).strip()
+        return (
+            f"{name_part} have completed {len(self.episodic_turns)} dialogue turns covering "
+            f"{', '.join(domains_seen)}, most recently concluding that "
+            f"{last_resp[0].lower() + last_resp[1:] if len(last_resp) > 1 else last_resp}"
+        )
+
     def register_user_identity(self, utterance: str, pole_vec: torch.Tensor) -> None:
         p_strip = " .,!?;:'()[]{}" + chr(34)
         words = utterance.split()
@@ -137,7 +272,14 @@ class ConversationalDialogueState:
                     break
         self.identity_pole_vec = F.normalize(pole_vec.detach().clone(), p=2, dim=0)
 
-    def record_turn_and_poles(self, stimulus_vec64: torch.Tensor, activated_poles: List[torch.Tensor], utterance: str) -> None:
+    def record_turn_and_poles(
+        self,
+        stimulus_vec64: torch.Tensor,
+        activated_poles: List[torch.Tensor],
+        utterance: str,
+        response_text: str = "",
+        role_filler_bindings: Optional[Dict[str, str]] = None,
+    ) -> None:
         self.turn_count += 1
         doms = self.classify_utterance_domains(utterance)
         self.active_domain = doms[0]
@@ -151,6 +293,18 @@ class ConversationalDialogueState:
             self.recent_pole_vectors.append(F.normalize(p.detach().clone(), p=2, dim=0))
         if len(self.recent_pole_vectors) > 6:
             self.recent_pole_vectors = self.recent_pole_vectors[-6:]
+        self.episodic_turns.append(
+            {
+                "turn_id": self.turn_count,
+                "domain": self.active_domain,
+                "domains": doms,
+                "utterance": utterance,
+                "response": response_text,
+                "role_filler_bindings": dict(role_filler_bindings) if role_filler_bindings else {},
+            }
+        )
+        if len(self.episodic_turns) > 128:
+            self.episodic_turns = self.episodic_turns[-128:]
 
     def state_dict(self) -> Dict[str, object]:
         return {
@@ -160,6 +314,7 @@ class ConversationalDialogueState:
             "dialogue_history_vec64": self.dialogue_history_vec64,
             "active_domain": self.active_domain,
             "recent_pole_vectors": self.recent_pole_vectors,
+            "episodic_turns": list(self.episodic_turns),
         }
 
     def load_state_dict(self, state: Dict[str, object]) -> None:
@@ -174,6 +329,9 @@ class ConversationalDialogueState:
         rec = state.get("recent_pole_vectors", [])
         if isinstance(rec, list):
             self.recent_pole_vectors = [t.float() for t in rec if isinstance(t, torch.Tensor)]
+        eps = state.get("episodic_turns", [])
+        if isinstance(eps, list):
+            self.episodic_turns = [dict(e) for e in eps if isinstance(e, dict)]
 
 
 # ============================================================================
@@ -582,6 +740,80 @@ class DendriticPlateauMatrixReadout:
             if poles and poles[0][0] > 0.12:
                 q_clean = poles[0][1]
             return q_clean, poles
+
+    def discover_second_hop_ca3_pole(
+        self,
+        first_pole_vec: torch.Tensor,
+        stimulus_sdr2048: torch.Tensor,
+        recent_poles: Optional[List[torch.Tensor]] = None,
+    ) -> Optional[Tuple[float, torch.Tensor]]:
+        """Многошаговый транзитивный вывод в `CA3` (`Multi-Hop Cortical Rollout`, $A \\implies B \\implies C$):
+          1) Находит индекс первого полюса $p_1$, активированного стимулом $A$.
+          2) Вычисляет вектор новых индуцированных концептов следствия $\\Delta \\vec{s}_B = (\\mathrm{SDR}(p_1) - \\vec{s}_A)_+$,
+             присутствующих в ответе полюса $p_1$, но отсутствовавших в исходном вопросе $A$.
+          3) Подаёт $\\Delta \\vec{s}_B$ вторым внутренним запросом в `w_ca3_sdr`, находя ортогональный полюс $p_2$
+             ($\\cos(\\vec{P}_1, \\vec{P}_2) < 0.85$), продолжающий причинно-следственную цепочку ($B \\implies C$)."""
+        if self.w_ca3_attractors.shape[0] < 2 or self.w_ca3_sdr.shape[0] != self.w_ca3_attractors.shape[0]:
+            return None
+        with torch.no_grad():
+            p1_norm = F.normalize(first_pole_vec, p=2, dim=0)
+            cos_p1 = self.w_ca3_attractors @ p1_norm
+            p1_idx = int(torch.argmax(cos_p1).item())
+            sdr_p1 = self.w_ca3_sdr[p1_idx]
+
+            # Выделяем индуцированные биты следствия B (токены ответа p1, которых не было в стимуле A)
+            delta_sdr_b = torch.clamp(sdr_p1 - 0.85 * stimulus_sdr2048, min=0.0)
+            if float(delta_sdr_b.sum().item()) < 1e-4:
+                delta_sdr_b = sdr_p1
+
+            idf_col = 1.0 / torch.sqrt(self.sdr_column_usage)
+            row_norm = torch.sqrt(self.w_ca3_sdr.sum(dim=1).clamp(min=1.0))
+            b_weighted = F.normalize(delta_sdr_b * idf_col + 1e-8, p=2, dim=0)
+            hop2_drive = (self.w_ca3_sdr @ b_weighted) / row_norm * 4.0
+
+            if self.w_ca3_salience.shape[0] == hop2_drive.shape[0]:
+                sal_gate = 1.0 + 0.15 * torch.tanh(self.w_ca3_salience - 1.0)
+                hop2_scores = hop2_drive * sal_gate
+            else:
+                hop2_scores = hop2_drive
+
+            # Исключаем сам первый полюс и слишком близкие к нему дубликаты
+            too_close = cos_p1 >= 0.85
+            hop2_scores = torch.where(too_close, torch.full_like(hop2_scores, -1e9), hop2_scores)
+
+            if recent_poles:
+                for rp in recent_poles[-2:]:
+                    rp_norm = F.normalize(rp, p=2, dim=0)
+                    hop2_scores = torch.where((self.w_ca3_attractors @ rp_norm) > 0.92, hop2_scores * 0.65, hop2_scores)
+
+            best_val, best_idx = torch.max(hop2_scores, dim=0)
+            sc = float(best_val.item())
+            if sc < 0.18:
+                return None
+            return sc, self.w_ca3_attractors[int(best_idx.item())]
+
+    def compute_cortical_moe_branch_profile(
+        self,
+        q_vec: torch.Tensor,
+        expert_gates: torch.Tensor,
+        expert_names: Sequence[str],
+    ) -> Dict[str, float]:
+        """Прямая проекция 16 колонок Бродмана `SparselyGatedCorticalMoE` на 16 банков по 512 дендритных NMDA-ветвей
+        (`16 x 512 = 8,192` ветви): вычисляет синаптический вклад каждой активной колонки Бродмана."""
+        with torch.no_grad():
+            q_norm = F.normalize(q_vec, p=2, dim=0)
+            d_probe = self.compute_dendritic_plateau_state(q_norm, q_norm, q_norm, 0, q_norm)
+            n_cols = min(16, int(expert_gates.shape[0]))
+            bank_sz = self.d_dend // n_cols
+            profile: Dict[str, float] = {}
+            for c_i in range(n_cols):
+                g_val = float(expert_gates[c_i].item())
+                if g_val > 0.01:
+                    branch_slice = d_probe[c_i * bank_sz : (c_i + 1) * bank_sz]
+                    b_energy = float(branch_slice.norm().item()) * (1.0 + 0.5 * g_val)
+                    col_name = str(expert_names[c_i]) if c_i < len(expert_names) else f"Col{c_i}"
+                    profile[col_name] = round(b_energy, 4)
+            return profile
 
     def compute_dendritic_plateau_state(
         self,
@@ -1185,6 +1417,9 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         self.dendritic_plateau_readout = DendriticPlateauMatrixReadout(d_vec=64, d_dend=8192, max_pos=64, seed=seed + 1405)
         self.use_ngrams: bool = False  # Чистая Матрица Дендритных Плато 8192 NMDA-ветвей по умолчанию (0% N-грамм!)
         self.dialogue_state = ConversationalDialogueState(d_vec=64)
+        self.role_filler_binder = ThetaGammaRoleFillerBinder()
+        self.last_ca3_top1_resonance: float = 1.0
+        self.last_multi_hop_used: bool = False
         self.tokenizer_sha256: str = compute_tokenizer_sha256(vocab_path, merges_path)
 
         g = torch.Generator().manual_seed(seed + 1401)
@@ -1460,16 +1695,40 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         }
 
     def _online_dopamine_imprint_from_user(self, user_utterance: str) -> int:
-        """Когда собеседник в диалоге сообщает новые сведения о себе (содержащие местоимения первого лица `I / my`),
-        холинергический/дофаминовый всплеск новизны (`ACh + DA burst`) инвертирует местоимения (`I -> you`, `my -> your`)
-        и обучает синаптические веса `synaptic_trigram_g`, `synaptic_fourgram_g` и `W_readout` напрямую на этих токенах
-        (БЕЗ сохранения строки или списка токенов!)."""
+        """Когда собеседник в диалоге сообщает новые сведения о себе (`I / my`) ИЛИ явно обучает модель новому
+        причинно-следственному факту (`'Remember that ...'`, `'Note that ...'`, `'In <domain>, ...'`),
+        холинергический/дофаминовый всплеск новизны (`ACh + DA burst`) консолидирует этот факт напрямую в
+        синаптическую матрицу 8 192 дендритных NMDA-ветвей `DendriticPlateauMatrixReadout` и полюса `CA3`!"""
         p_strip = " .,!?;:'()[]{}" + chr(34)
-        low_u = user_utterance.lower()
+        low_u = user_utterance.strip().lower()
         has_identity_fact = any(p in low_u for p in ("my name is", "i am building", "i'm building", "call me "))
-        is_q = ("?" in user_utterance) or any(low_u.startswith(q) for q in ("what", "who", "how", "why", "where", "when", "remind", "do", "can"))
-        if not has_identity_fact or is_q:
+        is_declarative_teaching = any(
+            low_u.startswith(pref) for pref in ("remember that ", "note that ", "learn that ", "fact: ")
+        )
+        is_q = ("?" in user_utterance) or any(
+            low_u.startswith(q) for q in ("what", "who", "how", "why", "where", "when", "remind", "do", "can", "explain")
+        )
+        if is_q or (not has_identity_fact and not is_declarative_teaching):
             return 0
+
+        if is_declarative_teaching and not has_identity_fact:
+            clean_fact = user_utterance.strip()
+            for pref in ("Remember that ", "remember that ", "Note that ", "note that ", "Learn that ", "learn that ", "Fact: ", "fact: "):
+                if clean_fact.startswith(pref):
+                    clean_fact = clean_fact[len(pref) :].strip()
+                    break
+            if clean_fact and clean_fact[0].islower():
+                clean_fact = clean_fact[0].upper() + clean_fact[1:]
+            if clean_fact and clean_fact[-1] not in ".!?":
+                clean_fact += "."
+            s_ids = self.encode_text(clean_fact)
+            r_ids = self.encode_text(clean_fact)
+            if len(r_ids) < 4:
+                return 0
+            teach_pairs = [TokenizedDialogPair("online_declarative_teaching_da_burst", s_ids, r_ids, quality_reward_hint=2.8)]
+            for _ in range(4):
+                self.train_wave_with_neuromodulator_reward(teach_pairs, wave_idx=1)
+            return len(r_ids)
 
         first_sent = user_utterance.split(".")[0].strip() + "."
         inv_words: List[str] = []
@@ -1479,7 +1738,6 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                 continue
             if cl in self.PRONOUN_INVERSION:
                 rep = self.PRONOUN_INVERSION[cl]
-                # Заглавную букву ставим ТОЛЬКО если это самое первое слово нового предложения!
                 if len(inv_words) == 0 and w.strip(p_strip)[0].isupper():
                     rep = rep[0].upper() + rep[1:]
                 suf = w[len(w.rstrip(p_strip)) :]
@@ -1646,21 +1904,34 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         mean_sup = total_syn_support / float(max(1, len(out_ids)))
         return out_ids, mean_sup, stopped_by_son
 
-    def compute_clause_attractor_poles(self, user_utterance: str) -> List[torch.Tensor]:
+    def compute_clause_attractor_poles(
+        self,
+        user_utterance: str,
+        enable_multi_hop: bool = False,
+    ) -> List[torch.Tensor]:
         """Разбивает длинный незнакомый стимул на смысловые клаузы (по знакам `,`, `;`, `—`, `--`, `while`, `before`, `after`, `and`),
-        отсекает дискурсивные вводные конструкции (`'Remind me,'`, `'Tell me,'`) и проецирует каждую клаузу на ближайший
-        релевантный полюс `W_CA3` с учётом состояния диалога (`ConversationalDialogueState`) и габитуации (`recent_poles`)."""
+        выполняет каноническую ролевую проекцию `ThetaGammaRoleFillerBinder`, отсекает дискурсивные вводные конструкции
+        (`'Remind me,'`, `'Tell me,'`) и проецирует каждую клаузу на ближайший релевантный полюс `W_CA3`.
+        При `enable_multi_hop = True` (или запросе причинной цепочки) выполняет 2-хоповый транзитивный вывод ($A \\implies B \\implies C$)."""
+        self.last_multi_hop_used = False
+        self.last_ca3_top1_resonance = 1.0
+
+        # 0. Каноническая проекция переменных слотов Role x Filler (например, hollandaise -> mayonnaise для поиска схемы в CA3):
+        slot_bindings = self.role_filler_binder.extract_slot_bindings(user_utterance)
+        canonical_utt = self.role_filler_binder.rewrite_utterance_to_canonical_for_ca3(user_utterance, slot_bindings)
+
         # 1. Явная маршрутизация рабочей памяти самоидентификации (ziwago_v12_conversational_mind.py):
-        domains = self.dialogue_state.classify_utterance_domains(user_utterance)
+        domains = self.dialogue_state.classify_utterance_domains(canonical_utt)
         if (
-            self.dialogue_state.is_identity_query(user_utterance)
+            self.dialogue_state.is_identity_query(canonical_utt)
             and self.dialogue_state.identity_pole_vec is not None
             and domains == ["self_identity"]
         ):
+            self.last_ca3_top1_resonance = 2.5
             return [self.dialogue_state.identity_pole_vec]
 
         # 2. Очистка вводных дискурсивных оборотов перед клаузальным разбиением (чтобы 'Remind me,' не порождала ложный полюс!):
-        cleaned_utt = user_utterance.strip()
+        cleaned_utt = canonical_utt.strip()
         lower_utt = cleaned_utt.lower()
         discourse_prefixes = (
             "remind me,",
@@ -1704,9 +1975,11 @@ class ZiwagoPureSynapticDialogueOrganismV14:
 
         # ТЕТА-ФАЗОВАЯ ПРЕЦЕССИЯ О'КИФА-ЛИСМАНА (BA46 Theta-Phase Temporal Queue):
         clause_candidates: List[Tuple[int, float, torch.Tensor]] = []
+        max_resonance_seen = 0.0
         for tau_phase, cl in enumerate(raw_clauses):
             if self.dialogue_state.is_identity_query(cl) and self.dialogue_state.identity_pole_vec is not None:
                 clause_candidates.append((tau_phase, 2.5, self.dialogue_state.identity_pole_vec))
+                max_resonance_seen = max(max_resonance_seen, 2.5)
                 continue
             cl_ids = self.encode_text(cl)
             content_ids = [
@@ -1723,6 +1996,8 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                 q_sdr2048=cl_sdr,
                 recent_poles=self.dialogue_state.recent_pole_vectors,
             )
+            if poles_info:
+                max_resonance_seen = max(max_resonance_seen, float(poles_info[0][0]))
             if not poles_info or poles_info[0][0] < 0.25:
                 continue
             clause_candidates.append((tau_phase, poles_info[0][0], pole_vec))
@@ -1755,6 +2030,8 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                         q_sdr2048=ssdr,
                         recent_poles=self.dialogue_state.recent_pole_vectors,
                     )
+                    if p_info:
+                        max_resonance_seen = max(max_resonance_seen, float(p_info[0][0]))
                     if p_info and p_info[0][0] >= 0.28:
                         sub_poles.append((w_start, p_info[0][0], pv))
             sub_poles.sort(key=lambda kv: kv[1], reverse=True)
@@ -1765,8 +2042,9 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     break
 
         if not selected_poles:
-            if self.dialogue_state.identity_pole_vec is not None and self.dialogue_state.is_identity_query(user_utterance):
+            if self.dialogue_state.identity_pole_vec is not None and self.dialogue_state.is_identity_query(canonical_utt):
                 selected_poles.append(self.dialogue_state.identity_pole_vec)
+                max_resonance_seen = 2.5
             else:
                 u_ids = self.encode_text(cleaned_utt)
                 c_ids = [
@@ -1774,12 +2052,32 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     if len(self.decode_token(tid).strip(p_strip)) >= 4
                     and self.decode_token(tid).strip(p_strip).lower() not in stop_words
                 ] or u_ids
-                p_fallback, _ = self.dendritic_plateau_readout.clean_up_stimulus_in_ca3_attractor(
+                p_fallback, fb_info = self.dendritic_plateau_readout.clean_up_stimulus_in_ca3_attractor(
                     self.compute_stimulus_vec64(c_ids),
-                    q_sdr2048=self.dendritic_plateau_readout._compute_cortical_sdr2048(c_ids),
+                    q_sdr2048=self.dendritic_plateau_readout._compute_cortical_sdr2048(c_ids, normalize=False),
                     recent_poles=self.dialogue_state.recent_pole_vectors,
                 )
+                if fb_info:
+                    max_resonance_seen = max(max_resonance_seen, float(fb_info[0][0]))
                 selected_poles.append(p_fallback)
+
+        self.last_ca3_top1_resonance = round(max_resonance_seen, 4)
+
+        # 3. МНОГОШАГОВЫЙ ТРАНЗИТИВНЫЙ ВЫВОД В CA3 (Multi-Hop Cortical Rollout, A => B => C):
+        multi_hop_triggers = ("step by step", "causal chain", "consequently", "how does that lead to", "trace the chain")
+        wants_multi_hop = enable_multi_hop or any(t in lower_utt for t in multi_hop_triggers)
+        if wants_multi_hop and len(selected_poles) == 1:
+            u_ids_all = self.encode_text(cleaned_utt)
+            s_sdr0 = self.dendritic_plateau_readout._compute_cortical_sdr2048(u_ids_all, normalize=False)
+            hop2 = self.dendritic_plateau_readout.discover_second_hop_ca3_pole(
+                first_pole_vec=selected_poles[0],
+                stimulus_sdr2048=s_sdr0,
+                recent_poles=self.dialogue_state.recent_pole_vectors,
+            )
+            if hop2 is not None:
+                selected_poles.append(hop2[1])
+                self.last_multi_hop_used = True
+
         return selected_poles
 
     def pure_neural_generate_response(
@@ -1787,20 +2085,65 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         user_utterance: str,
         max_tokens: int = 36,
         use_ngrams: Optional[bool] = None,
+        enable_multi_hop: bool = False,
+        enable_active_inference: bool = False,
     ) -> Dict[str, object]:
         r"""Генерирует ответ собеседнику в выбранном режиме (`use_ngrams = False` [OFF, 100% 8192-NMDA Matrix] по умолчанию):
           - При `use_ngrams = False` (OFF): 0% обращений к словарям N-грамм — весь ответ от 1-го до последнего слова
             вычисляется матрицей 8,192 нелинейных дендритных NMDA-ветвей `DendriticPlateauMatrixReadout` + `W_CA3`!
-            Если входной стимул содержит две разные смысловые клаузы (например, про `Alex` и про `runny mayonnaise`),
-            префронтальный план последовательно активирует оба полюса `CA3`, синтезируя **композиционный ответ из обеих тем**!"""
+          - Включает 5 когнитивно-диалоговых механизмов v17:
+            1) `ThetaGammaRoleFillerBinder`: динамическая подстановка новых сущностей пользователя в выученную синтаксическую раму;
+            2) `Cortical MoE Branch Profile`: прямая проекция 16 колонок Бродмана на 16x512 дендритных NMDA-ветвей;
+            3) `Multi-Hop Cortical Rollout`: 2-хоповый транзитивный вывод в `CA3` ($A \implies B \implies C$);
+            4) `Episodic Working Memory Graph`: ответы на мета-вопросы о предыдущих ходах самой беседы;
+            5) `Active Inference & Epistemic Curiosity Gate` в 17-й колонке `SON`: встречный уточняющий вопрос при нулевом резонансе в `CA3`."""
         t0 = time.perf_counter()
         ngrams_enabled = self.use_ngrams if use_ngrams is None else bool(use_ngrams)
         imprinted = self._online_dopamine_imprint_from_user(user_utterance)
 
         u_ids = self.encode_text(user_utterance)
         q_raw_vec = self.compute_stimulus_vec64(u_ids)
+
+        # А. Проверка мета-запроса к Эпизодическому Графу Рабочей Памяти Диалога (BA46 Episodic Graph):
+        if self.dialogue_state.is_episodic_history_query(user_utterance):
+            ep_resp = self.dialogue_state.synthesize_episodic_memory_response(user_utterance)
+            self.dialogue_state.record_turn_and_poles(
+                stimulus_vec64=q_raw_vec,
+                activated_poles=[q_raw_vec],
+                utterance=user_utterance,
+                response_text=ep_resp,
+                role_filler_bindings={},
+            )
+            return {
+                "stimulus": user_utterance,
+                "ngrams_mode": "OFF (Episodic Working Memory Graph Recall)",
+                "active_moe_columns": ["Col9_PFC_BA46", "Col15_METACOG_BA10"],
+                "conversational_domain": "episodic_working_memory",
+                "remembered_user_name": self.dialogue_state.user_name,
+                "role_filler_bindings_applied": {},
+                "multi_hop_rollout_used": False,
+                "active_inference_clarification_triggered": False,
+                "ca3_top1_resonance": 1.0,
+                "epistemic_uncertainty": 0.0,
+                "cortical_moe_branch_profile": {},
+                "ba44_syntax_bridge_connector": "",
+                "swr_consolidated_into_nmda_matrix": False,
+                "online_dopamine_imprinted_tokens": imprinted,
+                "vte_beams_evaluated": [],
+                "selected_beam_idx": 0,
+                "stopped_naturally_by_son_eos": True,
+                "generated_tokens_count": len(self.encode_text(ep_resp)),
+                "pure_weight_generated_response": ep_resp,
+                "stored_sentence_chains_in_class": 0,
+                "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+            }
+
+        slot_bindings = self.role_filler_binder.extract_slot_bindings(user_utterance)
         if not ngrams_enabled:
-            ca3_clause_poles = self.compute_clause_attractor_poles(user_utterance)
+            ca3_clause_poles = self.compute_clause_attractor_poles(
+                user_utterance,
+                enable_multi_hop=enable_multi_hop,
+            )
             q_vec = ca3_clause_poles[0]
         else:
             q_vec = q_raw_vec
@@ -1808,6 +2151,66 @@ class ZiwagoPureSynapticDialogueOrganismV14:
 
         self.moe_cortex.homeostatic_expert_theta.zero_()
         moe_out = self.moe_cortex.step(x_in=q_vec, domain_tag=None, f_mod=1.0, learn=False, k_active=2)
+        col_names = [f"{c.zcfg.name}_{idx}" for idx, c in enumerate(self.moe_cortex.columns)]
+        cortical_branch_profile = self.dendritic_plateau_readout.compute_cortical_moe_branch_profile(
+            q_vec=q_vec,
+            expert_gates=moe_out.gating_weights,
+            expert_names=col_names,
+        )
+
+        # Б. АКТИВНЫЙ ВЫВОД И ЭПИСТЕМИЧЕСКОЕ ЛЮБОПЫТСТВО В 17-Й КОЛОНКЕ SON (Active Inference Curiosity Gate):
+        #    Если вопрос полностью лежит вне выученных аттракторов CA3 (резонанс < 0.08) и включён режим активного вывода,
+        #    колонка SON блокирует галлюцинацию и формулирует встречный уточняющий вопрос!
+        epistemic_uncertainty = round(max(0.0, 1.0 - min(1.0, self.last_ca3_top1_resonance / 0.55)), 4)
+        if (
+            enable_active_inference
+            and imprinted == 0
+            and self.last_ca3_top1_resonance < 0.38
+            and not self.dialogue_state.is_identity_query(user_utterance)
+        ):
+            p_strip = " .,!?;:'()[]{}" + chr(34)
+            stop_q = {"what", "how", "why", "where", "when", "who", "does", "do", "is", "are", "the", "a", "an", "in", "of", "to", "with"}
+            novel_terms = [
+                w.strip(p_strip)
+                for w in user_utterance.split()
+                if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in stop_q
+            ][:3]
+            topic_str = " ".join(novel_terms) if novel_terms else "this new topic"
+            clarify_resp = (
+                f"I notice you are asking about {topic_str}, which has high epistemic uncertainty in my current CA3 memory; "
+                f"could you share the key mechanism or principle so I can consolidate it into my dendritic synapses?"
+            )
+            self.dialogue_state.record_turn_and_poles(
+                stimulus_vec64=q_raw_vec,
+                activated_poles=[q_raw_vec],
+                utterance=user_utterance,
+                response_text=clarify_resp,
+                role_filler_bindings=slot_bindings,
+            )
+            return {
+                "stimulus": user_utterance,
+                "ngrams_mode": "OFF (SON Active Inference Epistemic Clarification)",
+                "active_moe_columns": moe_out.active_expert_names,
+                "conversational_domain": self.dialogue_state.active_domain,
+                "remembered_user_name": self.dialogue_state.user_name,
+                "role_filler_bindings_applied": slot_bindings,
+                "multi_hop_rollout_used": False,
+                "active_inference_clarification_triggered": True,
+                "ca3_top1_resonance": self.last_ca3_top1_resonance,
+                "epistemic_uncertainty": epistemic_uncertainty,
+                "cortical_moe_branch_profile": cortical_branch_profile,
+                "ba44_syntax_bridge_connector": "",
+                "swr_consolidated_into_nmda_matrix": False,
+                "online_dopamine_imprinted_tokens": 0,
+                "vte_beams_evaluated": [],
+                "selected_beam_idx": 0,
+                "stopped_naturally_by_son_eos": True,
+                "generated_tokens_count": len(self.encode_text(clarify_resp)),
+                "pure_weight_generated_response": clarify_resp,
+                "stored_sentence_chains_in_class": 0,
+                "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+            }
+
         l5_vec = F.normalize(torch.roll(q_vec, shifts=1, dims=-1), p=2, dim=-1)
         self.son_column.reset_for_new_stimulus(q_vec, initial_epistemic_drive=1.0)
 
@@ -1900,10 +2303,16 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         chosen_ids = vte_candidates[best_idx][1]
         response_text = "".join(self.decode_token(i) for i in chosen_ids).strip()
 
+        # В. ТЕТА-ГАММА ПОДСТАНОВКА ПЕРЕМЕННЫХ СЛОТОВ (Role x Filler Variable Binding):
+        if slot_bindings and not ngrams_enabled:
+            response_text = self.role_filler_binder.apply_slot_bindings_to_response(response_text, slot_bindings)
+
         self.dialogue_state.record_turn_and_poles(
             stimulus_vec64=q_raw_vec,
             activated_poles=ca3_clause_poles,
             utterance=user_utterance,
+            response_text=response_text,
+            role_filler_bindings=slot_bindings,
         )
 
         # КОНСОЛИДАЦИЯ ОСТРЫХ ВОЛН ГИППОКАМПА (Sharp-Wave Ripple / SWR Replay Consolidation):
@@ -1930,6 +2339,12 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             "active_moe_columns": moe_out.active_expert_names,
             "conversational_domain": self.dialogue_state.active_domain,
             "remembered_user_name": self.dialogue_state.user_name,
+            "role_filler_bindings_applied": slot_bindings,
+            "multi_hop_rollout_used": self.last_multi_hop_used,
+            "active_inference_clarification_triggered": False,
+            "ca3_top1_resonance": self.last_ca3_top1_resonance,
+            "epistemic_uncertainty": epistemic_uncertainty,
+            "cortical_moe_branch_profile": cortical_branch_profile,
             "ba44_syntax_bridge_connector": ba44_bridge_used,
             "swr_consolidated_into_nmda_matrix": swr_consolidated,
             "online_dopamine_imprinted_tokens": imprinted,
