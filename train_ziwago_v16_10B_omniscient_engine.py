@@ -55,6 +55,10 @@ import pyarrow.parquet as pq
 import torch
 import torch.nn.functional as F
 
+from neuroweave10.evaluation.gates import (
+    HOLD_OUT_EXAM_SUITE,
+    UnifiedCurriculumGates,
+)
 from train_ziwago_v14_pure_synaptic_dialogue import (
     TokenizedDialogPair,
     ZiwagoPureSynapticDialogueOrganismV14,
@@ -62,9 +66,128 @@ from train_ziwago_v14_pure_synaptic_dialogue import (
     _init_bpe_worker,
 )
 from train_ziwago_v15_omniscient_marathon import (
-    FIVE_WORLD_ANCHOR_PAIRS,
     execute_sws_synaptic_homeostasis_and_pruning,
 )
+
+
+# ============================================================================
+# БАЗОВЫЕ ОНТОГЕНЕТИЧЕСКИЕ УРОКИ ПО ЭПОХАМ (СТРОГО ОТДЕЛЕНЫ ОТ HOLD_OUT_EXAM_SUITE!)
+# ============================================================================
+FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH: Dict[int, List[Tuple[str, str, str, float]]] = {
+    1: [
+        (
+            "tinystories",
+            "Once upon a time, a curious little fox found a shiny brass key near the old oak tree.",
+            "The little fox used the brass key to unlock the hidden wooden chest and shared the golden berries with her friends.",
+            2.3,
+        ),
+    ],
+    2: [
+        (
+            "bookcorpus",
+            "The autumn wind swept across the cobblestone courtyard as the cathedral bells began to chime at dusk.",
+            "Shadows lengthened beneath the stone arches while the old scholar closed his leather-bound journal and stepped into the lantern light.",
+            2.3,
+        ),
+    ],
+    3: [
+        (
+            "wikitext103",
+            "How do biological pyramidal neurons in the neocortex integrate bottom-up sensory input with top-down predictions?",
+            "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+            2.4,
+        ),
+    ],
+    4: [
+        (
+            "npc_dialogue",
+            "Greetings, guardian of the ancient stone arch.",
+            "Ah, you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge.",
+            2.3,
+        ),
+        (
+            "personachat",
+            "Hi, how are you doing? I am getting ready to go running to stay in shape.",
+            "That sounds great! Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind.",
+            2.3,
+        ),
+    ],
+    5: [
+        (
+            "oasst2",
+            "I am making mayonnaise, it was starting to thicken but now it has become runny and liquid.",
+            "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+            2.3,
+        ),
+        (
+            "ultrachat",
+            "How can I fix errors in my grammar when writing an essay?",
+            "To fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+            2.3,
+        ),
+    ],
+}
+
+
+class DeficitRoundRobinDomainBalancer:
+    """Балансировщик доменов по алгоритму `Deficit Round-Robin` (из `v10.1 StreamingDataMixer`, `next14.txt` п. 7):
+    Отслеживает целевые квоты доменов по эпохам, явно журналирует отсутствующие на диске корпуса (`missing_sources`)
+    и восполняет дефицит из ближайшего доступного корпуса того же регистра, чтобы ни одна эпоха не вырождалась в ноль."""
+
+    def __init__(self, data_dir: Path):
+        self.data_dir = data_dir
+        self.missing_sources: List[str] = []
+        self.deficit_backfills: List[Dict[str, object]] = []
+        self.domain_pair_counts: Dict[str, int] = {}
+
+    def record_missing_source(self, epoch_idx: int, source_name: str, expected_path: str) -> None:
+        msg = f"Epoch {epoch_idx}: missing source '{source_name}' at '{expected_path}'"
+        if msg not in self.missing_sources:
+            self.missing_sources.append(msg)
+
+    def record_pairs(self, pairs: List[Tuple[str, str, str, float]]) -> None:
+        for src, _, _, _ in pairs:
+            self.domain_pair_counts[src] = self.domain_pair_counts.get(src, 0) + 1
+
+    def backfill_epoch_deficit_if_needed(
+        self,
+        epoch_idx: int,
+        target_domain: str,
+        current_pairs: List[Tuple[str, str, str, float]],
+        min_required_pairs: int,
+        fallback_lessons: List[Tuple[str, str, str, float]],
+    ) -> List[Tuple[str, str, str, float]]:
+        if len(current_pairs) >= min_required_pairs:
+            return current_pairs
+        deficit = min_required_pairs - len(current_pairs)
+        backfilled = list(current_pairs)
+        # Восполняем дефицит из соседнего доступного корпуса (`cornell_movie_dialogs_honest.jsonl` / `TinyStories_train_4k.txt`)
+        honest_Dialog = self.data_dir / "cornell_movie_dialogs_honest.jsonl"
+        if honest_Dialog.exists():
+            try:
+                with open(honest_Dialog, "r", encoding="utf-8", errors="ignore") as f:
+                    for ln in f:
+                        if len(backfilled) >= min_required_pairs:
+                            break
+                        obj = json.loads(ln)
+                        sa = str(obj.get("stimulus", obj.get("prompt", ""))).strip()
+                        sb = str(obj.get("response", obj.get("reply", ""))).strip()
+                        if len(sa) >= 12 and len(sb) >= 15:
+                            backfilled.append((target_domain, sa, sb, 1.45))
+            except Exception:
+                pass
+        while len(backfilled) < max(8, min(min_required_pairs, len(fallback_lessons) * 4)) and fallback_lessons:
+            backfilled.extend(fallback_lessons)
+        self.deficit_backfills.append(
+            {
+                "epoch": epoch_idx,
+                "target_domain": target_domain,
+                "initial_pairs": len(current_pairs),
+                "deficit_filled": len(backfilled) - len(current_pairs),
+                "final_pairs": len(backfilled),
+            }
+        )
+        return backfilled
 
 
 # ============================================================================
@@ -363,13 +486,26 @@ def run_v16_10B_omniscient_curriculum(
     )
     organism.use_ngrams = False
     ca3_atlas = FiveBankCA3AttractorAtlas(d_vec=64, max_poles_per_bank=2048)
+    domain_balancer = DeficitRoundRobinDomainBalancer(data_dir=data_dir)
 
     vocab_p = str(data_dir / "gpt2" / "vocab.json")
     merges_p = str(data_dir / "gpt2" / "merges.txt")
     _init_bpe_worker(vocab_p, merges_p)
 
-    anchor_tok = _bpe_tokenize_raw_pairs_worker(FIVE_WORLD_ANCHOR_PAIRS)
-    anchor_objs = [TokenizedDialogPair(s, ia, ib, q) for s, ia, ib, q in anchor_tok]
+    # Строгий реестр всех стимулов обучения для математической проверки 0% пересечения с HOLD_OUT_EXAM_SUITE
+    trained_stimuli_normalized: set[str] = set()
+    all_foundational_lessons: List[Tuple[str, str, str, float]] = []
+    epoch_lesson_objs: Dict[int, List[TokenizedDialogPair]] = {}
+    for ep_i, lessons in FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.items():
+        all_foundational_lessons.extend(lessons)
+        for _, sa, _, _ in lessons:
+            trained_stimuli_normalized.add(" ".join(sa.strip().lower().split()))
+        tok_l = _bpe_tokenize_raw_pairs_worker(lessons)
+        epoch_lesson_objs[ep_i] = [TokenizedDialogPair(s, ia, ib, q) for s, ia, ib, q in tok_l]
+
+    all_lesson_objs: List[TokenizedDialogPair] = [
+        tp for ep_list in epoch_lesson_objs.values() for tp in ep_list
+    ]
 
     total_raw_tokens_scanned = 0
     total_shards_and_zones_scanned = 0
@@ -388,29 +524,42 @@ def run_v16_10B_omniscient_curriculum(
         raw_elite_pairs: List[Tuple[str, str, str, float]],
         raw_scanned_toks: int,
         shards_done: int,
+        target_domain: str,
     ) -> Dict[str, object]:
         nonlocal total_raw_tokens_scanned, total_shards_and_zones_scanned
         ep_t0 = time.perf_counter()
         total_raw_tokens_scanned += raw_scanned_toks
         total_shards_and_zones_scanned += shards_done
 
+        raw_elite_pairs = domain_balancer.backfill_epoch_deficit_if_needed(
+            epoch_idx=epoch_idx,
+            target_domain=target_domain,
+            current_pairs=raw_elite_pairs,
+            min_required_pairs=32,
+            fallback_lessons=FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.get(epoch_idx, []),
+        )
+        domain_balancer.record_pairs(raw_elite_pairs)
+        for _, sa, _, _ in raw_elite_pairs:
+            trained_stimuli_normalized.add(" ".join(sa.strip().lower().split()))
+
         random.Random(42 + epoch_idx).shuffle(raw_elite_pairs)
-        n_w = min(workers, max(1, len(raw_elite_pairs) // 40))
-        chunk_sz = max(1, (len(raw_elite_pairs) + n_w - 1) // n_w)
-        chunks = [raw_elite_pairs[i : i + chunk_sz] for i in range(0, len(raw_elite_pairs), chunk_sz)]
-
         tok_pairs: List[TokenizedDialogPair] = []
-        with ProcessPoolExecutor(
-            max_workers=n_w,
-            initializer=_init_bpe_worker,
-            initargs=(vocab_p, merges_p),
-        ) as ex:
-            for res_list in ex.map(_bpe_tokenize_raw_pairs_worker, chunks):
-                for src, ids_a, ids_b, q_h in res_list:
-                    tok_pairs.append(TokenizedDialogPair(src, ids_a, ids_b, q_h))
+        if raw_elite_pairs:
+            n_w = min(workers, max(1, len(raw_elite_pairs) // 40))
+            chunk_sz = max(1, (len(raw_elite_pairs) + n_w - 1) // n_w)
+            chunks = [raw_elite_pairs[i : i + chunk_sz] for i in range(0, len(raw_elite_pairs), chunk_sz)]
 
-        # Подмешиваем золотые якоря всех 5 миров для непрерывной калибровки
-        tok_pairs.extend(anchor_objs * 2)
+            with ProcessPoolExecutor(
+                max_workers=n_w,
+                initializer=_init_bpe_worker,
+                initargs=(vocab_p, merges_p),
+            ) as ex:
+                for res_list in ex.map(_bpe_tokenize_raw_pairs_worker, chunks):
+                    for src, ids_a, ids_b, q_h in res_list:
+                        tok_pairs.append(TokenizedDialogPair(src, ids_a, ids_b, q_h))
+
+        # Добавляем фундаментальные уроки текущей эпохи онтогенеза (строго не пересекающиеся с HOLD_OUT_EXAM_SUITE)
+        tok_pairs.extend(epoch_lesson_objs.get(epoch_idx, []) * 2)
 
         # Записываем полюса в 5-Банковый Доменный Атлас CA3
         for tp in tok_pairs[::4]:
@@ -423,12 +572,14 @@ def run_v16_10B_omniscient_curriculum(
 
         ep_sec = max(1e-3, time.perf_counter() - ep_t0)
         eff_scan_speed = int(raw_scanned_toks / ep_sec)
+        ach_yield_pct = round(100.0 * wave_stat["tokens_trained"] / float(max(1, raw_scanned_toks)), 4)
         stat_out = {
             "epoch": epoch_idx,
             "epoch_name": epoch_name,
             "shards_or_zones_scanned": shards_done,
             "raw_corpus_tokens_scanned": raw_scanned_toks,
             "thalamic_scan_throughput_tok_per_sec": eff_scan_speed,
+            "thalamic_ach_token_yield_pct": ach_yield_pct,
             "elite_pairs_consolidated": len(tok_pairs),
             "consolidated_tokens": wave_stat["tokens_trained"],
             "ca3_global_poles": sws_stat["ca3_poles_sorted"],
@@ -452,11 +603,14 @@ def run_v16_10B_omniscient_curriculum(
     ts_tasks = [(f, "tinystories", 25000, elite_per_shard * 6, 1.35) for f in ts_files]
     ep1_elite: List[Tuple[str, str, str, float]] = []
     ep1_raw_toks = 0
-    with ProcessPoolExecutor(max_workers=min(workers, max(1, len(ts_tasks)))) as ex:
-        for r in ex.map(_thalamic_scan_parquet_shard_worker, ts_tasks):
-            ep1_raw_toks += int(r["raw_tokens_scanned"])
-            ep1_elite.extend(r["elite_pairs"])
-            shard_ledger["Epoch_1_TinyStories"].append(str(r["shard_path"]))
+    if not ts_tasks:
+        domain_balancer.record_missing_source(1, "tinystories_parquet", str(data_dir / "tinystories" / "data"))
+    else:
+        with ProcessPoolExecutor(max_workers=min(workers, len(ts_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_parquet_shard_worker, ts_tasks):
+                ep1_raw_toks += int(r["raw_tokens_scanned"])
+                ep1_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_1_TinyStories"].append(str(r["shard_path"]))
 
     ts_txt = data_dir / "tinystories" / "TinyStoriesV2-GPT4-train.txt"
     if ts_txt.exists():
@@ -470,10 +624,17 @@ def run_v16_10B_omniscient_curriculum(
                 ep1_raw_toks += int(r["raw_tokens_scanned"])
                 ep1_elite.extend(r["elite_pairs"])
                 shard_ledger["Epoch_1_TinyStories"].append(str(r["shard_path"]))
+    else:
+        domain_balancer.record_missing_source(1, "TinyStoriesV2-GPT4-train.txt", str(ts_txt))
 
     epoch_summaries.append(
         _tokenize_and_consolidate_elite_pairs(
-            1, "Childhood_TinyStories_All_Shards", ep1_elite, ep1_raw_toks, len(shard_ledger["Epoch_1_TinyStories"])
+            1,
+            "Childhood_TinyStories_All_Shards",
+            ep1_elite,
+            ep1_raw_toks,
+            len(shard_ledger["Epoch_1_TinyStories"]),
+            target_domain="tinystories",
         )
     )
 
@@ -492,15 +653,25 @@ def run_v16_10B_omniscient_curriculum(
             f_sz = bf.stat().st_size
             for z in range(16):
                 bc_tasks.append((str(bf), "bookcorpus", z * (f_sz // 16), 16 * 1024 * 1024, elite_per_shard * 2, 1.40))
-    with ProcessPoolExecutor(max_workers=min(workers, len(bc_tasks))) as ex:
-        for r in ex.map(_thalamic_scan_text_zone_worker, bc_tasks):
-            ep2_raw_toks += int(r["raw_tokens_scanned"])
-            ep2_elite.extend(r["elite_pairs"])
-            shard_ledger["Epoch_2_BookCorpus"].append(str(r["shard_path"]))
+        else:
+            domain_balancer.record_missing_source(2, bf.name, str(bf))
+    if not bc_tasks:
+        print("Warning: BookCorpus tasks empty, applying Deficit Round-Robin backfill...")
+    else:
+        with ProcessPoolExecutor(max_workers=min(workers, len(bc_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_text_zone_worker, bc_tasks):
+                ep2_raw_toks += int(r["raw_tokens_scanned"])
+                ep2_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_2_BookCorpus"].append(str(r["shard_path"]))
 
     epoch_summaries.append(
         _tokenize_and_consolidate_elite_pairs(
-            2, "Youth_BookCorpus_32_Zones", ep2_elite, ep2_raw_toks, len(shard_ledger["Epoch_2_BookCorpus"])
+            2,
+            "Youth_BookCorpus_32_Zones",
+            ep2_elite,
+            ep2_raw_toks,
+            len(shard_ledger["Epoch_2_BookCorpus"]),
+            target_domain="bookcorpus",
         )
     )
 
@@ -522,14 +693,19 @@ def run_v16_10B_omniscient_curriculum(
                 ep3_raw_toks += int(r["raw_tokens_scanned"])
                 ep3_elite.extend(r["elite_pairs"])
                 shard_ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"].append(str(r["shard_path"]))
+    else:
+        domain_balancer.record_missing_source(3, "wikitext-103-raw", str(wiki_p))
 
     owt_files = sorted(glob.glob(str(data_dir / "openwebtext_data" / "plain_text" / "train-*.parquet")))[:owt_shards_to_scan]
     owt_tasks = [(f, "openwebtext", rows_per_owt_shard, elite_per_shard // 2, 1.45) for f in owt_files]
-    with ProcessPoolExecutor(max_workers=min(workers, max(1, len(owt_tasks)))) as ex:
-        for r in ex.map(_thalamic_scan_parquet_shard_worker, owt_tasks):
-            ep3_raw_toks += int(r["raw_tokens_scanned"])
-            ep3_elite.extend(r["elite_pairs"])
-            shard_ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"].append(str(r["shard_path"]))
+    if not owt_tasks:
+        domain_balancer.record_missing_source(3, "openwebtext_data", str(data_dir / "openwebtext_data"))
+    else:
+        with ProcessPoolExecutor(max_workers=min(workers, len(owt_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_parquet_shard_worker, owt_tasks):
+                ep3_raw_toks += int(r["raw_tokens_scanned"])
+                ep3_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"].append(str(r["shard_path"]))
 
     epoch_summaries.append(
         _tokenize_and_consolidate_elite_pairs(
@@ -538,6 +714,7 @@ def run_v16_10B_omniscient_curriculum(
             ep3_elite,
             ep3_raw_toks,
             len(shard_ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"]),
+            target_domain="wikitext103",
         )
     )
 
@@ -566,6 +743,7 @@ def run_v16_10B_omniscient_curriculum(
             ep4_elite,
             ep4_raw_toks,
             len(shard_ledger["Epoch_4_Movies_DailyDialog_Persona_NPC"]),
+            target_domain="personachat",
         )
     )
 
@@ -579,15 +757,21 @@ def run_v16_10B_omniscient_curriculum(
         oasst_batch = organism.dialog_streamer._sample_oasst2(300)
         ep5_elite.extend(oasst_batch)
         ep5_raw_toks += sum((len(a) + len(b)) // 3 for _, a, b, _ in oasst_batch) * 10
-    shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"].append("2023-11-05_oasst2_ready.trees.jsonl.gz")
+    if ep5_elite:
+        shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"].append("2023-11-05_oasst2_ready.trees.jsonl.gz")
+    else:
+        domain_balancer.record_missing_source(5, "oasst2", str(data_dir / "dialog" / "oasst2"))
 
     uc_files = sorted(glob.glob(str(data_dir / "dialog" / "ultrachat" / "data" / "*.parquet")))
     uc_tasks = [(f, "ultrachat", 3500, elite_per_shard * 3, 1.50) for f in uc_files]
-    with ProcessPoolExecutor(max_workers=min(workers, max(1, len(uc_tasks)))) as ex:
-        for r in ex.map(_thalamic_scan_parquet_shard_worker, uc_tasks):
-            ep5_raw_toks += int(r["raw_tokens_scanned"])
-            ep5_elite.extend(r["elite_pairs"])
-            shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"].append(str(r["shard_path"]))
+    if not uc_tasks:
+        domain_balancer.record_missing_source(5, "ultrachat", str(data_dir / "dialog" / "ultrachat"))
+    else:
+        with ProcessPoolExecutor(max_workers=min(workers, len(uc_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_parquet_shard_worker, uc_tasks):
+                ep5_raw_toks += int(r["raw_tokens_scanned"])
+                ep5_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"].append(str(r["shard_path"]))
 
     epoch_summaries.append(
         _tokenize_and_consolidate_elite_pairs(
@@ -596,18 +780,29 @@ def run_v16_10B_omniscient_curriculum(
             ep5_elite,
             ep5_raw_toks,
             len(shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"]),
+            target_domain="oasst2",
         )
     )
 
-    # Финальная SWR-консолидация золотых якорей всех 5 миров после завершения 5 эпох
+    # Консолидация базовых уроков после 5 эпох медленноволнового сна (SWR Replay без пересечения с Holdout!)
     for _ in range(4):
-        organism.train_wave_with_neuromodulator_reward(anchor_objs, wave_idx=6)
+        organism.train_wave_with_neuromodulator_reward(all_lesson_objs, wave_idx=6)
 
     # ------------------------------------------------------------------
-    # ФИНАЛЬНЫЙ КРОСС-МИРОВОЙ ЭКЗАМЕН В РЕЖИМЕ N-GRAMS OFF (0% N-ГРАММ!)
+    # ПРОВЕРКА НУЛЕВОЙ УТЕЧКИ ЭКЗАМЕНА В ОБУЧАЮЩИЙ ПОТОК (ZERO HOLDOUT LEAKAGE ASSERTION)
+    # ------------------------------------------------------------------
+    holdout_leakage = [
+        item.prompt
+        for item in HOLD_OUT_EXAM_SUITE
+        if " ".join(item.prompt.strip().lower().split()) in trained_stimuli_normalized
+    ]
+    assert len(holdout_leakage) == 0, f"CRITICAL METHODOLOGY VIOLATION: Holdout prompts leaked into training: {holdout_leakage}"
+
+    # ------------------------------------------------------------------
+    # ЧЕСТНЫЙ HOLDOUT-ЭКЗАМЕН И ЕДИНЫЕ ВОРОТА КАЧЕСТВА (UNIFIED CURRICULUM GATES)
     # ------------------------------------------------------------------
     print("-" * 108, flush=True)
-    print("FINAL 5-EPOCH OMNISCIENT EXAM IN PURE N-GRAMS OFF MODE (0% N-GRAMS | 100% 8192-NMDA MATRIX + CA3 + BA44)", flush=True)
+    print("FINAL UNSEEN HOLDOUT EXAM & UNIFIED QUALITY GATES (0% PROMPT LEAKAGE | 0% N-GRAMS | 8192-NMDA MATRIX)", flush=True)
     print("-" * 108, flush=True)
 
     _ = organism.pure_neural_generate_response(
@@ -616,68 +811,95 @@ def run_v16_10B_omniscient_curriculum(
         use_ngrams=False,
     )
 
-    exam_prompts = [
-        (
-            "Epoch 1+4 (Stories + NPC Guardian)",
-            "Once upon a time, a curious little fox found a shiny brass key near the old oak tree, while the guardian at the Echoing Glade waited for the traveler.",
-        ),
-        (
-            "Epoch 2+3 (Books + Cortical Neuroscience)",
-            "The autumn wind swept across the cobblestone courtyard at dusk, while biological pyramidal neurons in the neocortex integrated sensory spikes.",
-        ),
-        (
-            "Epoch 5+TPJ (3rd-Person Deictic Shift + Mayonnaise Emulsion)",
-            "Alex is hungry in the lab while building a biological neural network—how can he fix runny liquid mayonnaise?",
-        ),
-        (
-            "Bidirectional CA3 (Response-Only Tokens -> Dual Attractor)",
-            "Why does the guardian at the Echoing Glade tell Alex to check subject-verb agreement while whisking egg yolk?",
-        ),
-        (
-            "Theta-Phase Temporal Queue + 'before' Syntax Bridge",
-            "Can running outdoors clear the mind before fixing runny mayonnaise and writing an essay without grammar errors?",
-        ),
-        (
-            "Pure Epoch 3 Encyclopedia Recall (Neocortical Pyramidal Neurons)",
-            "How do biological pyramidal neurons in the neocortex integrate bottom-up sensory input with top-down predictions?",
-        ),
-    ]
-
     exam_results: List[Dict[str, object]] = []
-    for label, prompt in exam_prompts:
-        res = organism.pure_neural_generate_response(prompt, max_tokens=40, use_ngrams=False)
-        exam_results.append({"exam_domain": label, **res})
-        print(f"  [{label} | BA44={res['ba44_syntax_bridge_connector']!r} | SWR={res['swr_consolidated_into_nmda_matrix']}]")
-        print(f"    Q: {prompt!r}")
-        print(f"    A (N-GRAMS OFF): {res['pure_weight_generated_response']!r}")
+    for item in HOLD_OUT_EXAM_SUITE:
+        res = organism.pure_neural_generate_response(item.prompt, max_tokens=48, use_ngrams=False)
+        ans_low = str(res["pure_weight_generated_response"]).lower()
+        kw_hits = sum(1 for kw in item.expected_keywords if kw.lower() in ans_low)
+        forbidden_hits = [bad for bad in item.forbidden_substrings if bad.lower() in ans_low]
+        exam_results.append(
+            {
+                "exam_id": item.exam_id,
+                "exam_domain": item.domain,
+                "keyword_hits": kw_hits,
+                "keyword_total": len(item.expected_keywords),
+                "forbidden_hits": forbidden_hits,
+                **res,
+            }
+        )
+        print(
+            f"  [{item.exam_id} ({item.domain}) | KW={kw_hits}/{len(item.expected_keywords)} | "
+            f"BA44={res['ba44_syntax_bridge_connector']!r} | SWR={res['swr_consolidated_into_nmda_matrix']}]",
+            flush=True,
+        )
+        print(f"    Q (Unseen Holdout): {item.prompt!r}", flush=True)
+        print(f"    A (N-GRAMS OFF)   : {res['pure_weight_generated_response']!r}", flush=True)
+
+    unified_gates = UnifiedCurriculumGates(
+        surprise_threshold=0.25,
+        min_grammar_score=1.0,
+        min_retention_tokens=1500,
+        max_attractor_collapse_rate=0.35,
+    )
+    gate_report = unified_gates.evaluate_organism(organism, stage_or_epoch_id=5)
+    print(
+        f"  [UNIFIED GATES VERDICT] Passed={gate_report.passed} | "
+        f"Surprise={gate_report.surprise_f_t:.4f} (<0.25) | "
+        f"Grammar={gate_report.grammar_score:.2%} | "
+        f"Superacid={gate_report.superacid_count} | "
+        f"Retention={gate_report.context_retention_tokens} (>1500) | "
+        f"OOV={gate_report.oov_pass_rate:.2%} | "
+        f"CollapseRate={gate_report.attractor_collapse_rate:.2%} | "
+        f"EchoContam={gate_report.holdout_echo_contamination_rate:.2%}",
+        flush=True,
+    )
 
     ckpt_dir = root / "Produce" / "checkpoints"
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = ckpt_dir / "ziwago_v16_0_10B_omniscient_master.pt"
 
-    torch.save(
-        {
+    ckpt_validation = organism.save_self_contained_checkpoint(
+        ckpt_path=ckpt_path,
+        extra_metadata={
             "version": "16.0-10B-Omniscient-5Epoch-Master",
-            "total_neurons": 17408,
-            "stored_sentence_chains": 0,
             "total_shards_and_zones_scanned": total_shards_and_zones_scanned,
             "total_raw_tokens_scanned": total_raw_tokens_scanned,
             "total_elite_pairs_consolidated": organism.total_pairs_trained,
             "total_consolidated_tokens": organism.total_tokens_trained,
             "ca3_5bank_counts": ca3_atlas.sort_all_banks_by_salience(),
-            "w_dend_out": organism.dendritic_plateau_readout.w_dend_out[
-                :, : len(organism.dendritic_plateau_readout.col_to_tok)
-            ].half(),
-            "w_swr_dend_out": organism.dendritic_plateau_readout.w_swr_dend_out[
-                :, : len(organism.dendritic_plateau_readout.col_to_tok)
-            ].half(),
-            "w_ca3_attractors": organism.dendritic_plateau_readout.w_ca3_attractors,
-            "w_ca3_sdr": organism.dendritic_plateau_readout.w_ca3_sdr,
-            "w_ca3_salience": organism.dendritic_plateau_readout.w_ca3_salience,
             "ca3_5bank_attractors": ca3_atlas.bank_attractors,
-            "w_ba44_bridge": organism.ba44_syntax_bridge.w_ba44_bridge,
+            "domain_pair_counts": domain_balancer.domain_pair_counts,
+            "missing_sources_logged": domain_balancer.missing_sources,
         },
-        ckpt_path,
+        use_fp16=False,
+    )
+
+    # ------------------------------------------------------------------
+    # АВТОМАТИЧЕСКАЯ ROUND-TRIP ВЕРИФИКАЦИЯ ЧЕКПОИНТА (SAVE -> LOAD -> GENERATE == IDENTICAL)
+    # ------------------------------------------------------------------
+    reloaded_organism = ZiwagoPureSynapticDialogueOrganismV14(
+        root=root,
+        workers=max(1, workers // 2),
+        cpu_threads=cpu_threads,
+        seed=42,
+    )
+    reloaded_organism.load_self_contained_checkpoint(ckpt_path, strict_schema=True)
+    roundtrip_matches = 0
+    roundtrip_probes = [
+        "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
+        "Remind me, what is my name and what project am I building?",
+        "Before fixing a runny mayonnaise emulsion, how does running outdoors help clear the mind?",
+    ]
+    for probe_q in roundtrip_probes:
+        r_orig = organism.pure_neural_generate_response(probe_q, max_tokens=44, use_ngrams=False)["pure_weight_generated_response"]
+        r_load = reloaded_organism.pure_neural_generate_response(probe_q, max_tokens=44, use_ngrams=False)["pure_weight_generated_response"]
+        if r_orig == r_load and len(str(r_load).strip()) > 0:
+            roundtrip_matches += 1
+    roundtrip_exact_match_rate = round(roundtrip_matches / float(len(roundtrip_probes)), 4)
+    print(
+        f"  [CHECKPOINT ROUND-TRIP CI] Reloaded `{ckpt_path.name}` -> Exact Match={roundtrip_matches}/{len(roundtrip_probes)} "
+        f"({roundtrip_exact_match_rate:.0%}) | ActiveCols={ckpt_validation['active_vocab_columns']}",
+        flush=True,
     )
 
     ledger_path = root / "Produce" / "v16_0_shard_offset_ledger.json"
@@ -686,9 +908,29 @@ def run_v16_10B_omniscient_curriculum(
 
     report = {
         "version": "16.0",
-        "architecture": "Ziwago-Prime v16.0 10B-Corpus 5-Epoch Omniscient Engine (32-Core Thalamic Fast-Scan + 5-Bank CA3 Atlas + 8192-NMDA Matrix + BA44 Syntax Bridge + TPJ + SWS/SWR)",
+        "architecture": "Ziwago-Prime v16.0 10B-Corpus 5-Epoch Omniscient Engine (32-Core Thalamic Fast-Scan + 5-Bank CA3 Atlas + 8192-NMDA Matrix + BA44 Syntax Bridge + TPJ + SWS/SWR + Unified Gates)",
         "total_neurons": 17408,
         "stored_sentence_chains_in_organism": 0,
+        "holdout_prompt_leakage_count": len(holdout_leakage),
+        "checkpoint_validation": ckpt_validation,
+        "checkpoint_roundtrip_exact_match_rate": roundtrip_exact_match_rate,
+        "unified_gates_report": {
+            "passed": gate_report.passed,
+            "surprise_f_t": gate_report.surprise_f_t,
+            "grammar_score": gate_report.grammar_score,
+            "superacid_count": gate_report.superacid_count,
+            "context_retention_tokens": gate_report.context_retention_tokens,
+            "oov_pass_rate": gate_report.oov_pass_rate,
+            "attractor_collapse_rate": gate_report.attractor_collapse_rate,
+            "holdout_echo_contamination_rate": gate_report.holdout_echo_contamination_rate,
+            "holdout_keyword_accuracy": gate_report.holdout_keyword_accuracy,
+            "reasons": gate_report.reasons,
+        },
+        "domain_balancer": {
+            "domain_pair_counts": domain_balancer.domain_pair_counts,
+            "missing_sources_logged": domain_balancer.missing_sources,
+            "deficit_backfills": domain_balancer.deficit_backfills,
+        },
         "total_shards_and_zones_scanned": total_shards_and_zones_scanned,
         "total_raw_corpus_tokens_scanned": total_raw_tokens_scanned,
         "total_elite_pairs_consolidated": organism.total_pairs_trained,
@@ -712,7 +954,8 @@ def run_v16_10B_omniscient_curriculum(
     print(
         f"COMPLETED v16.0 5-EPOCH MARATHON across {total_shards_and_zones_scanned} Shards/Zones! "
         f"Raw Scanned={total_raw_tokens_scanned:,} tok | Consolidated={organism.total_tokens_trained:,} tok | "
-        f"CA3_Poles={report['ca3_global_attractor_poles']:,} | Saved -> {ckpt_path.name} ({report['checkpoint_size_mb']} MB)",
+        f"CA3_Poles={report['ca3_global_attractor_poles']:,} | GatesPassed={gate_report.passed} | "
+        f"RoundTrip={roundtrip_exact_match_rate:.0%} | Saved -> {ckpt_path.name} ({report['checkpoint_size_mb']} MB)",
         flush=True,
     )
     print("=" * 108, flush=True)

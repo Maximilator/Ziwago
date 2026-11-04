@@ -1,2 +1,7 @@
 data/wikitext-103-raw/
 data/
+/data/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+Produce/checkpoints/
