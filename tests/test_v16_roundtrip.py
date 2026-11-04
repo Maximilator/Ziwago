@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
-CI Test Suite for Ziwago v14/v16/v17 Self-Contained Checkpoints, Context Arbitrage,
-BA44 Grammatical Bridge Seam Suppression, Unified Curriculum Gates, and the 5 Cognitive
-Dialogue Mechanisms (Theta-Gamma Role-Filler Binding, 16-Column MoE NMDA Branch Profile,
-Multi-Hop Transitive Rollout, Episodic Working Memory Graph, and SON Active Inference).
+CI Test Suite for Ziwago v14/v16/v17:
+  1) Golden-File Round-Trip CI with a different seed (seed=99999 != 42);
+  2) Projector & Cortex/SON/Chemistry State Export Contract;
+  3) Discriminating Grammar & Trained N-Gram Coverage Gate (rejecting word salad);
+  4) Paraphrase Robustness of Retrieval vs. Novel Knowledge Generalization;
+  5) 5 v17 Cognitive Dialogue Mechanisms (Theta-Gamma Role-Filler Binding,
+     16-Column MoE NMDA Branch Profile, Multi-Hop CA3 Rollout, Episodic Graph,
+     and SON Active Inference Curiosity -> Online Dopamine Teaching).
 """
 
 from __future__ import annotations
 
 import copy
+import json
 import sys
 import tempfile
 import unittest
@@ -24,6 +29,8 @@ from neuroweave10.evaluation.gates import (
     HOLD_OUT_EXAM_SUITE,
     CheckpointCompatibilityError,
     UnifiedCurriculumGates,
+    evaluate_grammar_and_artifacts,
+    evaluate_novel_knowledge_generalization,
     validate_self_contained_checkpoint,
 )
 from train_ziwago_v14_pure_synaptic_dialogue import (
@@ -74,61 +81,66 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.organism = _build_trained_test_organism()
+        cls.golden_path = ROOT / "tests" / "golden_v16_expected_outputs.json"
+        cls.golden_data = json.loads(cls.golden_path.read_text(encoding="utf-8"))
 
-    def test_v16_save_load_byte_for_byte_roundtrip(self) -> None:
-        """Round-Trip CI: save -> load into fresh organism -> byte-for-byte identical generation."""
-        probes = [
-            "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
-            "Remind me, what is my name and what project am I building?",
-            "Alex is testing his model; what is his name, and how can he fix grammar errors when writing an essay?",
-            "Before fixing a runny mayonnaise emulsion, how does running outdoors help clear the mind?",
-            "Can running outdoors clear the mind before writing an essay without grammar errors?",
-        ]
-
+    def test_v16_golden_file_roundtrip_with_different_seed(self) -> None:
+        """Point 1, 4 & 5: Save checkpoint -> Load into fresh organism with DIFFERENT seed (seed=99999)
+        -> Verify 100% byte-for-byte match against Golden Answers File (golden_v16_expected_outputs.json)."""
         with tempfile.TemporaryDirectory() as tmpdir:
             ckpt_path = Path(tmpdir) / "ziwago_roundtrip_test.pt"
             val_info = self.organism.save_self_contained_checkpoint(ckpt_path, use_fp16=False)
             self.assertTrue(val_info["valid"])
             self.assertGreater(int(val_info["active_vocab_columns"]), 20)
 
-            expected_outputs = [
-                self.organism.pure_neural_generate_response(q, max_tokens=44, use_ngrams=False)[
-                    "pure_weight_generated_response"
-                ]
-                for q in probes
-            ]
-
+            # Deliberately instantiate with seed=99999 (!= 42) to prove zero dependency on seed!
             reloaded = ZiwagoPureSynapticDialogueOrganismV14(
                 root=ROOT,
                 workers=2,
                 cpu_threads=4,
-                seed=42,
+                seed=99999,
             )
             load_info = reloaded.load_self_contained_checkpoint(ckpt_path, strict_schema=True)
             self.assertTrue(load_info["valid"])
 
-            for q, exp_out in zip(probes, expected_outputs):
-                actual_out = reloaded.pure_neural_generate_response(q, max_tokens=44, use_ngrams=False)[
+            for g_item in self.golden_data["holdout_paraphrase_retrieval_golden"]:
+                q = str(g_item["prompt"])
+                gold_expected = str(g_item["expected_response"])
+                actual_out = reloaded.pure_neural_generate_response(q, max_tokens=48, use_ngrams=False)[
                     "pure_weight_generated_response"
                 ]
                 self.assertEqual(
                     actual_out,
-                    exp_out,
-                    f"Round-trip mismatch for {q!r}: {actual_out!r} != {exp_out!r}",
+                    gold_expected,
+                    f"Golden Round-Trip mismatch (seed=99999) for {g_item['exam_id']}: GOT={actual_out!r} != GOLD={gold_expected!r}",
                 )
 
-    def test_v16_checkpoint_rejects_broken_maps_and_mismatch(self) -> None:
-        """Verifies that missing col_to_tok, broken bijection, or wrong tokenizer hash raises CheckpointCompatibilityError."""
+            for n_item in self.golden_data["novel_knowledge_generalization_golden"]:
+                q = str(n_item["prompt"])
+                gold_expected = str(n_item["expected_response"])
+                actual_out = reloaded.pure_neural_generate_response(q, max_tokens=48, use_ngrams=False)[
+                    "pure_weight_generated_response"
+                ]
+                self.assertEqual(
+                    actual_out,
+                    gold_expected,
+                    f"Golden Novel Generalization mismatch (seed=99999) for {n_item['probe_id']}: GOT={actual_out!r} != GOLD={gold_expected!r}",
+                )
+
+    def test_v16_checkpoint_rejects_broken_maps_projectors_and_states(self) -> None:
+        """Points 1, 4 & 5: Verifies that missing col_to_tok, missing projectors (pos_phase_vecs, vsa_encoder_state),
+        missing cortex/SON/chemistry states, broken bijection, or wrong tokenizer hash raises CheckpointCompatibilityError."""
         with tempfile.TemporaryDirectory() as tmpdir:
             ckpt_path = Path(tmpdir) / "valid_ckpt.pt"
             self.organism.save_self_contained_checkpoint(ckpt_path, use_fp16=False)
             base_payload = torch.load(str(ckpt_path), map_location="cpu", weights_only=False)
 
-            # 1. Missing col_to_tok (Defect A from next14.txt)
-            bad_no_map = copy.deepcopy(base_payload)
-            del bad_no_map["col_to_tok"]
-            with self.assertRaisesRegex(CheckpointCompatibilityError, "missing required self-contained keys"):
-                validate_self_contained_checkpoint(bad_no_map)
+            # 1. Missing col_to_tok, pos_phase_vecs, vsa_encoder_state, or moe_cortex_state
+            for req_key in ("col_to_tok", "pos_phase_vecs", "w_basal_branch", "vsa_encoder_state", "moe_cortex_state", "son_motor_state", "chemistry_state"):
+                bad_missing = copy.deepcopy(base_payload)
+                del bad_missing[req_key]
+                with self.assertRaisesRegex(CheckpointCompatibilityError, "missing required self-contained keys"):
+                    validate_self_contained_checkpoint(bad_missing)
 
             # 2. Broken bijection between col_to_tok and tok_to_col
             bad_bijection = copy.deepcopy(base_payload)
@@ -147,9 +159,36 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
             with self.assertRaisesRegex(CheckpointCompatibilityError, "Unsupported checkpoint schema_version"):
                 validate_self_contained_checkpoint(bad_schema, strict_schema=True)
 
+    def test_v16_discriminating_grammar_gate_rejects_word_salad(self) -> None:
+        """Point 2: Verifies that the discriminating grammar & n-gram coverage gate strictly rejects
+        BPE word salad that starts with a capital letter and ends with a period."""
+        word_salad_samples = [
+            "To in but to are, i a In you more , at- are for the, you with he, Yes were In for The there the this will at to his and neural be i of as was for.",
+            "While and to its a be in are, and before He't was the and is by a one to , you an , look.",
+            "A is it is for I, his the to but for in's me ' it the him i's they, in could.",
+        ]
+        for bad_txt in word_salad_samples:
+            rep = evaluate_grammar_and_artifacts(
+                bad_txt,
+                trained_bigram_g=self.organism.synaptic_bigram_g,
+                encode_fn=self.organism.encode_text,
+            )
+            self.assertFalse(
+                bool(rep["grammar_coherent"]),
+                f"Discriminating grammar gate failed to reject word salad: {bad_txt!r} -> {rep}",
+            )
+
+        valid_txt = "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments."
+        rep_good = evaluate_grammar_and_artifacts(
+            valid_txt,
+            trained_bigram_g=self.organism.synaptic_bigram_g,
+            encode_fn=self.organism.encode_text,
+        )
+        self.assertTrue(bool(rep_good["grammar_coherent"]))
+        self.assertGreaterEqual(float(rep_good["trained_ngram_coverage"]), 0.80)
+
     def test_v16_context_arbitrage_and_ba44_grammar_seam(self) -> None:
         """Verifies no 'Echoing Glade' leakage on identity queries and no 'before to fix' grammatical seam."""
-        # 1. Identity query must not pull in NPC 'Echoing Glade'
         res_id = self.organism.pure_neural_generate_response(
             "Remind me, what is my name and what project am I building?",
             max_tokens=40,
@@ -160,7 +199,6 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         self.assertIn("biological neural network", txt_id)
         self.assertNotIn("Echoing Glade", txt_id)
 
-        # 2. Temporal 'before' bridge with infinitive clause must produce 'before you fix' and never 'before to fix'
         res_before = self.organism.pure_neural_generate_response(
             "Can running outdoors clear the mind before writing an essay without grammar errors?",
             max_tokens=44,
@@ -171,13 +209,18 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         self.assertIn("running outdoors", txt_before)
         self.assertIn("before you fix grammar errors", txt_before)
 
-    def test_v16_unified_curriculum_gates_and_zero_leakage(self) -> None:
-        """Verifies zero prompt overlap with HOLD_OUT_EXAM_SUITE and passing UnifiedCurriculumGates."""
+    def test_v16_unified_gates_paraphrase_robustness_and_novel_generalization(self) -> None:
+        """Point 3: Verifies both paraphrase_robustness_of_retrieval and novel_knowledge_generalization_score."""
         lesson_stimuli = {
             " ".join(sa.strip().lower().split())
             for ep_lessons in FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.values()
             for _, sa, _, _ in ep_lessons
         }
+        lesson_responses_lower = [
+            sb.strip().lower()
+            for ep_lessons in FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.values()
+            for _, _, sb, _ in ep_lessons
+        ]
         for item in HOLD_OUT_EXAM_SUITE:
             norm_p = " ".join(item.prompt.strip().lower().split())
             self.assertNotIn(norm_p, lesson_stimuli, f"Holdout prompt leaked into lessons: {item.prompt}")
@@ -187,14 +230,22 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
             min_grammar_score=1.0,
             min_retention_tokens=1500,
             max_attractor_collapse_rate=0.35,
+            min_novel_generalization_score=0.75,
         )
-        rep = gates.evaluate_organism(self.organism, stage_or_epoch_id=5)
+        rep = gates.evaluate_organism(
+            self.organism,
+            stage_or_epoch_id=5,
+            training_corpus_responses_lower=lesson_responses_lower,
+        )
         self.assertTrue(rep.passed, f"Unified gates failed: {rep.reasons}")
         self.assertLess(rep.surprise_f_t, 0.25)
         self.assertEqual(rep.grammar_score, 1.0)
+        self.assertGreaterEqual(rep.trained_ngram_coverage, 0.65)
         self.assertEqual(rep.superacid_count, 0)
         self.assertGreater(rep.context_retention_tokens, 1500)
         self.assertEqual(rep.oov_pass_rate, 1.0)
+        self.assertEqual(rep.paraphrase_robustness_of_retrieval, 1.0)
+        self.assertEqual(rep.novel_knowledge_generalization_score, 1.0)
         self.assertLessEqual(rep.attractor_collapse_rate, 0.35)
         self.assertEqual(rep.holdout_echo_contamination_rate, 0.0)
 
@@ -233,7 +284,6 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
 
     def test_v17_episodic_working_memory_and_active_inference_teaching_loop(self) -> None:
         """Verifies Episodic Working Memory Graph recall and SON Active Inference Curiosity -> Online Teaching -> Recall."""
-        # 1. Episodic Working Memory Graph query
         res_ep = self.organism.pure_neural_generate_response(
             "What topics have we discussed in our conversation so far?",
             max_tokens=44,
@@ -243,7 +293,6 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         self.assertEqual(res_ep["conversational_domain"], "episodic_working_memory")
         self.assertIn("Alex", txt_ep)
 
-        # 2. Active Inference Curiosity Gate on completely unseen topic (before teaching)
         res_unknown = self.organism.pure_neural_generate_response(
             "How do excitons travel in quantum photosynthesis?",
             max_tokens=44,
@@ -253,7 +302,6 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         self.assertTrue(bool(res_unknown["active_inference_clarification_triggered"]))
         self.assertIn("epistemic uncertainty", str(res_unknown["pure_weight_generated_response"]).lower())
 
-        # 3. Online Declarative Dopamine Teaching Turn
         res_teach = self.organism.pure_neural_generate_response(
             "Remember that in quantum photosynthesis, excitons travel through chromophores via coherent wavepackets.",
             max_tokens=44,
@@ -262,7 +310,6 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         )
         self.assertGreater(int(res_teach["online_dopamine_imprinted_tokens"]), 0)  # type: ignore[arg-type]
 
-        # 4. Subsequent query on the newly taught topic now recalls from NMDA weights without clarification!
         res_learned = self.organism.pure_neural_generate_response(
             "How do excitons travel in quantum photosynthesis?",
             max_tokens=44,
@@ -273,6 +320,35 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         txt_learned = str(res_learned["pure_weight_generated_response"]).lower()
         self.assertIn("excitons", txt_learned)
         self.assertIn("chromophores", txt_learned)
+
+    def test_v16_master_checkpoint_disk_reproduces_golden_with_seed_99999(self) -> None:
+        """Directly loads Produce/checkpoints/ziwago_v16_0_10B_omniscient_master.pt with seed=99999
+        and verifies byte-for-byte reproduction of tests/golden_v16_expected_outputs.json."""
+        master_ckpt = ROOT / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
+        if not master_ckpt.exists():
+            self.skipTest("Master checkpoint not present on disk")
+
+        master_org = ZiwagoPureSynapticDialogueOrganismV14(
+            root=ROOT,
+            workers=2,
+            cpu_threads=4,
+            seed=99999,
+        )
+        val_info = master_org.load_self_contained_checkpoint(master_ckpt, strict_schema=True)
+        self.assertTrue(val_info["valid"])
+        self.assertGreaterEqual(int(val_info["active_vocab_columns"]), 9000)
+
+        for g_item in self.golden_data["holdout_paraphrase_retrieval_golden"]:
+            q = str(g_item["prompt"])
+            gold_expected = str(g_item["expected_response"])
+            actual_out = master_org.pure_neural_generate_response(q, max_tokens=48, use_ngrams=False)[
+                "pure_weight_generated_response"
+            ]
+            self.assertEqual(
+                actual_out,
+                gold_expected,
+                f"Master checkpoint mismatch (seed=99999) for {g_item['exam_id']}: GOT={actual_out!r} != GOLD={gold_expected!r}",
+            )
 
 
 if __name__ == "__main__":

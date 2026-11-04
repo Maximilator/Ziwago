@@ -811,6 +811,27 @@ def run_v16_10B_omniscient_curriculum(
         use_ngrams=False,
     )
 
+    # Сохраняем самодостаточный мастер-чекпоинт в чистом состоянии сразу после консолидации (до экзаменационных проб!)
+    ckpt_dir = root / "Produce" / "checkpoints"
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+    ckpt_path = ckpt_dir / "ziwago_v16_0_10B_omniscient_master.pt"
+
+    ckpt_validation = organism.save_self_contained_checkpoint(
+        ckpt_path=ckpt_path,
+        extra_metadata={
+            "version": "16.2-10B-Omniscient-5Epoch-Master",
+            "total_shards_and_zones_scanned": total_shards_and_zones_scanned,
+            "total_raw_tokens_scanned": total_raw_tokens_scanned,
+            "total_elite_pairs_consolidated": organism.total_pairs_trained,
+            "total_consolidated_tokens": organism.total_tokens_trained,
+            "ca3_5bank_counts": ca3_atlas.sort_all_banks_by_salience(),
+            "ca3_5bank_attractors": ca3_atlas.bank_attractors,
+            "domain_pair_counts": domain_balancer.domain_pair_counts,
+            "missing_sources_logged": domain_balancer.missing_sources,
+        },
+        use_fp16=False,
+    )
+
     exam_results: List[Dict[str, object]] = []
     for item in HOLD_OUT_EXAM_SUITE:
         res = organism.pure_neural_generate_response(item.prompt, max_tokens=48, use_ngrams=False)
@@ -835,70 +856,59 @@ def run_v16_10B_omniscient_curriculum(
         print(f"    Q (Unseen Holdout): {item.prompt!r}", flush=True)
         print(f"    A (N-GRAMS OFF)   : {res['pure_weight_generated_response']!r}", flush=True)
 
+    lesson_responses_lower = [sb.strip().lower() for _, _, sb, _ in all_foundational_lessons]
     unified_gates = UnifiedCurriculumGates(
         surprise_threshold=0.25,
         min_grammar_score=1.0,
         min_retention_tokens=1500,
         max_attractor_collapse_rate=0.35,
+        min_novel_generalization_score=0.75,
     )
-    gate_report = unified_gates.evaluate_organism(organism, stage_or_epoch_id=5)
+    gate_report = unified_gates.evaluate_organism(
+        organism,
+        stage_or_epoch_id=5,
+        training_corpus_responses_lower=lesson_responses_lower,
+    )
     print(
         f"  [UNIFIED GATES VERDICT] Passed={gate_report.passed} | "
         f"Surprise={gate_report.surprise_f_t:.4f} (<0.25) | "
-        f"Grammar={gate_report.grammar_score:.2%} | "
+        f"Grammar={gate_report.grammar_score:.2%} (NGramCov={gate_report.trained_ngram_coverage:.2%}) | "
         f"Superacid={gate_report.superacid_count} | "
         f"Retention={gate_report.context_retention_tokens} (>1500) | "
         f"OOV={gate_report.oov_pass_rate:.2%} | "
+        f"ParaphraseRetrieval={gate_report.paraphrase_robustness_of_retrieval:.2%} | "
+        f"NovelGeneralization={gate_report.novel_knowledge_generalization_score:.2%} | "
         f"CollapseRate={gate_report.attractor_collapse_rate:.2%} | "
         f"EchoContam={gate_report.holdout_echo_contamination_rate:.2%}",
         flush=True,
     )
 
-    ckpt_dir = root / "Produce" / "checkpoints"
-    ckpt_dir.mkdir(parents=True, exist_ok=True)
-    ckpt_path = ckpt_dir / "ziwago_v16_0_10B_omniscient_master.pt"
-
-    ckpt_validation = organism.save_self_contained_checkpoint(
-        ckpt_path=ckpt_path,
-        extra_metadata={
-            "version": "16.0-10B-Omniscient-5Epoch-Master",
-            "total_shards_and_zones_scanned": total_shards_and_zones_scanned,
-            "total_raw_tokens_scanned": total_raw_tokens_scanned,
-            "total_elite_pairs_consolidated": organism.total_pairs_trained,
-            "total_consolidated_tokens": organism.total_tokens_trained,
-            "ca3_5bank_counts": ca3_atlas.sort_all_banks_by_salience(),
-            "ca3_5bank_attractors": ca3_atlas.bank_attractors,
-            "domain_pair_counts": domain_balancer.domain_pair_counts,
-            "missing_sources_logged": domain_balancer.missing_sources,
-        },
-        use_fp16=False,
-    )
-
     # ------------------------------------------------------------------
-    # АВТОМАТИЧЕСКАЯ ROUND-TRIP ВЕРИФИКАЦИЯ ЧЕКПОИНТА (SAVE -> LOAD -> GENERATE == IDENTICAL)
+    # АВТОМАТИЧЕСКАЯ GOLDEN ROUND-TRIP ВЕРИФИКАЦИЯ ЧЕКПОИНТА С ДРУГИМ SEED (SEED=99999 != 42)
     # ------------------------------------------------------------------
+    golden_path = root / "tests" / "golden_v16_expected_outputs.json"
+    golden_data = json.loads(golden_path.read_text(encoding="utf-8"))
+    golden_items = golden_data["holdout_paraphrase_retrieval_golden"]
+
     reloaded_organism = ZiwagoPureSynapticDialogueOrganismV14(
         root=root,
         workers=max(1, workers // 2),
         cpu_threads=cpu_threads,
-        seed=42,
+        seed=99999,  # Намеренно ДРУГОЙ seed для проверки полной независимости чекпоинта от seed!
     )
     reloaded_organism.load_self_contained_checkpoint(ckpt_path, strict_schema=True)
     roundtrip_matches = 0
-    roundtrip_probes = [
-        "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
-        "Remind me, what is my name and what project am I building?",
-        "Before fixing a runny mayonnaise emulsion, how does running outdoors help clear the mind?",
-    ]
-    for probe_q in roundtrip_probes:
-        r_orig = organism.pure_neural_generate_response(probe_q, max_tokens=44, use_ngrams=False)["pure_weight_generated_response"]
-        r_load = reloaded_organism.pure_neural_generate_response(probe_q, max_tokens=44, use_ngrams=False)["pure_weight_generated_response"]
-        if r_orig == r_load and len(str(r_load).strip()) > 0:
+    for g_item in golden_items:
+        probe_q = str(g_item["prompt"])
+        gold_expected = str(g_item["expected_response"])
+        r_load = reloaded_organism.pure_neural_generate_response(probe_q, max_tokens=48, use_ngrams=False)["pure_weight_generated_response"]
+        if r_load == gold_expected:
             roundtrip_matches += 1
-    roundtrip_exact_match_rate = round(roundtrip_matches / float(len(roundtrip_probes)), 4)
+    roundtrip_exact_match_rate = round(roundtrip_matches / float(len(golden_items)), 4)
     print(
-        f"  [CHECKPOINT ROUND-TRIP CI] Reloaded `{ckpt_path.name}` -> Exact Match={roundtrip_matches}/{len(roundtrip_probes)} "
-        f"({roundtrip_exact_match_rate:.0%}) | ActiveCols={ckpt_validation['active_vocab_columns']}",
+        f"  [GOLDEN ROUND-TRIP CI (seed=99999)] Reloaded `{ckpt_path.name}` vs `golden_v16_expected_outputs.json` -> "
+        f"Exact Match={roundtrip_matches}/{len(golden_items)} ({roundtrip_exact_match_rate:.0%}) | "
+        f"ActiveCols={ckpt_validation['active_vocab_columns']}",
         flush=True,
     )
 
@@ -907,23 +917,25 @@ def run_v16_10B_omniscient_curriculum(
         json.dump(shard_ledger, f, indent=2, ensure_ascii=False)
 
     report = {
-        "version": "16.0",
-        "architecture": "Ziwago-Prime v16.0 10B-Corpus 5-Epoch Omniscient Engine (32-Core Thalamic Fast-Scan + 5-Bank CA3 Atlas + 8192-NMDA Matrix + BA44 Syntax Bridge + TPJ + SWS/SWR + Unified Gates)",
+        "version": "16.2",
+        "architecture": "Ziwago-Prime v16.2 10B-Corpus 5-Epoch Omniscient Engine (32-Core Thalamic Fast-Scan + 5-Bank CA3 Atlas + 8192-NMDA Matrix + BA44 Syntax Bridge + TPJ + Role-Filler Binding + SWS/SWR + Unified Gates)",
         "total_neurons": 17408,
         "stored_sentence_chains_in_organism": 0,
         "holdout_prompt_leakage_count": len(holdout_leakage),
         "checkpoint_validation": ckpt_validation,
-        "checkpoint_roundtrip_exact_match_rate": roundtrip_exact_match_rate,
+        "checkpoint_golden_roundtrip_seed99999_match_rate": roundtrip_exact_match_rate,
         "unified_gates_report": {
             "passed": gate_report.passed,
             "surprise_f_t": gate_report.surprise_f_t,
             "grammar_score": gate_report.grammar_score,
+            "trained_ngram_coverage": gate_report.trained_ngram_coverage,
             "superacid_count": gate_report.superacid_count,
             "context_retention_tokens": gate_report.context_retention_tokens,
             "oov_pass_rate": gate_report.oov_pass_rate,
             "attractor_collapse_rate": gate_report.attractor_collapse_rate,
+            "paraphrase_robustness_of_retrieval": gate_report.paraphrase_robustness_of_retrieval,
+            "novel_knowledge_generalization_score": gate_report.novel_knowledge_generalization_score,
             "holdout_echo_contamination_rate": gate_report.holdout_echo_contamination_rate,
-            "holdout_keyword_accuracy": gate_report.holdout_keyword_accuracy,
             "reasons": gate_report.reasons,
         },
         "domain_balancer": {

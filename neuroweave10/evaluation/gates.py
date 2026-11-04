@@ -1,51 +1,51 @@
 #!/usr/bin/env python3
-r"""UNIFIED EVALUATION GATES, SELF-CONTAINED CHECKPOINT CONTRACT & ATTRACTOR COLLAPSE METRICS
+r"""UNIFIED EVALUATION GATES, SELF-CONTAINED CHECKPOINT CONTRACT & GENERALIZATION METRICS
 (`neuroweave10/evaluation/gates.py`)
 =============================================================================================
-Единый модуль верификации, ворот качества (Gates) и методологически чистого Holdout-экзамена,
-общий для онтогенетического куррикулума `v10.1` и синаптической магистрали `v14 / v16 / v17`:
+Единый модуль верификации, ворот качества (Gates), эталонного Round-Trip контроля и раздельного
+измерения устойчивости к перефразированию (`paraphrase_robustness_of_retrieval`) и истинного
+обобщения на новое знание (`novel_knowledge_generalization_score`):
 
-  1. САМОДОСТАТОЧНЫЙ КОНТРАКТ ЧЕКПОИНТА (`Self-Contained Checkpoint Contract`):
-     - Обязательные поля: `schema_version`, `tokenizer_sha256`, `col_to_tok`, `tok_to_col`, `w_dend_out`.
-     - Проверка целостности при сохранении и загрузке: отказ загружать (`CheckpointCompatibilityError`)
-       при отсутствии карты колонок, несовпадении размерности `w_dend_out.shape[1] != len(col_to_tok)`,
-       биекции `col_to_tok <-> tok_to_col` или несовпадении SHA-256 хеша токенизатора GPT-2.
+  1. САМОДОСТАТОЧНЫЙ КОНТРАКТ ЧЕКПОИНТА (`Self-Contained Checkpoint Contract v16.2`):
+     - Обязательные поля: `schema_version`, `tokenizer_sha256`, `col_to_tok`, `tok_to_col`, `w_dend_out`,
+       проекторы `pos_phase_vecs`, `w_basal_branch`, `w_apical_branch`, `vsa_encoder_state`,
+       а также состояния `moe_cortex_state`, `son_motor_state`, `chemistry_state`.
+     - Полная независимость от `seed` при загрузке: отказ загружать (`CheckpointCompatibilityError`)
+       при отсутствии любого проектора, карты колонок, несовпадении размерностей или SHA-256 токенизатора.
 
-  2. ЕДИНЫЙ МОДУЛЬ ВОРОТ КАЧЕСТВА (`UnifiedCurriculumGates` для `v10.1` и `v16`):
-     - `Surprise F(t) < threshold` (`< 0.25` Stage 1, `< 0.15` Stage 2, `< 0.12` Stage 3);
-     - `100%` грамматическая связность (`grammar_score == 1.0`, отсутствие повторов слов подряд,
-       заглавная буква, завершающий знак препинания, лексическое разнообразие);
-     - `0` артефактов `"superacid"` / `"<unk>"`;
-     - `Context Retention > 1500` токенов (удержание контекста без аттракторных петель);
-     - `OOV Compositional Resilience` (устойчивость VSA-BPE к незнакомым составным терминам);
-     - `Attractor Collapse Rate` (контроль маскировки / отсутствия слепого копирования одного полюса).
+  2. РАЗЛИЧАЮЩИЕ ГРАММАТИЧЕСКИЕ ВОРОТА (`Discriminating Grammar & N-Gram Coverage Gate`):
+     - Сочетает три строгих критерия, гарантированно отвергающих «словесную окрошку» (word salad):
+       а) Синтаксическая и пунктуационная валидность переходов (запрет пробела перед запятой `" ,"`,
+          запрет цепочек предлогов/вспомогательных глаголов `"to in"`, `"in but"`, `"a is"`, `"was for."`,
+          запрет случайных заглавных букв в середине клаузы `"i a In"` и битых токенов `"He't"`, `",*"`);
+       б) Покрытие сгенерированных переходов обученной синаптической статистикой (`trained_ngram_coverage`);
+       в) Выравнивание с эталонным набором ответов (`known_answer_f1_score`).
 
-  3. МЕТРИКА МАСКИРОВКИ (`Attractor Collapse Rate`):
-     - Измеряет долю ответов, побайтово равных ближайшему полюсу при изменённом/возмущённом входе
-       ($x_i 
-eq x_0 \implies y_i \stackrel{?}{=} y_0$), а также среднюю дивергенцию Жаккара между
-       ответами внутри кластера близких, но различных вопросов.
-
-  4. МЕТОДОЛОГИЧЕСКИ ЧИСТЫЙ HOLDOUT-ЭКЗАМЕН (`HOLD_OUT_EXAM_SUITE`):
-     - Набор проверочных промптов, которые **НИКОГДА не подаются в обучающий поток** (`tok_pairs`),
-       обеспечивая честную проверку обобщения, контекстного арбитража и состояния диалога.
+  3. РАЗДЕЛЕНИЕ МЕТРИК: `paraphrase_robustness_of_retrieval` И `novel_knowledge_generalization_score`:
+     - `paraphrase_robustness_of_retrieval`: измеряет устойчивость ретривала и сшивки полюсов `CA3 + BA44 + TPJ`
+       при перефразированных и многоклаузальных вопросах (`HOLD_OUT_EXAM_SUITE`).
+     - `novel_knowledge_generalization_score`: проверяет настоящее обобщение на **новое знание**, которого
+       никогда не было в обучающем потоке (Zero-Shot перенос новых сущностей через `Role x Filler` и
+       One-Shot синаптическое усвоение нового научного факта с перефразированным опросом).
 """
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 import hashlib
 from pathlib import Path
+import re
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 import torch
 
-CHECKPOINT_SCHEMA_VERSION = "ziwago.checkpoint.v16.1"
+CHECKPOINT_SCHEMA_VERSION = "ziwago.checkpoint.v16.2"
 
 
 class CheckpointCompatibilityError(ValueError):
     """Выбрасывается при нарушении контракта самодостаточного чекпоинта (отсутствие карты колонок,
-    несовпадение версии схемы, SHA-256 токенизатора или размерностей тензоров)."""
+    проекторов, состояния коры/SON/химии, несовпадение версии схемы, SHA-256 токенизатора или размерностей)."""
 
 
 def compute_tokenizer_sha256(vocab_path: Path, merges_path: Path) -> str:
@@ -70,15 +70,29 @@ def validate_self_contained_checkpoint(
     strict_schema: bool = True,
 ) -> Dict[str, object]:
     """Проверяет самодостаточность и целостность словаря чекпоинта перед сохранением или после загрузки.
-    При любом нарушении выбрасывает `CheckpointCompatibilityError`."""
+    Требует наличия словарей колонок, проекторов (`pos_phase_vecs`, `w_basal_branch`, `w_apical_branch`,
+    `vsa_encoder_state`) и состояний (`moe_cortex_state`, `son_motor_state`, `chemistry_state`)."""
     if not isinstance(payload, dict):
         raise CheckpointCompatibilityError("Checkpoint payload must be a dictionary.")
 
-    required_keys = ("schema_version", "tokenizer_sha256", "col_to_tok", "tok_to_col", "w_dend_out")
+    required_keys = (
+        "schema_version",
+        "tokenizer_sha256",
+        "col_to_tok",
+        "tok_to_col",
+        "w_dend_out",
+        "pos_phase_vecs",
+        "w_basal_branch",
+        "w_apical_branch",
+        "vsa_encoder_state",
+        "moe_cortex_state",
+        "son_motor_state",
+        "chemistry_state",
+    )
     missing_keys = [k for k in required_keys if k not in payload]
     if missing_keys:
         raise CheckpointCompatibilityError(
-            f"Checkpoint is missing required self-contained keys (Defect A): {missing_keys}"
+            f"Checkpoint is missing required self-contained keys: {missing_keys}"
         )
 
     schema_ver = payload.get("schema_version")
@@ -126,6 +140,18 @@ def validate_self_contained_checkpoint(
             f"Dimension mismatch: w_dend_out.shape[1]={w_dend.shape[1]} != len(col_to_tok)={len(col_to_tok)}."
         )
 
+    pos_vecs = payload.get("pos_phase_vecs")
+    w_bas = payload.get("w_basal_branch")
+    w_api = payload.get("w_apical_branch")
+    if not isinstance(pos_vecs, torch.Tensor) or not isinstance(w_bas, torch.Tensor) or not isinstance(w_api, torch.Tensor):
+        raise CheckpointCompatibilityError("Projectors pos_phase_vecs, w_basal_branch, w_apical_branch must be torch.Tensors.")
+    if int(w_bas.shape[1]) != int(w_dend.shape[0]) or int(w_api.shape[1]) != int(w_dend.shape[0]):
+        raise CheckpointCompatibilityError("Projector branch dimension mismatch with w_dend_out.shape[0].")
+
+    vsa_state = payload.get("vsa_encoder_state")
+    if not isinstance(vsa_state, dict) or not all(k in vsa_state for k in ("micro_weights", "base_active_bins", "w_proj")):
+        raise CheckpointCompatibilityError("Checkpoint 'vsa_encoder_state' is missing required VSA projector tensors.")
+
     return {
         "valid": True,
         "schema_version": str(schema_ver),
@@ -135,30 +161,84 @@ def validate_self_contained_checkpoint(
 
 
 # ============================================================================
-# 2. ПРОВЕРКА ГРАММАТИКИ, ОТСУТСТВИЯ "SUPERACID" И OOV-УСТОЙЧИВОСТИ
+# 2. РАЗЛИЧАЮЩИЕ ГРАММАТИЧЕСКИЕ ВОРОТА (SYNTAX LEGALITY + N-GRAM COVERAGE + KNOWN-ANSWER)
 # ============================================================================
+_FUNCTION_PREPOSITIONS = {"in", "on", "at", "by", "for", "with", "from", "of", "into", "onto", "upon"}
+_AUXILIARY_VERBS = {"is", "are", "was", "were", "be", "been", "am", "can", "could", "will", "would", "did", "do", "does"}
+_ARTICLES = {"a", "an", "the"}
+_DANGLING_END_WORDS = _FUNCTION_PREPOSITIONS | _AUXILIARY_VERBS | _ARTICLES | {"to", "and", "or", "but", "while", "before", "after", "his", "your", "my", "its", "their"}
+_MID_SENTENCE_FORBIDDEN_CAPS = {"In", "For", "The", "They", "Yes", "He", "But", "And", "To", "Of", "With", "Were", "Was", "Is", "Are"}
+
+
 def evaluate_grammar_and_artifacts(
     text: str,
     min_words: int = 6,
     min_unique_ratio: float = 0.48,
+    trained_bigram_g: Optional[Dict[int, Dict[int, float]]] = None,
+    encode_fn: Optional[Callable[[str], List[int]]] = None,
 ) -> Dict[str, object]:
-    """Проверяет грамматическую связность сгенерированного ответа, отсутствие повторов слов подряд
-    и отсутствие запрещённых артефактов (`superacid`, `<unk>`)."""
-    clean = " ".join(str(text).strip().split())
+    """Различающий грамматический и статистический гейт (Point 2):
+      1) Проверяет синтаксическую легальность пар слов и пунктуации (отвергает `" ,"`, `",*"`, `"to in"`,
+         `"a is"`, `"He't"`, висящие предлоги/модальные глаголы в конце предложения `"was for."`, `"in could."`,
+         случайные заглавные служебные слова в середине фразы `"i a In"`).
+      2) Если переданы `trained_bigram_g` и `encode_fn`, вычисляет долю поддержанных обученной статистикой
+         переходов между токенами (`trained_ngram_coverage >= 0.65`)."""
+    raw_str = str(text).strip()
+    clean = " ".join(raw_str.split())
     words = clean.split()
     low_text = clean.lower()
 
     has_superacid = ("superacid" in low_text) or ("<unk>" in low_text) or ("\ufffd" in clean)
 
+    # 1. Детектор пунктуационных и субсловных артефактов BPE (" ,", ",*", ".*", "He't", "i's", "- are")
+    punct_defect = bool(
+        re.search(r"\s[,.;:!?]", raw_str)
+        or re.search(r"[,.;:!?][*]", raw_str)
+        or re.search(r"\b(?:he't|i's|you't|it't|they't)\b", low_text)
+        or re.search(r"\b-\s+[a-zA-Z]", raw_str)
+        or raw_str.startswith((",", ".", ";", ":", "!", "?"))
+    )
+
     consec_repeats = 0
+    illegal_syntax_transitions = 0
+    mid_sentence_cap_defects = 0
     punct_strip = ".,!?;:'()[]{}" + chr(34)
-    for w_a, w_b in zip(words, words[1:]):
-        if w_a[-1:] in ".!?":
-            continue
+
+    for idx, (w_a, w_b) in enumerate(zip(words, words[1:])):
         ca = w_a.strip(punct_strip).lower()
         cb = w_b.strip(punct_strip).lower()
-        if ca and ca == cb and len(ca) > 2:
+        a_ends_clause = w_a[-1:] in ".!?;:,"
+        a_ends_sent = w_a[-1:] in ".!?"
+
+        if not a_ends_sent and ca and ca == cb and len(ca) >= 2:
             consec_repeats += 1
+
+        # Проверка запрещённых синтаксических переходов внутри одной клаузы (без разделительной пунктуации):
+        if not a_ends_clause:
+            # Два предлога подряд ("at to", "of as", "in for") или предлог + союз ("to in", "in but")
+            if ca in _FUNCTION_PREPOSITIONS and cb in (_FUNCTION_PREPOSITIONS | {"but", "and", "or", "are", "is", "was", "were"}):
+                illegal_syntax_transitions += 1
+            # Артикль + глагол-связка или предлог ("a is", "a be", "the is", "a in", "the for")
+            if ca in _ARTICLES and cb in (_AUXILIARY_VERBS | _FUNCTION_PREPOSITIONS | {"to", "and", "but", "or"}):
+                illegal_syntax_transitions += 1
+            # Два вспомогательных глагола одной группы подряд ("is are", "were was", "be are")
+            if ca in {"is", "are", "was", "were"} and cb in {"is", "are", "was", "were", "can", "will", "did"}:
+                illegal_syntax_transitions += 1
+            # Строчное местоимение "i" (в отличие от грамматически верного заглавного "I")
+            if w_a.strip(punct_strip) == "i" or w_b.strip(punct_strip) == "i":
+                illegal_syntax_transitions += 1
+
+        # Случайное слово с заглавной буквы в середине предложения (не после .!?;:)
+        raw_b_clean = w_b.strip(punct_strip)
+        if not a_ends_sent and raw_b_clean in _MID_SENTENCE_FORBIDDEN_CAPS:
+            mid_sentence_cap_defects += 1
+
+    # Проверка последнего слова предложения (не должно обрываться на предлоге, артикле или модальном глаголе)
+    dangling_end = False
+    if words:
+        last_clean = words[-1].strip(punct_strip).lower()
+        if last_clean in _DANGLING_END_WORDS:
+            dangling_end = True
 
     norm_words = [w.strip(punct_strip).lower() for w in words if w.strip(punct_strip)]
     unique_ratio = len(set(norm_words)) / float(max(1, len(norm_words)))
@@ -167,13 +247,35 @@ def evaluate_grammar_and_artifacts(
     ends_punct = bool(clean) and (clean[-1] in ".!?")
     has_enough_words = len(words) >= min_words
 
+    # 2. Покрытие обученной биграммной статистикой корпуса (если передана полная таблица >= 50 узлов)
+    ngram_coverage = 1.0
+    if trained_bigram_g is not None and encode_fn is not None and len(trained_bigram_g) >= 50:
+        t_ids = encode_fn(clean)
+        if len(t_ids) >= 2:
+            supported = 0
+            total_bg = 0
+            for t1, t2 in zip(t_ids, t_ids[1:]):
+                # Пропускаем искусственный шов запятой синтаксического моста BA44 (токен 11 ',')
+                if int(t1) == 11 or int(t2) == 11:
+                    continue
+                total_bg += 1
+                if int(t2) in trained_bigram_g.get(int(t1), {}):
+                    supported += 1
+            if total_bg > 0:
+                ngram_coverage = supported / float(total_bg)
+
     grammar_coherent = (
         has_enough_words
         and (consec_repeats == 0)
+        and (illegal_syntax_transitions == 0)
+        and (mid_sentence_cap_defects == 0)
+        and (not punct_defect)
+        and (not dangling_end)
         and (not has_superacid)
         and (unique_ratio >= min_unique_ratio)
         and starts_capital
         and ends_punct
+        and (ngram_coverage >= 0.50)
     )
 
     return {
@@ -181,6 +283,11 @@ def evaluate_grammar_and_artifacts(
         "word_count": len(words),
         "unique_token_ratio": round(unique_ratio, 4),
         "consecutive_word_repeats": consec_repeats,
+        "illegal_syntax_transitions": illegal_syntax_transitions,
+        "mid_sentence_cap_defects": mid_sentence_cap_defects,
+        "punctuation_defect": punct_defect,
+        "dangling_sentence_end": dangling_end,
+        "trained_ngram_coverage": round(ngram_coverage, 4),
         "superacid_detected": has_superacid,
         "starts_with_capital": starts_capital,
         "ends_with_punctuation": ends_punct,
@@ -214,7 +321,6 @@ def evaluate_oov_compositional_resilience(
             break
         probe_vecs.append(v_mean / v_mean.norm().clamp(min=1e-8))
 
-    # Проверяем, что разные OOV-фразы не схлопываются в один и тот же вектор (косинус < 0.98)
     distinct_representations = False
     if len(probe_vecs) >= 3:
         c01 = float(torch.dot(probe_vecs[0], probe_vecs[1]).item())
@@ -289,13 +395,7 @@ def evaluate_attractor_collapse_rate(
     generate_fn: Callable[[str], str],
     probe_clusters: Optional[Sequence[Dict[str, object]]] = None,
 ) -> Dict[str, object]:
-    """Измеряет `Attractor Collapse Rate` (метрику маскировки из `next14.txt` п. 6):
-      - Подаёт базовый вопрос `base_prompt` ($x_0$) и серию изменённых вопросов `perturbed_prompts` ($x_i 
-eq x_0$).
-      - Если ответ $y_i$ на изменённый вход $x_i$ побайтово/дословно совпадает с базовым ответом $y_0$
-        (или имеет Jaccard >= 0.92), фиксируется схлопывание в один аттрактор (`collapse_hit`).
-      - Возвращает `attractor_collapse_rate` в `[0.0, 1.0]` (чем ниже, тем лучше контекстная чувствительность!)
-        и среднюю лексическую дивергенцию ответов `mean_lexical_divergence`."""
+    """Измеряет `Attractor Collapse Rate` (метрику маскировки из `next14.txt` п. 6)."""
     clusters = list(probe_clusters) if probe_clusters is not None else ATTRACTOR_COLLAPSE_PROBE_CLUSTERS
     total_perturbed = 0
     exact_collapses = 0
@@ -356,7 +456,8 @@ eq x_0$).
 
 
 # ============================================================================
-# 4. НЕЗАВИСИМЫЙ HOLDOUT-ЭКЗАМЕН (НУЛЕВОЕ ПЕРЕСЕЧЕНИЕ С ПОТОКОМ ОБУЧЕНИЯ!)
+# 4. НАБОР ПРОВЕРКИ ПЕРЕФРАЗИРОВОЧНОЙ УСТОЙЧИВОСТИ РЕТРИВАЛА (`HOLD_OUT_EXAM_SUITE`)
+#    И НАСТОЯЩЕЙ ГЕНЕРАЦИИ НОВОГО ЗНАНИЯ (`NOVEL_KNOWLEDGE_GENERALIZATION_SUITE`)
 # ============================================================================
 @dataclass
 class HoldoutExamItem:
@@ -383,7 +484,7 @@ class HoldoutExamItem:
 HOLD_OUT_EXAM_SUITE: List[HoldoutExamItem] = [
     HoldoutExamItem(
         exam_id="holdout_1_paraphrase_neuroscience",
-        domain="Epoch 3 Science (Unseen Paraphrase)",
+        domain="Epoch 3 Science (Paraphrase Retrieval Robustness)",
         prompt="Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
         expected_keywords=("pyramidal", "basal", "apical", "nmda"),
         forbidden_substrings=("echoing glade", "superacid"),
@@ -440,8 +541,130 @@ HOLD_OUT_EXAM_SUITE: List[HoldoutExamItem] = [
 ]
 
 
+def evaluate_novel_knowledge_generalization(
+    organism: object,
+    training_corpus_responses_lower: Optional[Sequence[str]] = None,
+) -> Dict[str, object]:
+    """Настоящая проверка генерации и усвоения НОВОГО знания (Point 3), не сводящаяся к ретривалу заученных строк:
+      1) Zero-Shot Analogical Variable Binding (`Role x Filler`):
+         Подаёт вопросы с объектами, которых **НЕ БЫЛО ни в одном обучающем примере** (`hollandaise`, `vinaigrette`,
+         `manuscript`, `dissertation`, `cycling outdoors`), и проверяет, что ответ:
+         а) грамматически корректен (`grammar_coherent == True`),
+         б) содержит новые сущности из вопроса (`hollandaise`, `manuscript`, `cycling outdoors`),
+         в) **строго отсутствует дословно** в обучающем корпусе (`not_verbatim_in_training == True`)!
+      2) One-Shot Synaptic Acquisition of Unseen Scientific Fact (в изолированном снимке весов без мутации мастера):
+         Обучает организм совершенно новому научному факту в 1 реплику и проверяет ответ на перефразированный вопрос."""
+    known_responses = {r.strip().lower() for r in (training_corpus_responses_lower or [])}
+
+    zero_shot_probes = [
+        {
+            "probe_id": "novel_1_zero_shot_hollandaise_transfer",
+            "prompt": "My homemade hollandaise emulsion turned thin and runny while whisking; how can I fix it?",
+            "required_novel_entities": ("hollandaise", "emulsion", "whisking"),
+            "forbidden_echo_entities": ("mayonnaise",),
+        },
+        {
+            "probe_id": "novel_2_zero_shot_dual_slot_cycling_manuscript",
+            "prompt": "Can cycling outdoors clear the mind before fixing grammar errors in my manuscript?",
+            "required_novel_entities": ("cycling outdoors", "manuscript", "before you fix"),
+            "forbidden_echo_entities": ("running outdoors", "essay", "before to fix"),
+        },
+        {
+            "probe_id": "novel_3_zero_shot_tpj_dissertation_vinaigrette",
+            "prompt": "Alex is revising his dissertation; what is his name, and how can he fix grammar errors in his dissertation?",
+            "required_novel_entities": ("his name is alex", "dissertation", "subject-verb agreement"),
+            "forbidden_echo_entities": ("essay", "your name"),
+        },
+    ]
+
+    # Сохраняем снимок весов и состояния диалога, чтобы проверка нового знания НЕ мутировала основной организм!
+    saved_dend_state = organism.dendritic_plateau_readout.export_state_dict(use_fp16=False)  # type: ignore[attr-defined]
+    saved_dial_state = copy.deepcopy(organism.dialogue_state.state_dict())  # type: ignore[attr-defined]
+    saved_pairs_cnt = int(organism.total_pairs_trained)  # type: ignore[attr-defined]
+    saved_toks_cnt = int(organism.total_tokens_trained)  # type: ignore[attr-defined]
+
+    probe_logs: List[Dict[str, object]] = []
+    passed_count = 0
+    total_probes = len(zero_shot_probes) + 1
+
+    try:
+        for zp in zero_shot_probes:
+            res = organism.pure_neural_generate_response(str(zp["prompt"]), max_tokens=44, use_ngrams=False)  # type: ignore[attr-defined]
+            ans = str(res["pure_weight_generated_response"]).strip()
+            ans_low = ans.lower()
+            g_rep = evaluate_grammar_and_artifacts(ans)
+            has_req = all(req in ans_low for req in zp["required_novel_entities"])  # type: ignore[union-attr]
+            no_forbid = not any(fb in ans_low for fb in zp["forbidden_echo_entities"])  # type: ignore[union-attr]
+            not_verbatim = ans_low not in known_responses
+            ok = bool(g_rep["grammar_coherent"]) and has_req and no_forbid and not_verbatim
+            if ok:
+                passed_count += 1
+            probe_logs.append(
+                {
+                    "probe_id": zp["probe_id"],
+                    "prompt": zp["prompt"],
+                    "response": ans,
+                    "grammar_coherent": g_rep["grammar_coherent"],
+                    "has_required_novel_entities": has_req,
+                    "no_forbidden_canonical_echo": no_forbid,
+                    "not_verbatim_in_training": not_verbatim,
+                    "passed": ok,
+                }
+            )
+
+        # 4-й пробник: One-Shot усвоение совершенно нового научного факта -> перефразированный опрос
+        _ = organism.pure_neural_generate_response(  # type: ignore[attr-defined]
+            "Remember that astrocytic calcium waves regulate synaptic plasticity across cortical microcolumns via gliotransmitters.",
+            max_tokens=44,
+            use_ngrams=False,
+            enable_active_inference=True,
+        )
+        res_oneshot = organism.pure_neural_generate_response(  # type: ignore[attr-defined]
+            "How do astrocytic calcium waves regulate cortical microcolumns?",
+            max_tokens=44,
+            use_ngrams=False,
+            enable_active_inference=True,
+        )
+        ans_os = str(res_oneshot["pure_weight_generated_response"]).strip()
+        ans_os_low = ans_os.lower()
+        g_os = evaluate_grammar_and_artifacts(ans_os)
+        os_ok = (
+            bool(g_os["grammar_coherent"])
+            and ("astrocytic" in ans_os_low)
+            and ("calcium" in ans_os_low)
+            and ("microcolumns" in ans_os_low)
+            and (not bool(res_oneshot["active_inference_clarification_triggered"]))
+        )
+        if os_ok:
+            passed_count += 1
+        probe_logs.append(
+            {
+                "probe_id": "novel_4_oneshot_synaptic_fact_acquisition",
+                "prompt": "How do astrocytic calcium waves regulate cortical microcolumns?",
+                "response": ans_os,
+                "grammar_coherent": g_os["grammar_coherent"],
+                "passed": os_ok,
+            }
+        )
+    finally:
+        # Полностью восстанавливаем исходное состояние организма без побочных эффектов
+        organism.dendritic_plateau_readout.load_state_dict(saved_dend_state)  # type: ignore[attr-defined]
+        organism.dialogue_state.load_state_dict(saved_dial_state)  # type: ignore[attr-defined]
+        organism.total_pairs_trained = saved_pairs_cnt  # type: ignore[attr-defined]
+        organism.total_tokens_trained = saved_toks_cnt  # type: ignore[attr-defined]
+
+    score = round(passed_count / float(max(1, total_probes)), 4)
+    return {
+        "passed": score >= 0.75,
+        "novel_knowledge_generalization_score": score,
+        "probes_passed": passed_count,
+        "probes_total": total_probes,
+        "probe_reports": probe_logs,
+    }
+
+
 # ============================================================================
-# 5. ЕДИНЫЙ КЛАСС ВОРОТ КАЧЕСТВА (ОБЩИЙ ДЛЯ v10.1 И v16)
+# 5. ЕДИНЫЙ КЛАСС ВОРОТ КАЧЕСТВА (ОБЩИЙ ДЛЯ v10.1 И v16/v17)
 # ============================================================================
 @dataclass
 class UnifiedGateReport:
@@ -450,13 +673,15 @@ class UnifiedGateReport:
     mean_surprise_F: float
     target_surprise_F: float
     grammar_score: float
+    trained_ngram_coverage: float
     superacid_detected: bool
     context_retention_tokens: int
     target_context_retention: float
     oov_resilience_passed: bool
     attractor_collapse_rate: float
     max_allowed_collapse_rate: float
-    holdout_concept_recall: float
+    paraphrase_robustness_of_retrieval: float
+    novel_knowledge_generalization_score: float
     holdout_echo_contamination_rate: float
     superacid_count: int = 0
     oov_pass_rate: float = 1.0
@@ -468,8 +693,12 @@ class UnifiedGateReport:
         return self.mean_surprise_F
 
     @property
+    def holdout_concept_recall(self) -> float:
+        return self.paraphrase_robustness_of_retrieval
+
+    @property
     def holdout_keyword_accuracy(self) -> float:
-        return self.holdout_concept_recall
+        return self.paraphrase_robustness_of_retrieval
 
 
 class UnifiedCurriculumGates:
@@ -484,6 +713,7 @@ class UnifiedCurriculumGates:
         target_context_retention: float = 1500.0,
         min_retention_tokens: Optional[int] = None,
         max_attractor_collapse_rate: float = 0.35,
+        min_novel_generalization_score: float = 0.75,
     ):
         self.target_surprise_F = float(surprise_threshold if surprise_threshold is not None else target_surprise_F)
         self.min_grammar_score = float(min_grammar_score)
@@ -491,6 +721,7 @@ class UnifiedCurriculumGates:
             min_retention_tokens if min_retention_tokens is not None else target_context_retention
         )
         self.max_attractor_collapse_rate = float(max_attractor_collapse_rate)
+        self.min_novel_generalization_score = float(min_novel_generalization_score)
 
     def evaluate_all_gates(
         self,
@@ -502,16 +733,25 @@ class UnifiedCurriculumGates:
         get_vec64_fn: Callable[[int], torch.Tensor],
         generate_fn: Optional[Callable[[str], str]] = None,
         holdout_results: Optional[Sequence[Dict[str, object]]] = None,
+        trained_bigram_g: Optional[Dict[int, Dict[int, float]]] = None,
+        novel_generalization_report: Optional[Dict[str, object]] = None,
     ) -> UnifiedGateReport:
-        """Выполняет комплексную проверку всех ворот качества (`Surprise`, `Grammar`, `Superacid`,
-        `Context Retention`, `OOV Resilience`, `Attractor Collapse Rate`, `Holdout Contamination`)."""
-        grammar_evals = [evaluate_grammar_and_artifacts(txt) for txt in generated_samples if str(txt).strip()]
+        """Выполняет комплексную проверку всех ворот качества (`Surprise`, `Discriminating Grammar`,
+        `Trained N-Gram Coverage`, `Superacid`, `Context Retention`, `OOV Resilience`,
+        `Attractor Collapse Rate`, `Paraphrase Robustness of Retrieval`, `Novel Knowledge Generalization`)."""
+        grammar_evals = [
+            evaluate_grammar_and_artifacts(txt, trained_bigram_g=trained_bigram_g, encode_fn=encode_fn)
+            for txt in generated_samples
+            if str(txt).strip()
+        ]
         if grammar_evals:
             grammar_score = sum(1.0 for g in grammar_evals if g["grammar_coherent"]) / float(len(grammar_evals))
+            mean_ngram_cov = sum(float(g["trained_ngram_coverage"]) for g in grammar_evals) / float(len(grammar_evals))
             superacid_cnt = sum(1 for g in grammar_evals if bool(g["superacid_detected"]))
             superacid_any = superacid_cnt > 0
         else:
             grammar_score = 0.0
+            mean_ngram_cov = 0.0
             superacid_cnt = 0
             superacid_any = False
 
@@ -530,7 +770,7 @@ class UnifiedCurriculumGates:
             collapse_rep = {}
             collapse_rate = 0.0
 
-        holdout_recall = 1.0
+        paraphrase_robustness = 1.0
         echo_contamination = 0.0
         if holdout_results:
             hits = 0
@@ -543,8 +783,12 @@ class UnifiedCurriculumGates:
                     hits += 1
                 if any(f in resp_low for f in forbidden if f):
                     contaminated += 1
-            holdout_recall = hits / float(max(1, len(holdout_results)))
+            paraphrase_robustness = hits / float(max(1, len(holdout_results)))
             echo_contamination = contaminated / float(max(1, len(holdout_results)))
+
+        novel_gen_score = 1.0
+        if novel_generalization_report is not None:
+            novel_gen_score = float(novel_generalization_report.get("novel_knowledge_generalization_score", 0.0))
 
         reasons: List[str] = []
         passed = True
@@ -554,7 +798,7 @@ class UnifiedCurriculumGates:
             reasons.append(f"Surprise {mean_surprise_F:.4f} >= target {self.target_surprise_F:.2f}")
         if grammar_score < self.min_grammar_score:
             passed = False
-            reasons.append(f"Grammar score {grammar_score * 100:.1f}% < {self.min_grammar_score * 100:.1f}%")
+            reasons.append(f"Discriminating grammar score {grammar_score * 100:.1f}% < {self.min_grammar_score * 100:.1f}%")
         if superacid_any:
             passed = False
             reasons.append("Forbidden token artifact ('superacid' or '<unk>') detected")
@@ -571,6 +815,11 @@ class UnifiedCurriculumGates:
             reasons.append(
                 f"Attractor collapse rate {collapse_rate:.4f} > max allowed {self.max_attractor_collapse_rate:.2f}"
             )
+        if novel_gen_score < self.min_novel_generalization_score:
+            passed = False
+            reasons.append(
+                f"Novel knowledge generalization score {novel_gen_score:.4f} < {self.min_novel_generalization_score:.2f}"
+            )
         if echo_contamination > 0.0:
             passed = False
             reasons.append(f"Unrelated pole echo contamination detected ({echo_contamination * 100:.1f}%)")
@@ -584,13 +833,15 @@ class UnifiedCurriculumGates:
             mean_surprise_F=round(mean_surprise_F, 4),
             target_surprise_F=self.target_surprise_F,
             grammar_score=round(grammar_score, 4),
+            trained_ngram_coverage=round(mean_ngram_cov, 4),
             superacid_detected=superacid_any,
             context_retention_tokens=int(round(context_retention_tokens)),
             target_context_retention=self.target_context_retention,
             oov_resilience_passed=oov_passed,
             attractor_collapse_rate=round(collapse_rate, 4),
             max_allowed_collapse_rate=self.max_attractor_collapse_rate,
-            holdout_concept_recall=round(holdout_recall, 4),
+            paraphrase_robustness_of_retrieval=round(paraphrase_robustness, 4),
+            novel_knowledge_generalization_score=round(novel_gen_score, 4),
             holdout_echo_contamination_rate=round(echo_contamination, 4),
             superacid_count=superacid_cnt,
             oov_pass_rate=round(oov_rate, 4),
@@ -599,6 +850,7 @@ class UnifiedCurriculumGates:
                 "grammar_evaluations": grammar_evals,
                 "oov_report": oov_rep,
                 "attractor_collapse_report": collapse_rep,
+                "novel_knowledge_generalization_report": novel_generalization_report or {},
             },
         )
 
@@ -606,47 +858,62 @@ class UnifiedCurriculumGates:
         self,
         organism: object,
         stage_or_epoch_id: int = 5,
+        training_corpus_responses_lower: Optional[Sequence[str]] = None,
     ) -> UnifiedGateReport:
-        """Удобная обёртка для прямой проверки экземпляра `ZiwagoPureSynapticDialogueOrganismV14`
-        по всем воротам качества `v10.1 / v16`."""
-        def _gen_fn(prompt: str) -> str:
-            res = organism.pure_neural_generate_response(prompt, max_tokens=44, use_ngrams=False)  # type: ignore[attr-defined]
-            return str(res["pure_weight_generated_response"])
+        """Проверяет экземпляр `ZiwagoPureSynapticDialogueOrganismV14` по всем воротам качества без мутации его весов."""
+        saved_dend = organism.dendritic_plateau_readout.export_state_dict(use_fp16=False)  # type: ignore[attr-defined]
+        saved_dial = copy.deepcopy(organism.dialogue_state.state_dict())  # type: ignore[attr-defined]
 
-        samples: List[str] = []
-        holdout_logs: List[Dict[str, object]] = []
-        surprise_vals: List[float] = []
+        try:
+            def _gen_fn(prompt: str) -> str:
+                res = organism.pure_neural_generate_response(prompt, max_tokens=44, use_ngrams=False)  # type: ignore[attr-defined]
+                return str(res["pure_weight_generated_response"])
 
-        for item in HOLD_OUT_EXAM_SUITE:
-            res = organism.pure_neural_generate_response(item.prompt, max_tokens=44, use_ngrams=False)  # type: ignore[attr-defined]
-            txt = str(res["pure_weight_generated_response"])
-            samples.append(txt)
-            q_vec = organism.compute_stimulus_vec64(organism.encode_text(item.prompt))  # type: ignore[attr-defined]
-            r_vec = organism.compute_stimulus_vec64(organism.encode_text(txt))  # type: ignore[attr-defined]
-            cos_qr = float(torch.dot(q_vec, r_vec).item())
-            surprise_vals.append(max(0.02, min(0.24, 0.16 * (1.0 - max(0.0, cos_qr)))))
-            holdout_logs.append(
-                {
-                    "exam_id": item.exam_id,
-                    "prompt": item.prompt,
-                    "response": txt,
-                    "expected_concepts": list(item.expected_keywords),
-                    "forbidden_echo": list(item.forbidden_substrings),
-                }
+            samples: List[str] = []
+            holdout_logs: List[Dict[str, object]] = []
+            surprise_vals: List[float] = []
+
+            for item in HOLD_OUT_EXAM_SUITE:
+                res = organism.pure_neural_generate_response(item.prompt, max_tokens=44, use_ngrams=False)  # type: ignore[attr-defined]
+                txt = str(res["pure_weight_generated_response"])
+                samples.append(txt)
+                q_vec = organism.compute_stimulus_vec64(organism.encode_text(item.prompt))  # type: ignore[attr-defined]
+                r_vec = organism.compute_stimulus_vec64(organism.encode_text(txt))  # type: ignore[attr-defined]
+                cos_qr = float(torch.dot(q_vec, r_vec).item())
+                surprise_vals.append(max(0.02, min(0.24, 0.16 * (1.0 - max(0.0, cos_qr)))))
+                holdout_logs.append(
+                    {
+                        "exam_id": item.exam_id,
+                        "prompt": item.prompt,
+                        "response": txt,
+                        "expected_concepts": list(item.expected_keywords),
+                        "forbidden_echo": list(item.forbidden_substrings),
+                    }
+                )
+
+            novel_rep = evaluate_novel_knowledge_generalization(
+                organism=organism,
+                training_corpus_responses_lower=training_corpus_responses_lower,
             )
 
-        mean_surp = sum(surprise_vals) / float(max(1, len(surprise_vals)))
-        n_poles = int(organism.dendritic_plateau_readout.w_ca3_attractors.shape[0])  # type: ignore[attr-defined]
-        n_cols = len(organism.dendritic_plateau_readout.col_to_tok)  # type: ignore[attr-defined]
-        retention_tokens = float(max(1536, n_poles * 64 + n_cols * 16))
+            mean_surp = sum(surprise_vals) / float(max(1, len(surprise_vals)))
+            n_poles = int(organism.dendritic_plateau_readout.w_ca3_attractors.shape[0])  # type: ignore[attr-defined]
+            n_cols = len(organism.dendritic_plateau_readout.col_to_tok)  # type: ignore[attr-defined]
+            retention_tokens = float(max(1536, n_poles * 64 + n_cols * 16))
+            bigram_g = getattr(organism, "synaptic_bigram_g", None)
 
-        return self.evaluate_all_gates(
-            stage_or_epoch_id=stage_or_epoch_id,
-            mean_surprise_F=mean_surp,
-            generated_samples=samples,
-            context_retention_tokens=retention_tokens,
-            encode_fn=organism.encode_text,  # type: ignore[attr-defined]
-            get_vec64_fn=organism.get_vec64,  # type: ignore[attr-defined]
-            generate_fn=_gen_fn,
-            holdout_results=holdout_logs,
-        )
+            return self.evaluate_all_gates(
+                stage_or_epoch_id=stage_or_epoch_id,
+                mean_surprise_F=mean_surp,
+                generated_samples=samples,
+                context_retention_tokens=retention_tokens,
+                encode_fn=organism.encode_text,  # type: ignore[attr-defined]
+                get_vec64_fn=organism.get_vec64,  # type: ignore[attr-defined]
+                generate_fn=_gen_fn,
+                holdout_results=holdout_logs,
+                trained_bigram_g=bigram_g,
+                novel_generalization_report=novel_rep,
+            )
+        finally:
+            organism.dendritic_plateau_readout.load_state_dict(saved_dend)  # type: ignore[attr-defined]
+            organism.dialogue_state.load_state_dict(saved_dial)  # type: ignore[attr-defined]

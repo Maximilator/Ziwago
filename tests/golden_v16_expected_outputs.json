@@ -1,0 +1,63 @@
+{
+  "schema_version": "ziwago.golden.v16.2",
+  "description": "Canonical Golden Reference Answers for Ziwago v16/v17 Round-Trip CI and Seed-Independent Checkpoint Verification",
+  "holdout_paraphrase_retrieval_golden": [
+    {
+      "exam_id": "holdout_1_paraphrase_neuroscience",
+      "prompt": "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
+      "expected_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments."
+    },
+    {
+      "exam_id": "holdout_2_paraphrase_culinary_science",
+      "prompt": "Why does a runny mayonnaise sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
+      "expected_response": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments."
+    },
+    {
+      "exam_id": "holdout_3_paraphrase_writing_fitness",
+      "prompt": "Before fixing a runny mayonnaise emulsion, how does running outdoors help clear the mind?",
+      "expected_response": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, before staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind."
+    },
+    {
+      "exam_id": "holdout_4_conversational_identity_recall",
+      "prompt": "Remind me, what is my name and what project am I building?",
+      "expected_response": "Your name is Alex, and you are building a biological neural network with dendritic predictive coding."
+    },
+    {
+      "exam_id": "holdout_5_tpj_third_person_shift",
+      "prompt": "Alex is testing his model; what is his name, and how can he fix grammar errors when writing an essay?",
+      "expected_response": "His name is Alex, and he is building a biological neural network with dendritic predictive coding, and to fix grammar errors in his essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses."
+    },
+    {
+      "exam_id": "holdout_6_theta_phase_before_bridge",
+      "prompt": "Can running outdoors clear the mind before writing an essay without grammar errors?",
+      "expected_response": "Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses."
+    },
+    {
+      "exam_id": "holdout_7_roleplay_plus_neuroscience",
+      "prompt": "Greetings, guardian of the ancient stone arch, how do pyramidal neurons integrate sensory input?",
+      "expected_response": "Ah, you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge, and pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments."
+    },
+    {
+      "exam_id": "holdout_8_bidirectional_ca3",
+      "prompt": "Why should a student check subject-verb agreement and read each sentence aloud, while whisking a fresh egg yolk to stabilize an emulsion?",
+      "expected_response": "To fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses, while it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes."
+    }
+  ],
+  "novel_knowledge_generalization_golden": [
+    {
+      "probe_id": "novel_1_zero_shot_hollandaise_transfer",
+      "prompt": "My homemade hollandaise emulsion turned thin and runny while whisking; how can I fix it?",
+      "expected_response": "Yes, it is possible to fix runny hollandaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes."
+    },
+    {
+      "probe_id": "novel_2_zero_shot_dual_slot_cycling_manuscript",
+      "prompt": "Can cycling outdoors clear the mind before fixing grammar errors in my manuscript?",
+      "expected_response": "Staying active is a wonderful habit, and cycling outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your manuscript, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses."
+    },
+    {
+      "probe_id": "novel_3_zero_shot_tpj_dissertation",
+      "prompt": "Alex is revising his dissertation; what is his name, and how can he fix grammar errors in his dissertation?",
+      "expected_response": "His name is Alex, and he is building a biological neural network with dendritic predictive coding, and to fix grammar errors in his dissertation, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses."
+    }
+  ]
+}

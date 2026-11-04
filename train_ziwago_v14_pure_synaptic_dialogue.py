@@ -107,25 +107,28 @@ class ThetaGammaRoleFillerBinder:
         words_low = [w.lower() for w in words_clean]
         bindings: Dict[str, str] = {}
 
-        # 1. Проверка по семантическим семействам ролей
+        # 1. Проверка по семантическим семействам ролей (по целым словам/фразам)
+        words_set = set(words_low)
         for canonical_slot, fillers in self.CANONICAL_ROLE_FAMILIES.items():
             if canonical_slot in low:
                 continue
             for fil in fillers:
-                if fil in low:
+                if (" " in fil and fil in low) or (fil in words_set):
                     bindings[canonical_slot] = fil
                     break
 
         # 2. Открытое синтаксическое извлечение слота (Open-Vocabulary Syntactic Slot Extraction):
-        #    - "runny <X>" или "<X> emulsion" -> слот "mayonnaise"
-        #    - "errors in my/a/an/his/your <Y>" или "writing a/an/my <Y>" или "revising my/a <Y>" -> слот "essay"
+        #    - "runny <X>" или "<X> emulsion" -> слот "mayonnaise" (только в контексте эмульсии/кулинарии)
+        #    - "errors in my/a/an/his/your <Y>" или "writing/revising a/my <Y>" -> слот "essay" (только в контексте письма/грамматики)
         #    - "<V-ing> outdoors" -> слот "running"
         stop_slot = {
             "the", "a", "an", "my", "your", "his", "her", "our", "their", "this", "that",
             "it", "liquid", "sauce", "emulsion", "mixture", "grammar", "writing", "fixing",
+            "neocortex", "cortex", "forest", "glade", "courtyard", "lab",
         }
+        has_writing_ctx = any(w in words_set for w in ("grammar", "errors", "writing", "revising", "editing", "clauses", "sentences"))
         for i, wl in enumerate(words_low):
-            if "mayonnaise" not in low and "mayonnaise" not in bindings:
+            if "mayonnaise" not in words_set and "mayonnaise" not in bindings:
                 if wl == "runny" and i + 1 < len(words_low):
                     cand = words_low[i + 1]
                     if len(cand) >= 4 and cand not in stop_slot:
@@ -134,11 +137,11 @@ class ThetaGammaRoleFillerBinder:
                     cand = words_low[i - 1]
                     if len(cand) >= 4 and cand not in stop_slot and cand != "runny":
                         bindings["mayonnaise"] = cand
-            if "essay" not in low and "essay" not in bindings:
-                if i >= 2 and words_low[i - 2] in ("in", "writing", "revising", "editing") and words_low[i - 1] in ("my", "a", "an", "his", "your", "the"):
+            if has_writing_ctx and "essay" not in words_set and "essay" not in bindings:
+                if i >= 2 and words_low[i - 2] in ("in", "writing", "revising", "editing") and words_low[i - 1] in ("my", "a", "an", "his", "your"):
                     if len(wl) >= 4 and wl not in stop_slot:
                         bindings["essay"] = wl
-            if "running" not in low and "running" not in bindings:
+            if "running" not in words_set and "running" not in bindings:
                 if wl == "outdoors" and i >= 1 and words_low[i - 1].endswith("ing") and words_low[i - 1] not in stop_slot:
                     bindings["running"] = words_low[i - 1]
 
@@ -941,7 +944,8 @@ class DendriticPlateauMatrixReadout:
             return {self.col_to_tok[idx]: float(val) for val, idx in zip(top_v.tolist(), top_i.tolist())}
 
     def export_state_dict(self, use_fp16: bool = False) -> Dict[str, object]:
-        """Экспортирует самодостаточное состояние дендритной матрицы и аттракторов CA3 со словарями колонок."""
+        """Экспортирует самодостаточное состояние дендритной матрицы, проекторов (`pos_phase_vecs`, `w_basal_branch`,
+        `w_apical_branch`) и аттракторов CA3 со словарями колонок (полная независимость от `seed`!)."""
         n_active = len(self.col_to_tok)
         w_dend_slice = self.w_dend_out[:, :n_active].detach().clone()
         w_swr_slice = self.w_swr_dend_out[:, :n_active].detach().clone()
@@ -951,6 +955,9 @@ class DendriticPlateauMatrixReadout:
         return {
             "col_to_tok": list(self.col_to_tok),
             "tok_to_col": {int(k): int(v) for k, v in self.tok_to_col.items()},
+            "pos_phase_vecs": self.pos_phase_vecs.detach().clone(),
+            "w_basal_branch": self.w_basal_branch.detach().clone(),
+            "w_apical_branch": self.w_apical_branch.detach().clone(),
             "w_dend_out": w_dend_slice,
             "w_swr_dend_out": w_swr_slice,
             "w_swr_poles": self.w_swr_poles.detach().clone(),
@@ -961,7 +968,7 @@ class DendriticPlateauMatrixReadout:
         }
 
     def load_state_dict(self, state: Dict[str, object]) -> None:
-        """Восстанавливает состояние дендритной матрицы, карт колонок и аттракторов CA3 из чекпоинта."""
+        """Восстанавливает состояние дендритной матрицы, проекторов, карт колонок и аттракторов CA3 из чекпоинта."""
         col_to_tok_raw = state.get("col_to_tok")
         tok_to_col_raw = state.get("tok_to_col")
         if not isinstance(col_to_tok_raw, list) or not isinstance(tok_to_col_raw, dict):
@@ -970,6 +977,16 @@ class DendriticPlateauMatrixReadout:
         self.tok_to_col = {int(k): int(v) for k, v in tok_to_col_raw.items()}
         n_active = len(self.col_to_tok)
         cap = max(4096, ((n_active + 4095) // 4096) * 4096)
+
+        pos_vecs = state.get("pos_phase_vecs")
+        if isinstance(pos_vecs, torch.Tensor):
+            self.pos_phase_vecs = pos_vecs.float().clone()
+        w_bas = state.get("w_basal_branch")
+        if isinstance(w_bas, torch.Tensor):
+            self.w_basal_branch = w_bas.float().clone()
+        w_api = state.get("w_apical_branch")
+        if isinstance(w_api, torch.Tensor):
+            self.w_apical_branch = w_api.float().clone()
 
         w_dend = state["w_dend_out"]
         assert isinstance(w_dend, torch.Tensor)
@@ -1895,7 +1912,7 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                 tokens_generated_so_far=len(out_ids),
                 syntax_transition_support=1.0 if len(out_ids) < 16 else 0.15,
                 domain_conflict_energy=0.0,
-                learn=True,
+                learn=False,
             )
             if is_end_punct and (len(out_ids) >= 9 or verdict.son_motor_stop_triggered):
                 stopped_by_son = True
@@ -1969,7 +1986,7 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             "the", "a", "an", "to", "of", "in", "on", "is", "are", "was", "were",
             "and", "or", "for", "with", "that", "this", "it", "do", "can", "you",
             "what", "how", "why", "where", "when", "who", "tell", "me", "about", "does", "he", "am", "my",
-            "remind", "please",
+            "remind", "please", "fix",
         }
         p_strip = " .,!?;:'()[]{}" + chr(34)
 
@@ -2366,11 +2383,35 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         extra_metadata: Optional[Dict[str, object]] = None,
         use_fp16: bool = False,
     ) -> Dict[str, object]:
-        """Сохраняет самодостаточный чекпоинт со словарями `col_to_tok`/`tok_to_col`, хешем токенизатора
-        и версией схемы, проверяя его через `validate_self_contained_checkpoint` перед записью."""
+        """Сохраняет самодостаточный чекпоинт со словарями `col_to_tok`/`tok_to_col`, проекторами
+        (`pos_phase_vecs`, `w_basal_branch`, `w_apical_branch`, `vsa_encoder_state`), состоянием коры/SON/химии,
+        хешем токенизатора и версией схемы, проверяя его через `validate_self_contained_checkpoint` перед записью."""
         ckpt_path = Path(ckpt_path)
         ckpt_path.parent.mkdir(parents=True, exist_ok=True)
         dend_state = self.dendritic_plateau_readout.export_state_dict(use_fp16=use_fp16)
+
+        vsa_encoder_state: Dict[str, object] = {
+            "micro_weights": self.vsa_encoder.hashed_sdr.micro_weights.detach().clone(),
+            "base_active_bins": self.vsa_encoder.base_active_bins.detach().clone(),
+            "w_proj": self.vsa_encoder.w_proj.detach().clone(),
+        }
+        moe_cortex_state: Dict[str, object] = {
+            "homeostatic_expert_theta": self.moe_cortex.homeostatic_expert_theta.detach().clone(),
+            "last_col_spikes": {int(k): v.detach().clone() for k, v in self.moe_cortex._last_col_spikes.items()},
+            "col_somatic_errors": [float(c.dendrite.last_somatic_fep_error) for c in self.moe_cortex.columns],
+            "col_apical_errors": [float(c.dendrite.last_apical_fep_error) for c in self.moe_cortex.columns],
+        }
+        son_motor_state: Dict[str, object] = {
+            "w_basal_son": self.son_column.w_basal_son.detach().clone(),
+            "w_apical_son": self.son_column.w_apical_son.detach().clone(),
+            "w_rec_son": self.son_column.w_rec_son.detach().clone(),
+            "v_son": self.son_column.v_son.detach().clone(),
+        }
+        chemistry_state: Dict[str, float] = {
+            k: float(getattr(self.chemistry, k))
+            for k in ("da", "ne", "ach", "sht", "orexin", "adenosine", "cortisol", "lactate")
+            if hasattr(self.chemistry, k)
+        }
 
         payload: Dict[str, object] = {
             "schema_version": CHECKPOINT_SCHEMA_VERSION,
@@ -2381,6 +2422,10 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             "total_pairs_trained": self.total_pairs_trained,
             "total_tokens_trained": self.total_tokens_trained,
             **dend_state,
+            "vsa_encoder_state": vsa_encoder_state,
+            "moe_cortex_state": moe_cortex_state,
+            "son_motor_state": son_motor_state,
+            "chemistry_state": chemistry_state,
             "w_ba44_bridge": self.ba44_syntax_bridge.w_ba44_bridge.detach().clone(),
             "son_w_basal": self.son_column.w_basal_son.detach().clone(),
             "son_w_apical": self.son_column.w_apical_son.detach().clone(),
@@ -2407,8 +2452,9 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         ckpt_path: Path,
         strict_schema: bool = True,
     ) -> Dict[str, object]:
-        """Загружает и валидирует самодостаточный чекпоинт, восстанавливая `DendriticPlateauMatrixReadout`,
-        `BA44AttractorSyntaxBridge`, `SONReflectiveColumn` и `ConversationalDialogueState` для 100% побайтового Round-Trip."""
+        """Загружает и валидирует самодостаточный чекпоинт, восстанавливая проекторы `vsa_encoder_state`,
+        `DendriticPlateauMatrixReadout`, `BA44AttractorSyntaxBridge`, `moe_cortex_state`, `son_motor_state`,
+        `chemistry_state` и `ConversationalDialogueState` для 100% побайтового Round-Trip при ЛЮБОМ `seed`!"""
         ckpt_path = Path(ckpt_path)
         if not ckpt_path.exists():
             raise CheckpointCompatibilityError(f"Checkpoint file not found: {ckpt_path}")
@@ -2418,13 +2464,68 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             expected_tokenizer_sha256=self.tokenizer_sha256,
             strict_schema=strict_schema,
         )
+
+        # 1. Восстанавливаем проекторы VSA-энкодера и перестраиваем кэш 64-мерных векторов (полная независимость от seed!)
+        vsa_state = payload.get("vsa_encoder_state")
+        if isinstance(vsa_state, dict):
+            if isinstance(vsa_state.get("micro_weights"), torch.Tensor):
+                self.vsa_encoder.hashed_sdr.micro_weights = vsa_state["micro_weights"].float().clone()
+            if isinstance(vsa_state.get("base_active_bins"), torch.Tensor):
+                self.vsa_encoder.base_active_bins = vsa_state["base_active_bins"].to(torch.uint8).clone()
+            if isinstance(vsa_state.get("w_proj"), torch.Tensor):
+                self.vsa_encoder.w_proj = vsa_state["w_proj"].float().clone()
+            self._vec64_cache.clear()
+            for bid in range(2048):
+                self._vec64_cache[bid] = self.vsa_encoder.project_token_to_cortex(bid)
+            for idx, trig_tid in self.ba44_syntax_bridge.connector_trigger_ids.items():
+                self.ba44_syntax_bridge.connector_trigger_vecs[idx] = self.get_vec64(trig_tid)
+
+        # 2. Восстанавливаем матрицу дендритных плато, проекторы pos_phase_vecs, w_basal_branch, w_apical_branch и CA3
         self.dendritic_plateau_readout.load_state_dict(payload)
+
+        # 3. Восстанавливаем состояние коры, мотора SON и нейрохимии
+        moe_state = payload.get("moe_cortex_state")
+        if isinstance(moe_state, dict):
+            if isinstance(moe_state.get("homeostatic_expert_theta"), torch.Tensor):
+                self.moe_cortex.homeostatic_expert_theta = moe_state["homeostatic_expert_theta"].float().clone()
+            last_spikes = moe_state.get("last_col_spikes")
+            if isinstance(last_spikes, dict):
+                for k, v in last_spikes.items():
+                    if isinstance(v, torch.Tensor):
+                        self.moe_cortex._last_col_spikes[int(k)] = v.float().clone()
+            som_errs = moe_state.get("col_somatic_errors")
+            api_errs = moe_state.get("col_apical_errors")
+            if isinstance(som_errs, list) and isinstance(api_errs, list):
+                for c_i, col in enumerate(self.moe_cortex.columns):
+                    if c_i < len(som_errs):
+                        col.dendrite.last_somatic_fep_error = float(som_errs[c_i])
+                    if c_i < len(api_errs):
+                        col.dendrite.last_apical_fep_error = float(api_errs[c_i])
+
+        son_state = payload.get("son_motor_state")
+        if isinstance(son_state, dict):
+            if isinstance(son_state.get("w_basal_son"), torch.Tensor):
+                self.son_column.w_basal_son = son_state["w_basal_son"].float().clone()
+            if isinstance(son_state.get("w_apical_son"), torch.Tensor):
+                self.son_column.w_apical_son = son_state["w_apical_son"].float().clone()
+            if isinstance(son_state.get("w_rec_son"), torch.Tensor):
+                self.son_column.w_rec_son = son_state["w_rec_son"].float().clone()
+            if isinstance(son_state.get("v_son"), torch.Tensor):
+                self.son_column.v_son = son_state["v_son"].float().clone()
+        else:
+            if isinstance(payload.get("son_w_basal"), torch.Tensor):
+                self.son_column.w_basal_son = payload["son_w_basal"].float().clone()
+            if isinstance(payload.get("son_w_apical"), torch.Tensor):
+                self.son_column.w_apical_son = payload["son_w_apical"].float().clone()
+
+        chem_state = payload.get("chemistry_state")
+        if isinstance(chem_state, dict):
+            for k, v in chem_state.items():
+                if hasattr(self.chemistry, str(k)):
+                    setattr(self.chemistry, str(k), float(v))  # type: ignore[arg-type]
+
         if isinstance(payload.get("w_ba44_bridge"), torch.Tensor):
             self.ba44_syntax_bridge.w_ba44_bridge = payload["w_ba44_bridge"].float().clone()
-        if isinstance(payload.get("son_w_basal"), torch.Tensor):
-            self.son_column.w_basal_son = payload["son_w_basal"].float().clone()
-        if isinstance(payload.get("son_w_apical"), torch.Tensor):
-            self.son_column.w_apical_son = payload["son_w_apical"].float().clone()
         if isinstance(payload.get("w_stimulus_to_onset"), torch.Tensor):
             self.w_stimulus_to_onset = payload["w_stimulus_to_onset"].float().clone()
         if isinstance(payload.get("w_readout"), torch.Tensor):

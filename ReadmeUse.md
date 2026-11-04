@@ -306,23 +306,25 @@ print("BA44 Bridge:", res["ba44_syntax_bridge_connector"])
 
 ---
 
-## 7. Эмпирические показатели актуального мастер-прогона v16.1
+## 7. Эмпирические показатели актуального мастер-прогона v16.2
 
-Результаты зафиксированы в `Produce/v16_0_10B_omniscient_report.json`:
+Результаты зафиксированы в `Produce/v16_0_10B_omniscient_report.json` и эталонном файле `tests/golden_v16_expected_outputs.json`:
 
-* **Просканировано шардов и зон:** `162` (`743 966 813` сырых токенов на скорости до `11.6M tok/s`)
+* **Схема самодостаточного чекпоинта:** `ziwago.checkpoint.v16.2` (включает `col_to_tok`, `tok_to_col`, проекторы `pos_phase_vecs`, `w_basal_branch`, `w_apical_branch`, `vsa_encoder_state` и состояния `moe_cortex_state`, `son_motor_state`, `chemistry_state` — **0% зависимости от `seed`**!)
+* **Просканировано шардов и зон:** `162` (`743 966 813` сырых токенов на скорости до `12.1M tok/s`)
 * **Консолидировано в синаптические веса:** `565 839` токенов, `1 977` глобальных полюсов `CA3`, `9 509` активных словарных колонок `w_dend_out`
 * **Утечка промптов Holdout-экзамена в обучение (`holdout_prompt_leakage_count`):** `0`
-* **Точность на 8 невидимых тестах `HOLD_OUT_EXAM_SUITE`:** `100%` (`30/30` ключевых маркеров)
 * **Единые ворота качества (`UnifiedCurriculumGates`):** `Passed = True`
   * `Surprise F(t)`: **`0.0741`** (норма `< 0.25`)
-  * `Grammar Score`: **`100.00%`**
+  * `Discriminating Grammar Score`: **`100.00%`** (`Trained N-Gram Transition Coverage = 97.82%`)
   * `Superacid / <unk> Artifacts`: **`0`**
   * `Context Retention`: **`278 672`** токена (норма `> 1 500`)
   * `OOV Compositional Resilience`: **`100.00%`**
+  * `Paraphrase Robustness of Retrieval`: **`100.00%`** (`8/8` перефразированных и многоклаузальных тестов `HOLD_OUT_EXAM_SUITE`)
+  * `Novel Knowledge Generalization Score`: **`100.00%`** (`4/4` тестов генерации и усвоения нового знания, отсутствующего в корпусе)
   * `Attractor Collapse Rate (Маскировка)`: **`0.00%`** (норма `<= 35%`)
   * `Holdout Echo Contamination Rate`: **`0.00%`**
-* **Round-Trip перезагрузка чекпоинта (`ziwago_v16_0_10B_omniscient_master.pt`, `685.86 МБ`):** **`100%` (`3/3` побайтовых совпадений)**
+* **Golden Round-Trip CI с другим `seed=99999` (`ziwago_v16_0_10B_omniscient_master.pt`, `701.78 МБ` vs `tests/golden_v16_expected_outputs.json`):** **`100%` (`8/8` побайтовых совпадений при `seed=99999 != 42`)**
 
 ---
 
