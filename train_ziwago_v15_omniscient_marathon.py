@@ -551,29 +551,14 @@ def run_v15_omniscient_5world_marathon(
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = ckpt_dir / "ziwago_v15_0_omniscient_5world_master.pt"
 
-    torch.save(
-        {
+    ckpt_validation = organism.save_self_contained_checkpoint(
+        ckpt_path=ckpt_path,
+        extra_metadata={
             "version": "15.0-Omniscient-5World-Biological-Master",
-            "total_neurons": 17408,
-            "stored_sentence_chains": 0,
-            "total_pairs_trained": organism.total_pairs_trained,
-            "total_tokens_trained": organism.total_tokens_trained,
             "world_pair_counts": five_world_streamer.world_pair_counts,
             "dataset_pair_counts": five_world_streamer.dataset_pair_counts,
-            "w_dend_out": organism.dendritic_plateau_readout.w_dend_out[
-                :, : len(organism.dendritic_plateau_readout.col_to_tok)
-            ],
-            "w_swr_dend_out": organism.dendritic_plateau_readout.w_swr_dend_out[
-                :, : len(organism.dendritic_plateau_readout.col_to_tok)
-            ],
-            "w_ca3_attractors": organism.dendritic_plateau_readout.w_ca3_attractors,
-            "w_ca3_sdr": organism.dendritic_plateau_readout.w_ca3_sdr,
-            "w_ca3_salience": organism.dendritic_plateau_readout.w_ca3_salience,
-            "w_ba44_bridge": organism.ba44_syntax_bridge.w_ba44_bridge,
-            "son_w_basal": organism.son_column.w_basal_son.half(),
-            "son_w_apical": organism.son_column.w_apical_son.half(),
         },
-        ckpt_path,
+        use_fp16=False,
     )
 
     report = {
@@ -581,6 +566,7 @@ def run_v15_omniscient_5world_marathon(
         "architecture": "Ziwago-Prime v15.0 Omniscient 5-World Biological Organism (8192-NMDA Matrix + Bidirectional CA3 + BA44 Syntax Bridge + TPJ Deictic Shift + SWS/SWR)",
         "total_neurons": 17408,
         "stored_sentence_chains_in_organism": 0,
+        "checkpoint_validation": ckpt_validation,
         "total_pairs_trained": organism.total_pairs_trained,
         "total_tokens_trained": organism.total_tokens_trained,
         "world_pair_counts": five_world_streamer.world_pair_counts,
