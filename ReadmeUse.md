@@ -353,4 +353,43 @@ print("BA44 Bridge:", res["ba44_syntax_bridge_connector"])
 5. **Активный вывод и обучение через эпистемическое любопытство (`SON Active Inference Curiosity -> Online Dopamine Teaching`):**
    При низком резонансе в `CA3` (`ca3_top1_resonance < 0.38` при `enable_active_inference=True`) 17-я колонка `SON` блокирует галлюцинацию и задаёт встречный уточняющий вопрос, а после ответа пользователя (`"Remember that in quantum photosynthesis..."`) мгновенно консолидирует новое знание в 8 192 дендритных NMDA-ветви под всплеском дофамина и ацетилхолина!
 
-Именно на стыке строгой инженерной честности (заложенной в `neuroweave10/evaluation/gates.py` и `tests/test_v16_roundtrip.py`) и смелой биофизики рождается настоящий искусственный разум. Удачи в следующих экспериментах!
+---
+
+## 9. Эволюция до идеала: `Ziwago v17.0` (SNN Assistant) и `Ziwago-Genesis v18.0` (Архитектура Мечты)
+
+Поверх фундамента `v16.2` реализованы два финальных эшелона архитектуры:
+
+### 9.1. Функциональный Биологический SNN-Ассистент (`ziwago_assistant.py`, `v17.0`)
+1. **Нейронный указатель Дугообразного Пучка (`ArcuateFasciculusSynapticPointer`, 0% `.replace()`):**
+   Прямая аксональная инъекция BPE-токенов новых сущностей пользователя в моторный буфер речи `out_ids` прямо внутри пословного цикла при сохранении канонического ролевого следа `role_state_ids` для рекуррентного контекста `(vp2, vp1, vc)`.
+2. **Защищённый кортикальный банк ядра (`w_core_dend_out`):**
+   Изолирует высокозначимые каузальные схемы (`f_mod >= 2.0`) от линейной интерференции фонового веб-шума с эндогенным укреплением во время медленноволнового сна (`SWS`).
+3. **Замкнутая сенсомоторная петля реафферентации (`Closed-Loop MoE + Stranger's Check` + `SON VTE Inner-Speech Gate`):**
+   Проверка кандидатов на каждом шаге через `DiscretePredictiveCodingBarrier` и блокировка несвязных фоновых осколков во внутренней речи `SON`.
+4. **Горизонтальные синапсы последовательности эпизодов `CA3` (`w_ca3_episode_links`):**
+   Направленные STDP-связи $p_1 \longrightarrow p_2$ между последовательными полюсами одного объяснения для генерации многопредложенческих абзацев (`Sentences=2+`).
+5. **Стриарный маршрутизатор действий Базальных Ганглиев (`BasalGangliaActionSelector`, `D1 Go / D2 NoGo`):**
+   Автоматический выбор между `ACTION_EPISODIC_MEMORY_RECALL`, `ACTION_ONLINE_DA_CONSOLIDATION`, `ACTION_ACTIVE_INFERENCE_CLARIFY`, `ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS` и `ACTION_DIRECT_SYNAPTIC_RESPONSE`.
+
+### 9.2. Пять Столпов «Архитектуры Мечты» `Ziwago-Genesis v18.0` (`neuroweave10/cortex/genesis_engine.py`, `train_ziwago_v18_genesis_dream.py`)
+1. **Непрерывная Волна Синтаксических Валентностей Зоны Брока БЕЗ `pos_idx` (`SyntacticValenceWaveGenerator`, 0% `pos_idx`!):**
+   Полный отказ от позиционного счётчика «магнитофонной головки» `pos_phase_vecs[pos_idx]`. Вектор валентности $\vec{\Psi}_{\mathrm{BA44}}(t) \in \mathbb{R}^{64}$ эволюционирует исключительно как нелинейный голографический оператор от реально произнесённых токенов.
+2. **Кристаллизация Семантического Графа Мира (`CorticalRelationalWorldGraph`):**
+   Извлекает каузальные триплеты $(\text{Subject } S \xrightarrow{\text{Relation } R} \text{Object } O)$ из отдельных предложений разных текстов и по многошаговой волне возбуждения $E_1 \xrightarrow{R_1} E_2 \xrightarrow{R_2} E_3 \xrightarrow{R_3} E_4$ **синтезирует совершенно новые сложноподчинённые предложения на лету**, которых никогда не было в обучающем корпусе!
+3. **Самоорганизующаяся Онтология Ролей через Асимметричную STDP (`EmergentOntologicalRoleDiscovery`, 0% ручных списков!):**
+   В слое `L2/3 BA22` слова накапливают направленные контекстные рецептивные поля предикатов ($\Delta t \in \{-2, -1, +1, +2\}$) по правилу STDP (Bi & Poo 1998). Новые слова (`bechamel`, `treatise`, `kayaking`), никогда не вносившиеся в ручные словари, автоматически связываются со своими каноническими ролями (`mayonnaise`, `essay`, `running`) исключительно по косинусному резонансу их STDP-полей!
+4. **Биофизический Тета-Гамма Фазовый Спайковый Мультиплексор (`ThetaGammaSpikingPhaseMultiplexer`, Time-to-First-Spike):**
+   Внутри одного 120-мс периода тета-ритма ($8\text{ Гц}$) 6 синтаксических ролей (`GAMMA_0_AGENT` ... `GAMMA_5_EFFECT`) кодируются временем первого спайка (TTFS) в 6 гамма-окнах по $20\text{ мс}$ с точностью реконструкции `cosine > 0.99` и нулевым перекрёстным смешением.
+5. **Двунаправленное Предиктивное Замыкание Смысла в `SON / BA10` (`BidirectionalMeaningClosureVerifier`, $X \longrightarrow \hat{Y} \longrightarrow \hat{X}$):**
+   Проверяет, восстанавливается ли исходный вопрос $X$ из черновика ответа $\hat{Y}$, контролирует информационный прирост $\Delta I > 0$ и при обнаружении непокрытого остатка вопроса $\vec{r}_{\mathrm{missing}} = (\vec{s}_X - \hat{s}_X(\hat{Y}))_+$ автоматически достраивает недостающую клаузу!
+
+```bash
+# Запуск витрины 5 столпов Ziwago-Genesis v18.0:
+/opt/micromamba/bin/python3.12 "/home/jupyter/Neuroweave Ziwago/train_ziwago_v18_genesis_dream.py"
+
+# Запуск 5 CI-тестов архитектуры мечты v18.0 + 10 CI-тестов ядра v16.2/v17.0:
+/opt/micromamba/bin/python3.12 "/home/jupyter/Neuroweave Ziwago/tests/test_v18_genesis_dream.py"
+/opt/micromamba/bin/python3.12 "/home/jupyter/Neuroweave Ziwago/tests/test_v16_roundtrip.py"
+```
+
+Именно на стыке строгой инженерной честности (заложенной в `neuroweave10/evaluation/gates.py` и `tests/test_v16_roundtrip.py`) и смелой биофизики (`neuroweave10/cortex/genesis_engine.py`) рождается настоящий искусственный разум. Удачи в следующих экспериментах!

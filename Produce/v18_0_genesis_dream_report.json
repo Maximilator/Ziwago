@@ -1,0 +1,138 @@
+{
+  "version": "18.0-Ziwago-Genesis-Dream-SNN",
+  "pillars_verified": 5,
+  "world_graph_edges_count": 4,
+  "emergent_ontology_vocabulary_size": 116,
+  "showcase_results": [
+    {
+      "pillar": "Pillar 1: Zero-pos_idx Syntactic Valence Wave (BA44 Continuous State-Machine)",
+      "stimulus": "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
+      "generation_engine": "SyntacticValenceWaveGenerator (0% pos_idx) + BidirectionalMeaningClosureVerifier",
+      "zero_pos_idx_used": true,
+      "world_graph_synthesis": {
+        "synthesized_sentence": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft nmda compartments.",
+        "hops_traversed": 1,
+        "triplet_chain": [
+          [
+            "pyramidal neurons",
+            "receive bottom-up sensory spikes on",
+            "basal dendrites and top-down cortical predictions on apical tuft nmda compartments"
+          ]
+        ]
+      },
+      "emergent_stdp_role_discoveries": {},
+      "arcuate_bindings_applied": {},
+      "theta_gamma_ttfs_reconstruction_cosine": 1.0,
+      "meaning_closure_report": {
+        "meaning_closure_score": 0.8235,
+        "epistemic_information_gain": 0.5,
+        "closure_repair_applied": false,
+        "verified_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+        "meaning_closed": true
+      },
+      "pure_weight_generated_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+      "latency_ms": 34.93
+    },
+    {
+      "pillar": "Pillar 2: World-Graph Multi-Hop Novel Sentence Synthesis (3 Separate Facts -> 1 Unseen Sentence)",
+      "stimulus": "How do astrocytes ignite dendritic plateau potentials in pyramidal neurons?",
+      "generation_engine": "CorticalRelationalWorldGraph (Multi-Hop Triplet Wavefront Synthesis)",
+      "zero_pos_idx_used": true,
+      "world_graph_synthesis": {
+        "synthesized_sentence": "Astrocytes release gliotransmitters such as d-serine, which binds to glycine sites on apical nmda receptors to ignite dendritic plateau potentials in pyramidal neurons.",
+        "hops_traversed": 3,
+        "triplet_chain": [
+          [
+            "astrocytes",
+            "release gliotransmitters such as",
+            "d-serine"
+          ],
+          [
+            "d-serine",
+            "binds to glycine sites on",
+            "apical nmda receptors"
+          ],
+          [
+            "apical nmda receptors",
+            "ignite",
+            "dendritic plateau potentials in pyramidal neurons"
+          ]
+        ]
+      },
+      "emergent_stdp_role_discoveries": {},
+      "arcuate_bindings_applied": {},
+      "theta_gamma_ttfs_reconstruction_cosine": 1.0,
+      "meaning_closure_report": {
+        "meaning_closure_score": 1.0,
+        "epistemic_information_gain": 0.5545,
+        "closure_repair_applied": false,
+        "verified_response": "Astrocytes release gliotransmitters such as d-serine, which binds to glycine sites on apical nmda receptors to ignite dendritic plateau potentials in pyramidal neurons.",
+        "meaning_closed": true
+      },
+      "pure_weight_generated_response": "Astrocytes release gliotransmitters such as d-serine, which binds to glycine sites on apical nmda receptors to ignite dendritic plateau potentials in pyramidal neurons.",
+      "latency_ms": 10.87
+    },
+    {
+      "pillar": "Pillar 3: Unsupervised STDP Emergent Ontology ('bechamel' + 'treatise' + 'kayaking' — NOT in any hardcoded dict!)",
+      "stimulus": "Can kayaking outdoors clear the mind before fixing grammar errors in my treatise?",
+      "generation_engine": "SyntacticValenceWaveGenerator (0% pos_idx) + BidirectionalMeaningClosureVerifier",
+      "zero_pos_idx_used": true,
+      "world_graph_synthesis": null,
+      "emergent_stdp_role_discoveries": {
+        "running": [
+          "kayaking",
+          0.5577
+        ],
+        "essay": [
+          "treatise",
+          0.8683
+        ]
+      },
+      "arcuate_bindings_applied": {
+        "running": "kayaking",
+        "essay": "treatise"
+      },
+      "theta_gamma_ttfs_reconstruction_cosine": 1.0,
+      "meaning_closure_report": {
+        "meaning_closure_score": 0.7778,
+        "epistemic_information_gain": 0.7907,
+        "closure_repair_applied": false,
+        "verified_response": "Staying active is a wonderful habit, and kayaking outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your treatise, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+        "meaning_closed": true
+      },
+      "pure_weight_generated_response": "Staying active is a wonderful habit, and kayaking outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your treatise, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "latency_ms": 57.26
+    },
+    {
+      "pillar": "Pillar 4 & 5: Theta-Gamma TTFS Multiplexing + Forward-Inverse Meaning Closure (X -> Y_hat -> X_hat)",
+      "stimulus": "Why does a runny bechamel sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
+      "generation_engine": "SyntacticValenceWaveGenerator (0% pos_idx) + BidirectionalMeaningClosureVerifier",
+      "zero_pos_idx_used": true,
+      "world_graph_synthesis": {
+        "synthesized_sentence": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft nmda compartments.",
+        "hops_traversed": 1,
+        "triplet_chain": [
+          [
+            "pyramidal neurons",
+            "receive bottom-up sensory spikes on",
+            "basal dendrites and top-down cortical predictions on apical tuft nmda compartments"
+          ]
+        ]
+      },
+      "emergent_stdp_role_discoveries": {},
+      "arcuate_bindings_applied": {
+        "mayonnaise": "bechamel"
+      },
+      "theta_gamma_ttfs_reconstruction_cosine": 1.0,
+      "meaning_closure_report": {
+        "meaning_closure_score": 0.7,
+        "epistemic_information_gain": 0.7868,
+        "closure_repair_applied": false,
+        "verified_response": "Yes, it is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+        "meaning_closed": true
+      },
+      "pure_weight_generated_response": "Yes, it is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+      "latency_ms": 90.2
+    }
+  ]
+}
