@@ -350,6 +350,58 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
                 f"Master checkpoint mismatch (seed=99999) for {g_item['exam_id']}: GOT={actual_out!r} != GOLD={gold_expected!r}",
             )
 
+    def test_v17_snn_assistant_all_five_breakthroughs(self) -> None:
+        """Tests the 5 v17.0 Biological SNN Assistant breakthroughs end-to-end:
+        1) Arcuate Fasciculus BPE token-ID pointer injection (0% string .replace);
+        2) Protected Core Bank w_core_dend_out;
+        3) Closed-loop MoE + DiscretePredictiveCodingBarrier Stranger's Check;
+        4) Sequential Attractor Episode Chains (w_ca3_episode_links, 2-sentence paragraphs);
+        5) Basal Ganglia D1/D2 Action Selection + Autonomic SWS Consolidation."""
+        from ziwago_assistant import BasalGangliaActionSelector, ZiwagoBiologicalSNNAssistant
+
+        assistant = ZiwagoBiologicalSNNAssistant(root=ROOT, workers=2, cpu_threads=4, seed=99999)
+        self.assertGreater(int(assistant.organism.dendritic_plateau_readout.w_core_dend_out.shape[1]), 0)
+
+        # 1. Arcuate Fasciculus BPE token-ID pointer injection
+        r_arc = assistant.chat("Can cycling outdoors clear the mind before fixing grammar errors in my manuscript?")
+        self.assertGreaterEqual(int(r_arc["arcuate_token_pointer_injections"]), 2)  # type: ignore[arg-type]
+        self.assertIn("cycling outdoors", str(r_arc["pure_weight_generated_response"]).lower())
+        self.assertIn("manuscript", str(r_arc["pure_weight_generated_response"]).lower())
+
+        # 2. Active Inference Clarification before teaching
+        r_clar = assistant.chat("How do excitons travel in quantum photosynthesis?")
+        self.assertEqual(
+            r_clar["basal_ganglia_selected_action"],
+            BasalGangliaActionSelector.ACTION_ACTIVE_INFERENCE_CLARIFY,
+        )
+        self.assertTrue(bool(r_clar["active_inference_clarification_triggered"]))
+
+        # 3. Multi-sentence teaching with CA3 horizontal episode link (p1 -> p2)
+        r_teach = assistant.chat(
+            "Remember that in quantum photosynthesis, excitons travel through chromophores via coherent wavepackets. "
+            "Coherent quantum wavepackets protect photosynthetic energy transfer from thermal dissipation."
+        )
+        self.assertEqual(
+            r_teach["basal_ganglia_selected_action"],
+            BasalGangliaActionSelector.ACTION_ONLINE_DA_CONSOLIDATION,
+        )
+        self.assertEqual(int(r_teach["episode_teaching_telemetry"]["episode_links_created"]), 1)  # type: ignore[index]
+
+        # 4. Multi-sentence paragraph generation via CA3 Sequential Attractor Chain (Sentences == 2)
+        r_para = assistant.chat("Explain in detail how excitons travel in quantum photosynthesis?")
+        self.assertEqual(
+            r_para["basal_ganglia_selected_action"],
+            BasalGangliaActionSelector.ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS,
+        )
+        self.assertEqual(int(r_para["episode_chain_sentences_generated"]), 2)  # type: ignore[arg-type]
+        txt_para = str(r_para["pure_weight_generated_response"]).lower()
+        self.assertIn("chromophores", txt_para)
+        self.assertIn("thermal dissipation", txt_para)
+
+        # 5. Autonomic Slow-Wave Sleep consolidation
+        sws = assistant.sleep_and_consolidate()
+        self.assertTrue(bool(sws["core_bank_replay_applied"]))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

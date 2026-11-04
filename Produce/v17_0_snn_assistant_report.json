@@ -1,0 +1,556 @@
+{
+  "version": "17.0-Biological-SNN-Assistant",
+  "loaded_checkpoint_info": {
+    "valid": true,
+    "schema_version": "ziwago.checkpoint.v16.2",
+    "tokenizer_sha256": "d16567cd4d433cc4f5ae8a566e04c9d0f1959e2ca6d43706712a2dad66ba09f5",
+    "active_vocab_columns": 9509
+  },
+  "turns": [
+    {
+      "stimulus": "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col0_SYNTAX_BA44",
+        "Col5_CAUSAL_PHYSICS"
+      ],
+      "conversational_domain": "self_identity",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.5,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col5_CAUSAL_PHYSICS_5": 0.3008,
+        "Col0_SYNTAX_BA44_8": 0.1919
+      },
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 20,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "Your name is Alex, and you are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1474.9,
+      "basal_ganglia_selected_action": "ACTION_ONLINE_DA_CONSOLIDATION",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 0.05,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 2.4,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 0.1,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 0.15,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 1.6
+      },
+      "episode_teaching_telemetry": {},
+      "assistant_turn_latency_ms": 1474.98
+    },
+    {
+      "stimulus": "Can cycling outdoors clear the mind before fixing grammar errors in my manuscript?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col7_EXECUTIVE_PFC",
+        "Col0_SYNTAX_BA44"
+      ],
+      "conversational_domain": "essay_grammar",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {
+        "essay": "manuscript",
+        "running": "cycling"
+      },
+      "arcuate_token_pointer_injections": 2,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.121,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col0_SYNTAX_BA44_0": 0.3103,
+        "Col7_EXECUTIVE_PFC_15": 0.4951
+      },
+      "ba44_syntax_bridge_connector": ", before",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2441,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2617
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2441,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2617
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2441,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2617
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 48,
+      "pure_weight_generated_response": "Staying active is a wonderful habit, and cycling outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your manuscript, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2474.59,
+      "basal_ganglia_selected_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 0.05,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 0.05,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 0.1,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 0.15,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 1.6
+      },
+      "episode_teaching_telemetry": {},
+      "assistant_turn_latency_ms": 2474.7
+    },
+    {
+      "stimulus": "Step by step, how do biological pyramidal neurons in the neocortex integrate sensory spikes?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col4_NARRATIVE_EPISODIC"
+      ],
+      "conversational_domain": "neuroscience",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": true,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 3.0811,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col1_LEXICAL_SEMANTICS_1": 0.2069,
+        "Col4_NARRATIVE_EPISODIC_4": 0.2413
+      },
+      "ba44_syntax_bridge_connector": ", and",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 52,
+          "stimulus_alignment_cos": 0.4687,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3853
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 52,
+          "stimulus_alignment_cos": 0.4687,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3853
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 52,
+          "stimulus_alignment_cos": 0.4687,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3853
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 52,
+      "pure_weight_generated_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments, and your name is Alex, and you are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2464.06,
+      "basal_ganglia_selected_action": "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 0.05,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 0.05,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 0.1,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 2.0,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 1.6
+      },
+      "episode_teaching_telemetry": {},
+      "assistant_turn_latency_ms": 2464.15
+    },
+    {
+      "stimulus": "How do excitons travel in quantum photosynthesis?",
+      "ngrams_mode": "OFF (SON VTE Inner-Speech Epistemic Clarification)",
+      "active_moe_columns": [
+        "Col7_EXECUTIVE_PFC",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "conversational_domain": "essay_grammar",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": true,
+      "ca3_top1_resonance": 1.1808,
+      "epistemic_uncertainty": 0.75,
+      "cortical_moe_branch_profile": {
+        "Col7_EXECUTIVE_PFC_7": 0.2849,
+        "Col3_PRAGMATIC_DIALOG_11": 0.1829
+      },
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": -0.1693,
+          "synaptic_coherence": 1.4117,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.1715
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": -0.1693,
+          "synaptic_coherence": 1.4117,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.1715
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": -0.1693,
+          "synaptic_coherence": 1.4117,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": 0.1715
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 46,
+      "pure_weight_generated_response": "I notice you are asking about excitons travel quantum, which has high epistemic uncertainty in my current CA3 memory; could you share the key mechanism or principle so I can consolidate it into my dendritic synapses?",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 877.87,
+      "basal_ganglia_selected_action": "ACTION_ACTIVE_INFERENCE_CLARIFY",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 0.05,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 0.05,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 2.3,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 0.15,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 0.2
+      },
+      "episode_teaching_telemetry": {},
+      "assistant_turn_latency_ms": 877.94
+    },
+    {
+      "stimulus": "Remember that in quantum photosynthesis, excitons travel through chromophores via coherent wavepackets. Coherent quantum wavepackets protect photosynthetic energy transfer from thermal dissipation.",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col2_ENCYCLOPEDIC_FACTS",
+        "Col7_EXECUTIVE_PFC"
+      ],
+      "conversational_domain": "essay_grammar",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 4.6072,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col2_ENCYCLOPEDIC_FACTS_10": 0.3716,
+        "Col7_EXECUTIVE_PFC_15": 0.4816
+      },
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 36,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 19,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6775
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 19,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6775
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 19,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6775
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 19,
+      "pure_weight_generated_response": "Consolidated 2 sentence(s) (36 BPE tokens, 1 CA3 episode link(s)) into the 8,192-branch NMDA matrix and Protected Core Bank.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2171.7,
+      "basal_ganglia_selected_action": "ACTION_ONLINE_DA_CONSOLIDATION",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 0.05,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 2.4,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 0.1,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 0.15,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 1.6
+      },
+      "episode_teaching_telemetry": {
+        "sentences_imprinted": 2,
+        "tokens_imprinted": 36,
+        "episode_links_created": 1
+      },
+      "assistant_turn_latency_ms": 3199.64
+    },
+    {
+      "stimulus": "Explain in detail how excitons travel in quantum photosynthesis?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col7_EXECUTIVE_PFC",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "conversational_domain": "essay_grammar",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 2,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.5239,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col7_EXECUTIVE_PFC_7": 0.4385,
+        "Col3_PRAGMATIC_DIALOG_11": 0.218
+      },
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 19,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6775
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 19,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6775
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 19,
+          "stimulus_alignment_cos": 1.0,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.6775
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 36,
+      "pure_weight_generated_response": "In quantum photosynthesis, excitons travel through chromophores via coherent wavepackets. Coherent quantum wavepackets protect photosynthetic energy transfer from thermal dissipation.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1047.65,
+      "basal_ganglia_selected_action": "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 0.05,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 0.05,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 0.1,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 2.0,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 1.6
+      },
+      "episode_teaching_telemetry": {},
+      "assistant_turn_latency_ms": 1047.72
+    },
+    {
+      "stimulus": "Remind me, what is my name and what project am I building?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col0_SYNTAX_BA44",
+        "Col5_CAUSAL_PHYSICS"
+      ],
+      "conversational_domain": "self_identity",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.5,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col5_CAUSAL_PHYSICS_5": 0.301,
+        "Col0_SYNTAX_BA44_8": 0.1918
+      },
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "Your name is Alex, and you are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 894.42,
+      "basal_ganglia_selected_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 0.05,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 0.05,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 0.1,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 0.15,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 1.6
+      },
+      "episode_teaching_telemetry": {},
+      "assistant_turn_latency_ms": 894.47
+    },
+    {
+      "stimulus": "What topics have we discussed in our conversation so far?",
+      "ngrams_mode": "OFF (Episodic Working Memory Graph Recall)",
+      "active_moe_columns": [
+        "Col9_PFC_BA46",
+        "Col15_METACOG_BA10"
+      ],
+      "conversational_domain": "episodic_working_memory",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 1.0,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {},
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 42,
+      "pure_weight_generated_response": "With Alex, we have completed 8 dialogue turns covering self identity, essay grammar, neuroscience, most recently concluding that your name is Alex, and you are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 3.68,
+      "basal_ganglia_selected_action": "ACTION_EPISODIC_MEMORY_RECALL",
+      "basal_ganglia_d1_scores": {
+        "ACTION_EPISODIC_MEMORY_RECALL": 2.5,
+        "ACTION_ONLINE_DA_CONSOLIDATION": 0.05,
+        "ACTION_ACTIVE_INFERENCE_CLARIFY": 0.1,
+        "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS": 0.15,
+        "ACTION_DIRECT_SYNAPTIC_RESPONSE": 1.6
+      },
+      "episode_teaching_telemetry": {},
+      "assistant_turn_latency_ms": 3.73
+    }
+  ],
+  "autonomic_sws_consolidation": {
+    "sws_homeostasis": {
+      "ca3_poles_sorted": 1980,
+      "w_dend_out_norm_before": 641.73,
+      "w_dend_out_norm_after": 636.5
+    },
+    "core_bank_replay_applied": true,
+    "saved_checkpoint": {}
+  }
+}
