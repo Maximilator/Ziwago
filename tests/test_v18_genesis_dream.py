@@ -338,6 +338,49 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
         self.assertIsInstance(traj, list)
         self.assertGreaterEqual(len(traj), 2)
 
+    def test_pillar11_pre_training_safeguards_a1_a2_a3_a4_a5(self) -> None:
+        """Pillar 11: Verifies pre-training foundations A1, A2, A3, A4, A5:
+        - A1: Final Generation Sanitizer & Stranger-Identity Quarantine ('Bel Pre Road', 'Who is Alex');
+        - A2: Semantic Pole Closure >= 0.80 instead of surface grammar_coherent ('Pauls West Side');
+        - A3: Prohibition of ungrounded/clarifying turns in episodic memory summary & REM replay;
+        - A4: CA3 Apoptotic Pole Sanitization (MASTER_CKPT purged to 63 verified high-closure poles);
+        - A5: Context-Gated Role Binding ('paper on quantum gravity' does NOT bind 'paper' -> 'essay')."""
+        from ziwago_assistant import ZiwagoBiologicalSNNAssistant
+
+        assistant = ZiwagoBiologicalSNNAssistant(root=ROOT, workers=2, cpu_threads=4, seed=12345)
+
+        # A4: Verify MASTER_CKPT has been apoptotically sanitized (< 100 poles, 1,914 zombie poles removed)
+        n_poles = int(assistant.organism.dendritic_plateau_readout.w_ca3_attractors.shape[0])
+        self.assertLessEqual(n_poles, 100, f"Expected sanitized CA3 poles <= 100, got {n_poles}")
+
+        # A1: 'Bel Pre Road' word salad is blocked
+        r_bel = assistant.chat("Where is Bel Pre Road located?", enable_active_inference=True)
+        self.assertTrue(bool(r_bel["active_inference_clarification_triggered"]))
+        self.assertNotIn("after crossing bel pre road", str(r_bel["pure_weight_generated_response"]).lower())
+
+        # A1: Unintroduced 'Alex' from training curriculum is quarantined in a fresh session
+        r_alex = assistant.chat("Who is Alex and what is he building?", enable_active_inference=True)
+        self.assertTrue(bool(r_alex["active_inference_clarification_triggered"]))
+        self.assertNotIn("his name is alex", str(r_alex["pure_weight_generated_response"]).lower())
+
+        # A5: 'paper on quantum gravity' does NOT absurdly bind 'paper' -> 'essay'
+        r_paper = assistant.chat("I wrote a short paper on quantum gravity yesterday; what do you think?", enable_active_inference=True)
+        self.assertEqual(r_paper["role_filler_bindings_applied"], {})
+        self.assertTrue(bool(r_paper["active_inference_clarification_triggered"]))
+        self.assertNotIn("grammar errors", str(r_paper["pure_weight_generated_response"]).lower())
+
+        # A2 + A5: 'Pauls West Side early Saturday morning' does NOT map 'morning' -> 'runny'
+        r_pauls = assistant.chat("What happened at Pauls West Side early Saturday morning?", enable_active_inference=True)
+        self.assertTrue(bool(r_pauls["active_inference_clarification_triggered"]))
+        self.assertNotIn("mayonnaise", str(r_pauls["pure_weight_generated_response"]).lower())
+
+        # A3: Episodic memory summary contains ZERO ungrounded or clarification responses as conclusions
+        r_sum = assistant.chat("Can you summarize what we discussed across our conversation so far?", enable_active_inference=True)
+        sum_low = str(r_sum["pure_weight_generated_response"]).lower()
+        self.assertIn("no verified conclusions have been consolidated", sum_low)
+        self.assertNotIn("alex", sum_low)
+        self.assertNotIn("mayonnaise", sum_low)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

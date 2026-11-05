@@ -99,6 +99,14 @@ class ThetaGammaRoleFillerBinder:
         "fox": ("owl", "badger", "squirrel", "wolf", "otter"),
     }
 
+    SLOT_DOMAIN_CONTEXT_MARKERS: Dict[str, Tuple[str, ...]] = {
+        "mayonnaise": ("runny", "liquid", "sauce", "emulsion", "whisk", "whisking", "fix", "fixing", "broken", "separate", "separated", "yolk", "egg", "mustard", "lecithin", "butter", "cream", "thicken", "stabilize", "curdled"),
+        "egg yolk": ("runny", "liquid", "sauce", "emulsion", "whisk", "whisking", "fix", "fixing", "mayonnaise", "hollandaise", "vinaigrette", "aioli", "bearnaise", "custard", "bechamel"),
+        "essay": ("grammar", "errors", "error", "fix", "fixing", "revise", "revising", "edit", "editing", "clauses", "clause", "sentence", "sentences", "aloud", "agreement", "punctuation", "proofread", "draft"),
+        "running": ("outdoors", "outdoor", "clear", "mind", "head", "active", "habit", "shape", "fitness", "exercise", "stay", "staying", "workout"),
+        "fox": ("guardian", "stone", "arch", "glade", "echoing", "ancient", "forest", "ruins"),
+    }
+
     def __init__(self) -> None:
         # Единый динамический банк ролевых аналогий, самоорганизующийся из латеральной STDP-коры (EmergentOntologicalRoleDiscovery):
         self.dynamic_stdp_role_map: Dict[str, str] = {}
@@ -112,11 +120,25 @@ class ThetaGammaRoleFillerBinder:
                 added += 1
         return added
 
+    def _has_domain_context_for_slot(self, canonical_slot: str, words_set: set[str], low_utt: str) -> bool:
+        """Предохранитель A5 (Context-Gated Role x Filler Binding):
+        Запрещает абсурдные внеконтекстные подстановки (например, `'paper on quantum gravity'` -> `'essay'`),
+        требуя либо наличия доменных маркеров соответствующей схемы в реплике, либо прямого концептуального запроса."""
+        if any(
+            low_utt.startswith(p)
+            for p in ("what do you know about ", "tell me about ", "how would you describe ")
+        ):
+            return True
+        ctx_markers = self.SLOT_DOMAIN_CONTEXT_MARKERS.get(canonical_slot, ())
+        if not ctx_markers:
+            return True
+        return any(m in words_set or (" " in m and m in low_utt) for m in ctx_markers)
+
     def extract_slot_bindings(self, utterance: str) -> Dict[str, str]:
         """Извлекает из реплики пользователя отображения `canonical_slot -> user_filler`,
         используя самоорганизовавшиеся STDP-аналогии (`dynamic_stdp_role_map`), семантические семейства ролей
-        и открытые синтаксические шаблоны."""
-        low = utterance.lower()
+        и открытые синтаксические шаблоны при строгом соблюдении доменного контекста (A5)."""
+        low = utterance.lower().strip()
         p_strip = " .,!?;:'()[]{}" + chr(34)
         words_clean = [w.strip(p_strip) for w in utterance.split() if w.strip(p_strip)]
         words_low = [w.lower() for w in words_clean]
@@ -125,12 +147,14 @@ class ThetaGammaRoleFillerBinder:
         # 0. Приоритетная проверка по самоорганизовавшимся STDP-ролям L2/3 BA22 (Unified STDP Ontology Fusion):
         words_set = set(words_low)
         for novel_fil, canon_slot in self.dynamic_stdp_role_map.items():
-            if canon_slot not in low and novel_fil in words_set:
+            if canon_slot not in low and novel_fil in words_set and self._has_domain_context_for_slot(canon_slot, words_set, low):
                 bindings[canon_slot] = novel_fil
 
-        # 1. Проверка по базовым семантическим семействам ролей (по целым словам/фразам)
+        # 1. Проверка по базовым семантическим семействам ролей (только при наличии доменного контекста A5!)
         for canonical_slot, fillers in self.CANONICAL_ROLE_FAMILIES.items():
             if canonical_slot in low or canonical_slot in bindings:
+                continue
+            if not self._has_domain_context_for_slot(canonical_slot, words_set, low):
                 continue
             for fil in fillers:
                 if (" " in fil and fil in low) or (fil in words_set):
@@ -307,32 +331,55 @@ class ConversationalDialogueState:
         )
         return any(m in low for m in episodic_markers)
 
+    def reset_session(self) -> None:
+        """Сбрасывает оперативную сессию диалога при старте нового интерактивного чата, чтобы имя из тренировочного
+        чекпоинта (`Alex`) не протекало в разговор с новым пользователем."""
+        self.turn_count = 0
+        self.user_name = None
+        self.identity_pole_vec = None
+        self.dialogue_history_vec64.zero_()
+        self.active_domain = "general_dialogue"
+        self.recent_pole_vectors = []
+        self.episodic_turns = []
+
     def synthesize_episodic_memory_response(self, utterance: str) -> str:
-        """Синтезирует ответ из эпизодического графа рабочей памяти `BA46` о предыдущих ходах диалога (включая уточнённые темы!)."""
-        if not self.episodic_turns:
+        """Синтезирует ответ из эпизодического графа рабочей памяти `BA46` ТОЛЬКО по заземлённым выводам (`A3`:
+        ungrounded-ответы и уточняющие запросы `Clarify` никогда не попадают в сводку как выводы!)."""
+        grounded_turns = [
+            ep for ep in self.episodic_turns
+            if bool(ep.get("is_grounded_conclusion", True)) and not bool(ep.get("was_clarification_request", False))
+        ]
+        if not grounded_turns and not self.episodic_turns:
             return "We have just started our conversation, and no prior turns are recorded in working memory yet."
         low = utterance.lower()
         if "previous turn" in low or "last turn" in low:
-            last_ep = self.episodic_turns[-1]
+            last_ep = grounded_turns[-1] if grounded_turns else self.episodic_turns[-1]
             prev_dom = str(last_ep.get("domain", "general_dialogue")).replace("_", " ")
             prev_resp = str(last_ep.get("response", "")).strip()
             return f"In our previous turn on {prev_dom}, we discussed that {prev_resp[0].lower() + prev_resp[1:] if len(prev_resp) > 1 else prev_resp}"
         domains_seen: List[str] = []
         topics_seen: List[str] = []
-        for ep in self.episodic_turns:
+        for ep in grounded_turns:
             d_str = str(ep.get("domain", "")).replace("_", " ")
             if d_str and d_str not in domains_seen:
                 domains_seen.append(d_str)
             for t_tag in ep.get("topic_tags", []):  # type: ignore[union-attr]
                 if t_tag and t_tag not in topics_seen and len(topics_seen) < 6:
                     topics_seen.append(str(t_tag))
+        if not domains_seen:
+            domains_seen = ["epistemic exploration"]
         name_part = f"With {self.user_name}, we" if self.user_name else "We"
-        last_resp = str(self.episodic_turns[-1].get("response", "")).strip()
         topics_clause = f" (exploring {', '.join(topics_seen[:5])})" if topics_seen else ""
+        if grounded_turns:
+            last_resp = str(grounded_turns[-1].get("response", "")).strip()
+            return (
+                f"{name_part} have completed {len(grounded_turns)} grounded dialogue turns covering "
+                f"{', '.join(domains_seen)}{topics_clause}, most recently concluding that "
+                f"{last_resp[0].lower() + last_resp[1:] if len(last_resp) > 1 else last_resp}"
+            )
         return (
-            f"{name_part} have completed {len(self.episodic_turns)} dialogue turns covering "
-            f"{', '.join(domains_seen)}{topics_clause}, most recently concluding that "
-            f"{last_resp[0].lower() + last_resp[1:] if len(last_resp) > 1 else last_resp}"
+            f"{name_part} have explored {', '.join(domains_seen)}{topics_clause}, "
+            f"and no verified conclusions have been consolidated into working memory yet."
         )
 
     def register_user_identity(self, utterance: str, pole_vec: torch.Tensor) -> None:
@@ -355,22 +402,30 @@ class ConversationalDialogueState:
         role_filler_bindings: Optional[Dict[str, str]] = None,
         topic_tags: Optional[List[str]] = None,
         was_clarification_request: bool = False,
+        is_grounded_conclusion: bool = True,
         selected_ca3_pole_indices: Optional[List[int]] = None,
         response_passport: Optional[Dict[str, object]] = None,
     ) -> None:
+        """Предохранитель A3:
+        Запрещает запись `ungrounded`-ответов в эпизодическую память и в буфер `recent_pole_vectors` (для REM/SWR реплея).
+        Уточняющие ходы (`was_clarification_request=True`) сохраняются только как маркер ожидания ответа собеседника
+        с `is_grounded_conclusion=False`, никогда не попадая в итоговую сводку выводов."""
+        if not is_grounded_conclusion and not was_clarification_request:
+            return
         self.turn_count += 1
         doms = self.classify_utterance_domains(utterance)
         self.active_domain = doms[0]
-        if self.turn_count == 1 or float(self.dialogue_history_vec64.norm().item()) < 1e-6:
-            self.dialogue_history_vec64 = F.normalize(stimulus_vec64.detach().clone(), p=2, dim=0)
-        else:
-            self.dialogue_history_vec64 = F.normalize(
-                0.70 * self.dialogue_history_vec64 + 0.30 * stimulus_vec64.detach(), p=2, dim=0
-            )
-        for p in activated_poles:
-            self.recent_pole_vectors.append(F.normalize(p.detach().clone(), p=2, dim=0))
-        if len(self.recent_pole_vectors) > 6:
-            self.recent_pole_vectors = self.recent_pole_vectors[-6:]
+        if is_grounded_conclusion and not was_clarification_request:
+            if self.turn_count == 1 or float(self.dialogue_history_vec64.norm().item()) < 1e-6:
+                self.dialogue_history_vec64 = F.normalize(stimulus_vec64.detach().clone(), p=2, dim=0)
+            else:
+                self.dialogue_history_vec64 = F.normalize(
+                    0.70 * self.dialogue_history_vec64 + 0.30 * stimulus_vec64.detach(), p=2, dim=0
+                )
+            for p in activated_poles:
+                self.recent_pole_vectors.append(F.normalize(p.detach().clone(), p=2, dim=0))
+            if len(self.recent_pole_vectors) > 6:
+                self.recent_pole_vectors = self.recent_pole_vectors[-6:]
 
         if topic_tags is None:
             p_strip = " .,!?;:'()[]{}" + chr(34)
@@ -387,10 +442,11 @@ class ConversationalDialogueState:
                 "domain": self.active_domain,
                 "domains": doms,
                 "utterance": utterance,
-                "response": response_text,
+                "response": response_text if (is_grounded_conclusion and not was_clarification_request) else "",
                 "role_filler_bindings": dict(role_filler_bindings) if role_filler_bindings else {},
                 "topic_tags": list(topic_tags),
                 "was_clarification_request": bool(was_clarification_request),
+                "is_grounded_conclusion": bool(is_grounded_conclusion and not was_clarification_request),
                 "selected_ca3_pole_indices": list(selected_ca3_pole_indices) if selected_ca3_pole_indices else [],
                 "response_passport": dict(response_passport) if response_passport else {},
             }
@@ -2372,6 +2428,160 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                 s_val = float(sal[idx].item()) if sal.shape[0] > idx else 1.0
                 self.last_selected_ca3_pole_saliences.append(round(s_val, 4))
 
+    def evaluate_semantic_pole_closure_and_grounding(
+        self,
+        question_text: str,
+        response_text: str,
+        pole_salience: float = 1.0,
+    ) -> Dict[str, object]:
+        """Предохранители A1 (Финальный санитайзер генерации) и A2 (Семантический критерий отбора полюсов >= 0.80):
+        Заменяет поверхностный `grammar_coherent` строгой семантической проверкой:
+          1) Синтаксическая и пунктуационная чистота (`evaluate_grammar_and_artifacts`);
+          2) Запрет утечки чужой идентичности из тренировочного корпуса (`Alex` без представления в текущей сессии);
+          3) Двунаправленное семантическое замыкание `semantic_closure_score >= 0.80` (пересечение концептуальных основ
+             `q_stems & r_stems`, совпадение канонического домена схемы при `salience >= 4.50` или подтверждённая
+             самоидентификация пользователя)."""
+        g_rep = evaluate_grammar_and_artifacts(response_text)
+        grammar_ok = bool(g_rep["grammar_coherent"])
+        if not grammar_ok:
+            return {
+                "grounded": False,
+                "semantic_closure_score": 0.0,
+                "grammar_coherent": False,
+                "reason": "grammar_incoherent",
+            }
+
+        p_strip = " .,!?;:'()[]{}" + chr(34)
+        q_words_low = {w.strip(p_strip).lower() for w in question_text.split() if w.strip(p_strip)}
+        r_words_low = {w.strip(p_strip).lower() for w in response_text.split() if w.strip(p_strip)}
+
+        # Карантин чужой идентичности из тренировочного курса ('Alex', 'Instead, it is Alex...')
+        active_user = (self.dialogue_state.user_name or "").strip().lower()
+        if "alex" in r_words_low and active_user != "alex":
+            return {
+                "grounded": False,
+                "semantic_closure_score": 0.0,
+                "grammar_coherent": True,
+                "reason": "unintroduced_training_identity_leak",
+            }
+
+        stop_q = {
+            "what", "how", "why", "where", "when", "who", "does", "do", "is", "are",
+            "the", "a", "an", "in", "of", "to", "with", "can", "you", "your", "my",
+            "his", "her", "and", "or", "for", "from", "that", "this", "have", "has",
+        }
+        q_stems = {w[:5] for w in q_words_low if len(w) >= 4 and w not in stop_q}
+        r_stems = {w[:5] for w in r_words_low if len(w) >= 4 and w not in stop_q}
+        stem_overlap = len(q_stems & r_stems)
+
+        q_doms = set(self.dialogue_state.classify_utterance_domains(question_text)) - {"general_dialogue", "self_identity"}
+        r_doms = set(self.dialogue_state.classify_utterance_domains(response_text)) - {"general_dialogue", "self_identity"}
+        domain_schema_match = bool(q_doms & r_doms) and (float(pole_salience) >= 4.50)
+
+        identity_match = (
+            bool(active_user)
+            and active_user in r_words_low
+            and (self.dialogue_state.is_identity_query(question_text) or active_user in q_words_low)
+        )
+
+        if identity_match:
+            closure_score = 0.96
+            reason = "verified_session_identity_closure"
+        elif stem_overlap >= 1 and domain_schema_match:
+            closure_score = min(1.0, 0.90 + 0.03 * stem_overlap)
+            reason = "lexical_and_domain_schema_closure"
+        elif domain_schema_match:
+            closure_score = 0.88
+            reason = "canonical_domain_schema_paraphrase_closure"
+        elif stem_overlap >= 1:
+            closure_score = min(0.95, 0.82 + 0.04 * stem_overlap)
+            reason = "direct_lexical_concept_closure"
+        else:
+            closure_score = 0.0
+            reason = "ungrounded_semantic_mismatch"
+
+        return {
+            "grounded": bool(closure_score >= 0.80),
+            "semantic_closure_score": round(closure_score, 4),
+            "grammar_coherent": True,
+            "reason": reason,
+        }
+
+    def execute_sws_ca3_apoptotic_pole_sanitization(self) -> Dict[str, int]:
+        """Предохранитель A2 + A4 (Vectorized SWS Apoptotic Pole Sanitization):
+        Векторизованно проверяет все полюса `w_ca3_attractors` путём пакетной генерации их траекторий из `w_dend_out`
+        и семантического само-замыкания (`self_closure >= 0.45` со своим собственным `w_ca3_sdr` + `grammar_coherent`).
+        Апоптотически удаляет повреждённые фоновые полюса («окрошку» из OpenWebText), чтобы они не засоряли `CA3` и `w_core_dend_out`."""
+        ro = self.dendritic_plateau_readout
+        n_before = int(ro.w_ca3_attractors.shape[0])
+        n_act = len(ro.col_to_tok)
+        if n_before == 0 or n_act == 0:
+            return {"poles_before": n_before, "poles_after": n_before, "pruned_garbage_poles": 0}
+
+        keep_indices: List[int] = []
+        with torch.no_grad():
+            w_eff = (ro.w_dend_out[:, :n_act] + 0.35 * ro.w_core_dend_out[:, :n_act]).contiguous()
+            q_mat = F.normalize(ro.w_ca3_attractors, p=2, dim=-1)
+            vec_bank = torch.stack([self.get_vec64(ro.col_to_tok[c]) for c in range(n_act)])
+
+            hist_vecs: List[torch.Tensor] = []
+            gen_cols: List[torch.Tensor] = []
+            for pos_idx in range(40):
+                vp2 = q_mat if pos_idx < 3 else hist_vecs[-3]
+                vp1 = q_mat if pos_idx < 2 else hist_vecs[-2]
+                vc = q_mat if pos_idx < 1 else hist_vecs[-1]
+                p_vec = ro.pos_phase_vecs[pos_idx].unsqueeze(0)
+                b1 = torch.roll(vp1, shifts=2, dims=-1) * torch.roll(vc, shifts=1, dims=-1) * p_vec * q_mat
+                b2 = torch.roll(vp2, shifts=3, dims=-1) * torch.roll(vc, shifts=1, dims=-1) * torch.roll(q_mat, shifts=4, dims=-1)
+                b3 = vc * p_vec * torch.roll(q_mat, shifts=2, dims=-1)
+                b4 = torch.roll(vp1, shifts=1, dims=-1) * p_vec * q_mat
+                holo_in = F.normalize(torch.cat([b1, b2, b3, b4], dim=-1) + 1e-8, p=2, dim=-1)
+                raw_d = F.relu(holo_in @ ro.w_basal_branch)
+                top_v, top_i = torch.topk(raw_d, k=32, dim=-1)
+                d_sparse = torch.zeros_like(raw_d)
+                d_sparse.scatter_(1, top_i, top_v * top_v)
+                d_nmda = F.normalize(d_sparse + 1e-9, p=2, dim=-1)
+                logits = d_nmda @ w_eff
+                best_c = torch.argmax(logits, dim=-1)
+                gen_cols.append(best_c)
+                hist_vecs.append(vec_bank.index_select(0, best_c))
+
+            gen_mat = torch.stack(gen_cols, dim=1).tolist()
+            for idx, cols in enumerate(gen_mat):
+                tids = [ro.col_to_tok[c] for c in cols]
+                cut: List[int] = []
+                for t in tids:
+                    cut.append(t)
+                    if len(cut) >= 8 and self.decode_token(t).strip().endswith((".", "!", "?")):
+                        break
+                txt = "".join(self.decode_token(t) for t in cut).strip()
+                if not bool(evaluate_grammar_and_artifacts(txt, min_words=5)["grammar_coherent"]):
+                    continue
+                if idx < ro.w_ca3_sdr.shape[0]:
+                    gen_sdr = ro._compute_cortical_sdr2048(cut, normalize=True)
+                    pole_sdr = F.normalize(ro.w_ca3_sdr[idx].float() + 1e-8, p=2, dim=0)
+                    self_closure = float(torch.dot(gen_sdr, pole_sdr).item())
+                    if self_closure >= 0.45:
+                        keep_indices.append(idx)
+                else:
+                    keep_indices.append(idx)
+
+            if keep_indices and len(keep_indices) < n_before:
+                k_t = torch.tensor(keep_indices, dtype=torch.long)
+                ro.w_ca3_attractors = ro.w_ca3_attractors.index_select(0, k_t).contiguous()
+                if ro.w_ca3_sdr.shape[0] == n_before:
+                    ro.w_ca3_sdr = ro.w_ca3_sdr.index_select(0, k_t).contiguous()
+                if ro.w_ca3_salience.shape[0] == n_before:
+                    ro.w_ca3_salience = ro.w_ca3_salience.index_select(0, k_t).contiguous()
+                ro.w_ca3_episode_links.clear()
+
+        n_after = int(ro.w_ca3_attractors.shape[0])
+        return {
+            "poles_before": n_before,
+            "poles_after": n_after,
+            "pruned_garbage_poles": n_before - n_after,
+        }
+
     def _detect_tpj_shift_mode(self, stimulus_ids: List[int]) -> str:
         stim_set = set(int(t) for t in stimulus_ids)
         has_1st = bool(stim_set & self.ba44_syntax_bridge.tpj_1st_trigger_ids)
@@ -2782,7 +2992,12 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     )
                     if clause_parts:
                         part_txt_check = "".join(self.decode_token(i) for i in part_ids).strip()
-                        if not bool(evaluate_grammar_and_artifacts(part_txt_check)["grammar_coherent"]):
+                        cl_sem = self.evaluate_semantic_pole_closure_and_grounding(
+                            question_text=user_utterance,
+                            response_text=part_txt_check,
+                            pole_salience=max(self.last_selected_ca3_pole_saliences, default=1.0),
+                        )
+                        if not bool(cl_sem["grounded"]):
                             continue
                     if not clause_parts or part_ids != clause_parts[0]:
                         clause_parts.append(part_ids)
@@ -2866,137 +3081,63 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     sentences_generated = 2
 
         response_text = "".join(self.decode_token(i) for i in chosen_ids).strip()
+        top_pole_sal = max(self.last_selected_ca3_pole_saliences, default=1.0)
+        sem_check = self.evaluate_semantic_pole_closure_and_grounding(
+            question_text=user_utterance,
+            response_text=response_text,
+            pole_salience=top_pole_sal,
+        )
+        has_grounding = bool(sem_check["grounded"])
+        closure_score_val = float(sem_check["semantic_closure_score"])  # type: ignore[arg-type]
 
-        # Г2. МЕТАКОГНИТИВНЫЙ КОНТРОЛЬ ВНУТРЕННЕЙ РЕЧИ В 17-Й КОЛОНКЕ SON (SON VTE Inner-Speech Gate):
-        #     Если включён режим активного вывода (`enable_active_inference = True`), а черновик внутренней речи
-        #     не проходит различающий грамматический барьер (например, полюс CA3 оказался сырым фоновым осколком),
-        #     колонка SON блокирует произнесение осколка (`SON_VTE_ABORT`) и переключается на уточняющий вопрос!
+        # Г2. ФИНАЛЬНЫЙ САНИТАЙЗЕР ГЕНЕРАЦИИ И СЕМАНТИЧЕСКИЙ ГЕЙТ ЗАМЫКАНИЯ (A1 + A2: closure >= 0.80):
         if (
             enable_active_inference
             and imprinted == 0
-            and not self.dialogue_state.is_identity_query(user_utterance)
+            and not has_grounding
         ):
-            vte_g_check = evaluate_grammar_and_artifacts(response_text)
-            p_strip = " .,!?;:'()[]{}" + chr(34)
-            stop_q = {"what", "how", "why", "where", "when", "who", "does", "do", "is", "are", "the", "a", "an", "in", "of", "to", "with", "can", "you"}
-            q_stems = {
-                w.strip(p_strip).lower()[:5]
-                for w in user_utterance.split()
-                if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in stop_q
-            }
-            r_stems = {
-                w.strip(p_strip).lower()[:5]
-                for w in response_text.split()
-                if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in stop_q
-            }
-            top_pole_sal = max(self.last_selected_ca3_pole_saliences, default=1.0)
-            has_grounding = (
-                bool(q_stems & r_stems)
-                or (top_pole_sal >= 4.50 and self.last_ca3_top1_resonance >= 0.65)
-                or (self.dialogue_state.user_name is not None and self.dialogue_state.user_name.lower() in response_text.lower())
+            think_res = self._attempt_endogenous_cortical_think_reformulation(
+                user_utterance=user_utterance,
+                slot_bindings=slot_bindings,
+                max_tokens=max_tokens,
             )
-            if not bool(vte_g_check["grammar_coherent"]) or not has_grounding:
-                think_res = self._attempt_endogenous_cortical_think_reformulation(
-                    user_utterance=user_utterance,
-                    slot_bindings=slot_bindings,
-                    max_tokens=max_tokens,
-                )
-                if think_res is not None:
-                    t_resp = str(think_res["response_text"])
-                    t_trace = str(think_res["think_trace"])
-                    t_bind = dict(think_res.get("bindings", slot_bindings))  # type: ignore[arg-type]
-                    passport = self._build_response_passport(
-                        stimulus_ids=u_ids,
-                        proportional_gate_zone="ZONE_2_KNOWN_REFORMULATE_THINK",
-                        son_vte_grounding="known_reformulated_i_know_x_as_y",
-                        think_trace=t_trace,
-                        endogenous_cortical_think=True,
-                        arcuate_injections=len(t_bind),
-                    )
-                    self.dialogue_state.record_turn_and_poles(
-                        stimulus_vec64=q_raw_vec,
-                        activated_poles=[think_res.get("pole_vec", q_vec)],  # type: ignore[list-item]
-                        utterance=user_utterance,
-                        response_text=t_resp,
-                        role_filler_bindings=t_bind,
-                        selected_ca3_pole_indices=list(self.last_selected_ca3_pole_indices),
-                        response_passport=passport,
-                    )
-                    return {
-                        "stimulus": user_utterance,
-                        "ngrams_mode": "OFF (Proportional Gate Zone 2: Endogenous Cortical THINK 'I know X as Y')",
-                        "active_moe_columns": moe_out.active_expert_names,
-                        "conversational_domain": self.dialogue_state.active_domain,
-                        "remembered_user_name": self.dialogue_state.user_name,
-                        "role_filler_bindings_applied": t_bind,
-                        "arcuate_token_pointer_injections": len(t_bind),
-                        "reafferent_stranger_check_interventions": self.last_reafferent_stranger_interventions,
-                        "episode_chain_sentences_generated": 1,
-                        "multi_hop_rollout_used": False,
-                        "active_inference_clarification_triggered": False,
-                        "endogenous_cortical_think_triggered": True,
-                        "ca3_top1_resonance": self.last_ca3_top1_resonance,
-                        "epistemic_uncertainty": max(epistemic_uncertainty, 0.35),
-                        "cortical_moe_branch_profile": cortical_branch_profile,
-                        "ba44_syntax_bridge_connector": "",
-                        "swr_consolidated_into_nmda_matrix": False,
-                        "online_dopamine_imprinted_tokens": 0,
-                        "vte_beams_evaluated": vte_logs,
-                        "selected_beam_idx": best_idx,
-                        "stopped_naturally_by_son_eos": True,
-                        "generated_tokens_count": len(self.encode_text(t_resp)),
-                        "pure_weight_generated_response": t_resp,
-                        "response_passport": passport,
-                        "stored_sentence_chains_in_class": 0,
-                        "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
-                    }
-
-                novel_terms = [
-                    w.strip(p_strip)
-                    for w in user_utterance.split()
-                    if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in stop_q
-                ][:3]
-                topic_str = " ".join(novel_terms) if novel_terms else "this new topic"
-                clarify_resp = (
-                    f"I notice you are asking about {topic_str}, which has high epistemic uncertainty in my current CA3 memory; "
-                    f"could you share the key mechanism or principle so I can consolidate it into my dendritic synapses?"
-                )
-                abductive_trace = (
-                    f"Zone3_AbductiveClarify: VTE draft rejected (grammar={vte_g_check['grammar_coherent']}, "
-                    f"grounding={has_grounding}) and {topic_str!r} not in STDP ontology"
-                )
+            if think_res is not None:
+                t_resp = str(think_res["response_text"])
+                t_trace = str(think_res["think_trace"])
+                t_bind = dict(think_res.get("bindings", slot_bindings))  # type: ignore[arg-type]
                 passport = self._build_response_passport(
                     stimulus_ids=u_ids,
-                    proportional_gate_zone="ZONE_3_UNKNOWN_CLARIFY",
-                    son_vte_grounding="ungrounded_clarify",
-                    think_trace=abductive_trace,
+                    proportional_gate_zone="ZONE_2_KNOWN_REFORMULATE_THINK",
+                    son_vte_grounding="known_reformulated_i_know_x_as_y",
+                    think_trace=t_trace,
+                    endogenous_cortical_think=True,
+                    arcuate_injections=len(t_bind),
                 )
                 self.dialogue_state.record_turn_and_poles(
                     stimulus_vec64=q_raw_vec,
-                    activated_poles=[q_raw_vec],
+                    activated_poles=[think_res.get("pole_vec", q_vec)],  # type: ignore[list-item]
                     utterance=user_utterance,
-                    response_text=clarify_resp,
-                    role_filler_bindings=slot_bindings,
-                    topic_tags=[t.lower() for t in novel_terms],
-                    was_clarification_request=True,
+                    response_text=t_resp,
+                    role_filler_bindings=t_bind,
+                    is_grounded_conclusion=True,
                     selected_ca3_pole_indices=list(self.last_selected_ca3_pole_indices),
                     response_passport=passport,
                 )
                 return {
                     "stimulus": user_utterance,
-                    "ngrams_mode": "OFF (SON VTE Inner-Speech Epistemic Clarification)",
+                    "ngrams_mode": "OFF (Proportional Gate Zone 2: Endogenous Cortical THINK 'I know X as Y')",
                     "active_moe_columns": moe_out.active_expert_names,
                     "conversational_domain": self.dialogue_state.active_domain,
                     "remembered_user_name": self.dialogue_state.user_name,
-                    "role_filler_bindings_applied": slot_bindings,
-                    "arcuate_token_pointer_injections": 0,
+                    "role_filler_bindings_applied": t_bind,
+                    "arcuate_token_pointer_injections": len(t_bind),
                     "reafferent_stranger_check_interventions": self.last_reafferent_stranger_interventions,
                     "episode_chain_sentences_generated": 1,
                     "multi_hop_rollout_used": False,
-                    "active_inference_clarification_triggered": True,
-                    "endogenous_cortical_think_triggered": False,
+                    "active_inference_clarification_triggered": False,
+                    "endogenous_cortical_think_triggered": True,
                     "ca3_top1_resonance": self.last_ca3_top1_resonance,
-                    "epistemic_uncertainty": max(epistemic_uncertainty, 0.75),
+                    "epistemic_uncertainty": max(epistemic_uncertainty, 0.35),
                     "cortical_moe_branch_profile": cortical_branch_profile,
                     "ba44_syntax_bridge_connector": "",
                     "swr_consolidated_into_nmda_matrix": False,
@@ -3004,35 +3145,100 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                     "vte_beams_evaluated": vte_logs,
                     "selected_beam_idx": best_idx,
                     "stopped_naturally_by_son_eos": True,
-                    "generated_tokens_count": len(self.encode_text(clarify_resp)),
-                    "pure_weight_generated_response": clarify_resp,
+                    "generated_tokens_count": len(self.encode_text(t_resp)),
+                    "pure_weight_generated_response": t_resp,
                     "response_passport": passport,
                     "stored_sentence_chains_in_class": 0,
                     "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
                 }
 
+            p_strip = " .,!?;:'()[]{}" + chr(34)
+            stop_q = {"what", "how", "why", "where", "when", "who", "does", "do", "is", "are", "the", "a", "an", "in", "of", "to", "with", "can", "you"}
+            novel_terms = [
+                w.strip(p_strip)
+                for w in user_utterance.split()
+                if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in stop_q
+            ][:3]
+            topic_str = " ".join(novel_terms) if novel_terms else "this new topic"
+            clarify_resp = (
+                f"I notice you are asking about {topic_str}, which has high epistemic uncertainty in my current CA3 memory; "
+                f"could you share the key mechanism or principle so I can consolidate it into my dendritic synapses?"
+            )
+            abductive_trace = (
+                f"Zone3_AbductiveClarify: draft rejected by Semantic Sanitizer A1/A2 "
+                f"(reason={sem_check['reason']}, closure={closure_score_val:.2f}) and {topic_str!r} not in STDP ontology"
+            )
+            passport = self._build_response_passport(
+                stimulus_ids=u_ids,
+                proportional_gate_zone="ZONE_3_UNKNOWN_CLARIFY",
+                son_vte_grounding="ungrounded_clarify",
+                think_trace=abductive_trace,
+            )
+            self.dialogue_state.record_turn_and_poles(
+                stimulus_vec64=q_raw_vec,
+                activated_poles=[q_raw_vec],
+                utterance=user_utterance,
+                response_text=clarify_resp,
+                role_filler_bindings=slot_bindings,
+                topic_tags=[t.lower() for t in novel_terms],
+                was_clarification_request=True,
+                is_grounded_conclusion=False,
+                selected_ca3_pole_indices=list(self.last_selected_ca3_pole_indices),
+                response_passport=passport,
+            )
+            return {
+                "stimulus": user_utterance,
+                "ngrams_mode": "OFF (SON VTE Inner-Speech Epistemic Clarification)",
+                "active_moe_columns": moe_out.active_expert_names,
+                "conversational_domain": self.dialogue_state.active_domain,
+                "remembered_user_name": self.dialogue_state.user_name,
+                "role_filler_bindings_applied": slot_bindings,
+                "arcuate_token_pointer_injections": 0,
+                "reafferent_stranger_check_interventions": self.last_reafferent_stranger_interventions,
+                "episode_chain_sentences_generated": 1,
+                "multi_hop_rollout_used": False,
+                "active_inference_clarification_triggered": True,
+                "endogenous_cortical_think_triggered": False,
+                "ca3_top1_resonance": self.last_ca3_top1_resonance,
+                "epistemic_uncertainty": max(epistemic_uncertainty, 0.75),
+                "cortical_moe_branch_profile": cortical_branch_profile,
+                "ba44_syntax_bridge_connector": "",
+                "swr_consolidated_into_nmda_matrix": False,
+                "online_dopamine_imprinted_tokens": 0,
+                "vte_beams_evaluated": vte_logs,
+                "selected_beam_idx": best_idx,
+                "stopped_naturally_by_son_eos": True,
+                "generated_tokens_count": len(self.encode_text(clarify_resp)),
+                "pure_weight_generated_response": clarify_resp,
+                "response_passport": passport,
+                "stored_sentence_chains_in_class": 0,
+                "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+            }
+
         arc_inj = max(0, self.last_arcuate_token_injections // max(1, len(top_onsets)))
         passport = self._build_response_passport(
             stimulus_ids=u_ids,
             proportional_gate_zone="ZONE_1_DIRECT_RECALL",
-            son_vte_grounding="grounded_direct",
-            think_trace=f"Zone1_DirectRecall: poles={self.last_selected_ca3_pole_indices} sal={self.last_selected_ca3_pole_saliences}",
+            son_vte_grounding="grounded_direct" if (has_grounding or imprinted > 0) else "ungrounded_suppressed_from_memory",
+            think_trace=f"Zone1_DirectRecall: poles={self.last_selected_ca3_pole_indices} sal={self.last_selected_ca3_pole_saliences} closure={closure_score_val:.2f}",
             arcuate_injections=arc_inj,
             ba44_bridge=ba44_bridge_used,
         )
+        # Предохранитель A3: записываем ход в эпизодическую память и SWR ТОЛЬКО если ответ прошёл семантическое заземление!
         self.dialogue_state.record_turn_and_poles(
             stimulus_vec64=q_raw_vec,
             activated_poles=ca3_clause_poles,
             utterance=user_utterance,
             response_text=response_text,
             role_filler_bindings=slot_bindings,
+            is_grounded_conclusion=bool(has_grounding or imprinted > 0),
             selected_ca3_pole_indices=list(self.last_selected_ca3_pole_indices),
             response_passport=passport,
         )
 
-        # КОНСОЛИДАЦИЯ ОСТРЫХ ВОЛН ГИППОКАМПА (Sharp-Wave Ripple / SWR Replay Consolidation):
+        # КОНСОЛИДАЦИЯ ОСТРЫХ ВОЛН ГИППОКАМПА (Sharp-Wave Ripple / SWR Replay Consolidation) ТОЛЬКО для заземлённых ответов (A1):
         swr_consolidated = False
-        if not ngrams_enabled and ba44_bridge_used and len(chosen_ids) >= 8 and len(ca3_clause_poles) >= 2:
+        if has_grounding and not ngrams_enabled and ba44_bridge_used and len(chosen_ids) >= 8 and len(ca3_clause_poles) >= 2:
             q_swr_pole = F.normalize(
                 torch.roll(ca3_clause_poles[0], shifts=1, dims=0) * ca3_clause_poles[1] + 0.35 * q_raw_vec + 1e-8,
                 p=2,

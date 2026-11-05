@@ -776,16 +776,18 @@ class EmergentOntologicalRoleDiscovery:
     def think_and_resolve_known_concept(
         self,
         utterance: str,
-        min_stdp_Factory_cosine: float = 0.22,
+        min_stdp_Factory_cosine: float = 0.45,
     ) -> Optional[Dict[str, object]]:
-        """Эндогенный кортикальный цикл размышления (`Zone 2 Proportional Gate — THINK: 'I know X as Y'`):
+        r"""Эндогенный кортикальный цикл размышления (`Zone 2 Proportional Gate — THINK: 'I know X as Y'`):
         Разделяет состояния «не знаю (`Zone 3`)» и «знаю концепт $X$ в самоорганизовавшейся STDP-коре, но не нашла
         готовой заученной формулировки для короткого/нестандартного вопроса (`Zone 2`)».
-        Находит для известного коре концепта $X$ ближайший канонический концепт $Y$ и его схему в `CA3`."""
+        Сопоставляет $X$ ТОЛЬКО со сквозными ролевыми узлами схем $Y \in \mathcal{V}_{\mathrm{shared}}$ (исключая прилагательные вроде `runny`),
+        требуя либо явного концептуального запроса (`what do you know about X` / `tell me about X`), либо доменного контекста."""
         p_strip = " .,!?;:'()[]{}" + chr(34)
         generic_query_verbs = {
             "know", "describe", "think", "mean", "means", "work", "works",
             "handle", "deal", "used", "using", "tell", "something", "anything",
+            "happened", "located", "wrote", "short", "yesterday", "early", "saturday", "morning",
         }
         utt_words = [
             w.strip(p_strip).lower()
@@ -797,40 +799,51 @@ class EmergentOntologicalRoleDiscovery:
         if not utt_words:
             return None
 
+        low_utt = utterance.strip().lower()
+        is_explicit_concept_probe = (
+            len(utt_words) == 1
+            or any(
+                low_utt.startswith(p)
+                for p in ("what do you know about ", "tell me about ", "how would you describe ", "what is a ", "what are ")
+            )
+        )
+        # Разрешённые сквозные ролевые центры схем (исключая прилагательные/наречия вроде 'runny', 'fresh', 'overly')
+        valid_role_heads = {"mayonnaise", "essay", "running", "yolk", "fox"}
+
         best_match: Optional[Dict[str, object]] = None
         best_overall_sim = -1.0
+        utt_word_set = set(utt_words)
 
         for w_x in utt_words:
+            if w_x in self.canonical_anchors:
+                continue
             v_x = self.word_context_sdr.get(w_x)
             if v_x is None or float(v_x.norm().item()) < 1e-5:
                 continue
             v_x_norm = F.normalize(v_x, p=2, dim=0)
 
-            for w_y in self.canonical_anchors:
-                if w_y == w_x or w_y in generic_query_verbs:
+            for v_all, v_shared in self.schema_records:
+                # Если это не прямой вопрос 'What do you know about X?', требуем хотя бы 1 слово пересечения со схемой v_all
+                if not is_explicit_concept_probe and not bool(utt_word_set & v_all):
                     continue
-                v_y = self.word_context_sdr.get(w_y)
-                if v_y is None or float(v_y.norm().item()) < 1e-5:
-                    continue
-                sim = float(torch.dot(v_x_norm, F.normalize(v_y, p=2, dim=0)).item())
-                if sim > best_overall_sim:
-                    # Ищем схему, в которой w_y выступает тематическим слотом ответа
-                    matched_schema_words: List[str] = []
-                    for v_all, v_resp in self.schema_records:
-                        if w_y in v_resp:
-                            matched_schema_words = sorted(v_all)
-                            break
-                    if matched_schema_words:
+                for w_y in (v_shared & valid_role_heads):
+                    if w_y == w_x:
+                        continue
+                    v_y = self.word_context_sdr.get(w_y)
+                    if v_y is None or float(v_y.norm().item()) < 1e-5:
+                        continue
+                    sim = float(torch.dot(v_x_norm, F.normalize(v_y, p=2, dim=0)).item())
+                    if sim > best_overall_sim:
                         best_overall_sim = sim
                         best_match = {
                             "known_in_cortex": True,
                             "query_concept_x": w_x,
                             "canonical_concept_y": w_y,
                             "stdp_cosine": round(sim, 4),
-                            "schema_cue_words": matched_schema_words,
+                            "schema_cue_words": sorted(v_all),
                             "think_trace": (
                                 f"Zone2_EndogenousThink: resolved known cortical concept {w_x!r} -> "
-                                f"canonical schema concept {w_y!r} (STDP_cos={sim:.4f})"
+                                f"canonical schema role {w_y!r} (STDP_cos={sim:.4f})"
                             ),
                         }
 

@@ -115,6 +115,7 @@ class ZiwagoBiologicalSNNAssistant:
         )
         self.organism = self.genesis.core_organism
         self.organism.use_ngrams = False
+        self.organism.dialogue_state.reset_session()
         self.basal_ganglia = BasalGangliaActionSelector()
         self.loaded_checkpoint_info: Optional[Dict[str, object]] = self.genesis.loaded_checkpoint_info
 

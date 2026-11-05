@@ -209,10 +209,11 @@ def evaluate_grammar_and_artifacts(
 
     has_superacid = ("superacid" in low_text) or ("<unk>" in low_text) or ("\ufffd" in clean)
 
-    # 1. Детектор пунктуационных и субсловных артефактов BPE (" ,", ",*", ".*", "He't", "i's", "- are")
+    # 1. Детектор пунктуационных и субсловных артефактов BPE (" ,", ",*", ".*", "He't", "i's", "- are", ",'s")
     punct_defect = bool(
         re.search(r"\s[,.;:!?]", raw_str)
         or re.search(r"[,.;:!?][*]", raw_str)
+        or re.search(r"[,.;:!?]'[a-zA-Z]", raw_str)
         or re.search(r"\b(?:he't|i's|you't|it't|they't)\b", low_text)
         or re.search(r"\b-\s+[a-zA-Z]", raw_str)
         or raw_str.startswith((",", ".", ";", ":", "!", "?"))
@@ -232,13 +233,26 @@ def evaluate_grammar_and_artifacts(
         if not a_ends_sent and ca and ca == cb and len(ca) >= 2:
             consec_repeats += 1
 
+        # Одиночные случайные согласные буквы ("Bel Pre Road f in")
+        if (len(ca) == 1 and ca.isalpha() and ca not in {"a", "i"}) or (len(cb) == 1 and cb.isalpha() and cb not in {"a", "i"}):
+            illegal_syntax_transitions += 1
+
+        # Завершение внутренней фразы/предложения на предлоге или артикле ("f in. overly", "the, a")
+        if a_ends_clause and ca in (_ARTICLES | _FUNCTION_PREPOSITIONS | {"your", "my", "his", "her", "to"}):
+            illegal_syntax_transitions += 1
+
+        # Строчная буква сразу после точки в середине текста (". overly")
+        raw_b_clean = w_b.strip(punct_strip)
+        if a_ends_sent and raw_b_clean and raw_b_clean[0].islower():
+            illegal_syntax_transitions += 1
+
         # Проверка запрещённых синтаксических переходов внутри одной клаузы (без разделительной пунктуации):
         if not a_ends_clause:
             # Два предлога подряд ("at to", "of as", "in for") или предлог + союз ("to in", "in but")
             if ca in _FUNCTION_PREPOSITIONS and cb in (_FUNCTION_PREPOSITIONS | {"but", "and", "or", "are", "is", "was", "were"}):
                 illegal_syntax_transitions += 1
-            # Артикль + глагол-связка или предлог ("a is", "a be", "the is", "a in", "the for")
-            if ca in _ARTICLES and cb in (_AUXILIARY_VERBS | _FUNCTION_PREPOSITIONS | {"to", "and", "but", "or"}):
+            # Артикль + глагол-связка, предлог или служебное слово ("a is", "a be", "the is", "a in", "the for", "a as")
+            if ca in _ARTICLES and cb in (_AUXILIARY_VERBS | _FUNCTION_PREPOSITIONS | {"to", "and", "but", "or", "as", "that", "all"}):
                 illegal_syntax_transitions += 1
             # Два вспомогательных глагола одной группы подряд ("is are", "were was", "be are")
             if ca in {"is", "are", "was", "were"} and cb in {"is", "are", "was", "were", "can", "will", "did"}:
@@ -248,7 +262,6 @@ def evaluate_grammar_and_artifacts(
                 illegal_syntax_transitions += 1
 
         # Случайное слово с заглавной буквы в середине предложения (не после .!?;:)
-        raw_b_clean = w_b.strip(punct_strip)
         if not a_ends_sent and raw_b_clean in _MID_SENTENCE_FORBIDDEN_CAPS:
             mid_sentence_cap_defects += 1
 

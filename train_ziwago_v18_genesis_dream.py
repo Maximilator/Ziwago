@@ -825,10 +825,12 @@ def run_v18_10B_genesis_omniscient_marathon(
     )
 
     # ------------------------------------------------------------------
-    # ФИНАЛЬНАЯ КОНСОЛИДАЦИЯ SWR И МОДУЛЕЙ GENESIS v18.1 ПОСЛЕ 5 ЭПОХ
+    # ФИНАЛЬНАЯ КОНСОЛИДАЦИЯ SWR, АПОПТОЗ МУСОРНЫХ ПОЛЮСОВ CA3 (A2/A4) И МОДУЛЕЙ GENESIS v18.1 ПОСЛЕ 5 ЭПОХ
     # ------------------------------------------------------------------
     for _ in range(4):
         organism.train_wave_with_neuromodulator_reward(all_lesson_objs, wave_idx=6)
+    sws_apoptosis_rep = organism.execute_sws_ca3_apoptotic_pole_sanitization()
+    print(f"  [SWS Apoptotic Pole Sanitizer A2/A4] {sws_apoptosis_rep}", flush=True)
 
     # Кристаллизуем без-позиционные траектории валентностей (0% pos_idx), Граф Мира и STDP-онтологию:
     genesis._bootstrap_genesis_modules_from_lessons()
