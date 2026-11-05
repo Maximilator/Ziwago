@@ -1,0 +1,12 @@
+====================================================================================================================
+NEUROWEAVE ZIWAGO: EVOTRAIN v25.1 — 10-HOUR ULTRADIAN MULTI-BANK SOCRATIC MARATHON (Target=10.0h)
+====================================================================================================================
+Traceback (most recent call last):
+  File "/home/jupyter/Neuroweave Ziwago/run_ziwago_v25_evotrain_marathon.py", line 572, in <module>
+    main()
+  File "/home/jupyter/Neuroweave Ziwago/run_ziwago_v25_evotrain_marathon.py", line 562, in main
+    run_evotrain_v25_marathon(
+  File "/home/jupyter/Neuroweave Ziwago/run_ziwago_v25_evotrain_marathon.py", line 365, in run_evotrain_v25_marathon
+    snap_links = dp.w_ca3_episode_links.clone()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'clone'
