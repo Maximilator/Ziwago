@@ -1,16 +1,19 @@
 # NEUROWEAVE ZIWAGO: EVOTRAIN v25.1 LIVE DASHBOARD
 
-- **Status:** `COMPLETED_AND_CERTIFIED`
-- **Ultradian Cycles Completed:** `1`
-- **Elapsed Time:** `114.95 s`
-- **Verified High-Closure CA3 Poles:** `344` (`0` garbage poles)
-- **Active Vocabulary Columns:** `10705`
-- **World Graph Causal Triplets:** `18` (`175` zero-pos_idx columns)
-- **Socratic Questions Synthesized (BA46):** `16`
-- **STDP Self-Organized Vocabulary:** `13964` words
+- **Status:** `RUNNING_10H_ULTRADIAN_EVOLUTION`
+- **Current Phase:** `Cycle 129 (RATCHET_PROTECTED_PEAK)`
+- **Ultradian Cycles Completed:** `129`
+- **Elapsed Time:** `13002.63 s` (`3.6118 h` / `10.0 h`)
+- **Raw Sensory Tokens Scanned:** `48,971,433`
+- **BCM-Gated Useful Tokens Consolidated:** `2,130,181` (`Yield: 4.35%`)
+- **Verified High-Closure CA3 Poles (Peak Ratchet):** `369` (`0` garbage poles)
+- **Active Vocabulary Columns:** `10788`
+- **World Graph Causal Triplets:** `378` (`227` zero-pos_idx columns)
+- **Socratic Questions Synthesized (BA46):** `163`
+- **STDP Self-Organized Vocabulary:** `15367` words
 - **Domain-A Metaplasticity Retention (Fusi–Zenke):** `87.5%`
-- **Golden Holdout Verification:** `8/8 (100% byte-for-byte)` (100% byte-for-byte)
-- **Free Disk Space (SSD Guard):** `25.8 GiB`
+- **Golden Holdout Verification:** `8/8 (100% byte-for-byte)`
+- **Free Disk Space (SSD Guard):** `53.5 GiB`
 
 ## Consciousness & Criticality Metrics (`Knowledge/consciousness2.md` + `math.md`)
 - **Priesemann Subcriticality ($\hat{\sigma}$):** `0.9859` (target $[0.960, 0.990]$)
@@ -25,19 +28,19 @@
 {
   "0": 8,
   "1": 62,
-  "2": 10,
+  "2": 9,
   "3": 1,
   "4": 5,
   "5": 11,
-  "6": 27,
-  "7": 17,
+  "6": 28,
+  "7": 27,
   "8": 13,
-  "9": 73,
-  "10": 44,
-  "11": 45,
-  "12": 3,
-  "13": 13,
-  "14": 9,
+  "9": 78,
+  "10": 46,
+  "11": 50,
+  "12": 5,
+  "13": 15,
+  "14": 8,
   "15": 3
 }
 ```

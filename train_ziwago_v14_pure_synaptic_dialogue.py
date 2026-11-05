@@ -1223,6 +1223,15 @@ class DendriticPlateauMatrixReadout:
         ca3_sal = state.get("w_ca3_salience")
         if isinstance(ca3_sal, torch.Tensor):
             self.w_ca3_salience = ca3_sal.float().clone()
+        if self.w_ca3_attractors.shape[0] > 0:
+            n_ca3 = min(
+                int(self.w_ca3_attractors.shape[0]),
+                int(self.w_ca3_sdr.shape[0]),
+                int(self.w_ca3_salience.shape[0]),
+            )
+            self.w_ca3_attractors = self.w_ca3_attractors[:n_ca3].contiguous()
+            self.w_ca3_sdr = self.w_ca3_sdr[:n_ca3].contiguous()
+            self.w_ca3_salience = self.w_ca3_salience[:n_ca3].contiguous()
         sdr_usage = state.get("sdr_column_usage")
         if isinstance(sdr_usage, torch.Tensor):
             self.sdr_column_usage = sdr_usage.float().clone()

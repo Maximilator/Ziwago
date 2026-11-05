@@ -197,7 +197,6 @@ class ProgressiveMultiCorpusStreamHarvester:
                 gate_res = self.bcm_gate.evaluate_neuromodulatory_gate(sdr_v, causal_density_hint=1.15, grammar_ok=True)
                 if bool(gate_res["accepted"]):
                     self.bcm_accepted_tokens += len(s_ids)
-                    genesis.emergent_ontology.observe_sentence_stdp(sent_full, register_as_canonical=False, lr=0.45)
 
                 # Если предложение содержит каузальный глагол, синтезируем Сократический вопрос и каузальное ребро Графа Мира
                 soc_q = self.socratic_synth.synthesize_socratic_question_from_fact(sent_full)
@@ -215,6 +214,12 @@ class ProgressiveMultiCorpusStreamHarvester:
 
 
 def _verify_golden_holdout_exact(organism, golden_data: Sequence[Dict[str, object]]) -> int:
+    organism.dialogue_state.reset_session()
+    _ = organism.pure_neural_generate_response(
+        "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+        max_tokens=36,
+        use_ngrams=False,
+    )
     matches = 0
     for g_item in golden_data:
         organism.dialogue_state.recent_pole_vectors.clear()
@@ -347,6 +352,7 @@ def run_evotrain_v25_marathon(
     base_wake_pairs = domain_a_pairs + corpus_distilled_pairs
     target_seconds = max(10.0, float(hours) * 3600.0)
     cycles_completed = 0
+    _ = organism.execute_sws_ca3_apoptotic_pole_sanitization()
     best_verified_poles = int(organism.dendritic_plateau_readout.w_ca3_attractors.shape[0])
     last_telemetry: Dict[str, object] = {}
 
@@ -362,7 +368,9 @@ def run_evotrain_v25_marathon(
         snap_w_dend = dp.w_dend_out.clone()
         snap_w_core = dp.w_core_dend_out.clone()
         snap_ca3 = dp.w_ca3_attractors.clone()
-        snap_links = dp.w_ca3_episode_links.clone()
+        snap_ca3_sdr = dp.w_ca3_sdr.clone()
+        snap_ca3_sal = dp.w_ca3_salience.clone()
+        snap_links = dict(dp.w_ca3_episode_links)
         snap_col_to_tok = list(dp.col_to_tok)
         snap_tok_to_col = dict(dp.tok_to_col)
 
@@ -440,6 +448,8 @@ def run_evotrain_v25_marathon(
             dp.w_dend_out = snap_w_dend
             dp.w_core_dend_out = snap_w_core
             dp.w_ca3_attractors = snap_ca3
+            dp.w_ca3_sdr = snap_ca3_sdr
+            dp.w_ca3_salience = snap_ca3_sal
             dp.w_ca3_episode_links = snap_links
             dp.col_to_tok = snap_col_to_tok
             dp.tok_to_col = snap_tok_to_col
@@ -475,8 +485,8 @@ def run_evotrain_v25_marathon(
         elapsed_now = round(time.perf_counter() - t0, 2)
         elapsed_hours = round(elapsed_now / 3600.0, 4)
 
-        # Сохраняем чекпоинт на первом цикле и при каждом улучшении пика (или каждый час):
-        if cycles_completed == 1 or ratchet_state == "PROMOTED_NEW_PEAK" or cycles_completed % 5 == 0:
+        # Сохраняем чекпоинт строго при 8/8 Golden Holdout (на первом цикле, при улучшении пика или каждые 5 циклов):
+        if golden_matches == len(golden_data) and (cycles_completed == 1 or ratchet_state == "PROMOTED_NEW_PEAK" or cycles_completed % 5 == 0):
             extra_meta = {
                 "version": "25.1-EVOTRAIN-Ultradian-MultiBank-Socratic-Master",
                 "cycles_completed": cycles_completed,
