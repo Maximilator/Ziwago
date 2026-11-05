@@ -37,6 +37,14 @@ ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from neuroweave10.cortex.next16_core import (
+    ConsciousnessMetricsDashboard,
+    CrossDomainIsomorphismDreamer,
+    DynamicNeuromodulatoryBCMGate,
+    FusiZenkeCascadeMetaplasticityShield,
+    KnowledgeDistillery,
+    TwoCompartmentLarkumMicrocircuit,
+)
 from neuroweave10.evaluation.gates import (
     HOLD_OUT_EXAM_SUITE,
     MASTER_CKPT,
@@ -187,9 +195,16 @@ def run_ontogenetic_wake_sws_rem_training(
     organism.use_ngrams = False
 
     # ------------------------------------------------------------------
-    # СТАДИЯ I: WAKE — ТАЛАМИЧЕСКАЯ ДИСТИЛЛЯЦИЯ 16+ ДОМЕНОВ И СПИРАЛЬНАЯ КОНСОЛИДАЦИЯ С САМОПРОВЕРКОЙ
+    # СТАДИЯ I: WAKE — ДИСТИЛЛЯЦИЯ ПАПКИ Knowledge/ (37 АГЕНТОВ + МАТЕМАТИКА + СОЗНАНИЕ),
+    #           16-ДОМЕННОГО АТЛАСА И СЕНСОРНОГО ПОТОКА ЧЕРЕЗ DYNAMIC BCM GATE + КАСКАД ФУЗИ-ЗЕНКЕ
     # ------------------------------------------------------------------
     t_s1 = time.perf_counter()
+    knowledge_distillery = KnowledgeDistillery()
+    bcm_gate = DynamicNeuromodulatoryBCMGate()
+    larkum_circuit = TwoCompartmentLarkumMicrocircuit()
+    metaplasticity_shield = FusiZenkeCascadeMetaplasticityShield()
+    iso_dreamer = CrossDomainIsomorphismDreamer(knowledge_distillery)
+
     core_lesson_pairs: List[TokenizedDialogPair] = []
     for ep_i in range(1, 6):
         for dom_src, q_txt, r_txt, q_hint in FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.get(ep_i, []):
@@ -197,16 +212,45 @@ def run_ontogenetic_wake_sws_rem_training(
                 TokenizedDialogPair(dom_src, organism.encode_text(q_txt), organism.encode_text(r_txt), q_hint)
             )
 
-    atlas_pairs: List[TokenizedDialogPair] = []
-    for dom_name, q_txt, r_txt in OMNIDOMAIN_ENCYCLOPEDIC_ATLAS:
-        atlas_pairs.append(
-            TokenizedDialogPair(f"atlas_{dom_name}", organism.encode_text(q_txt), organism.encode_text(r_txt), 2.20)
-        )
-        # Также кристаллизуем каждое энциклопедическое предложение в STDP-онтологию и волну валентностей BA44
+    knowledge_pairs: List[TokenizedDialogPair] = []
+    for dom_name, q_txt, r_txt in knowledge_distillery.get_knowledge_core_lessons():
+        s_ids = organism.encode_text(q_txt)
+        r_ids = organism.encode_text(r_txt)
+        sdr_v = organism.dendritic_plateau_readout._compute_cortical_sdr2048(s_ids + r_ids, normalize=False)
+        _ = bcm_gate.evaluate_neuromodulatory_gate(sdr_v, causal_density_hint=1.5, grammar_ok=True)
+        q_v = organism.compute_stimulus_vec64(s_ids)
+        r_v = organism.compute_stimulus_vec64(r_ids)
+        _ = larkum_circuit.step_microcircuit(q_v, r_v, learn_sst=True)
+        knowledge_pairs.append(TokenizedDialogPair(dom_name, s_ids, r_ids, 2.20))
         genesis.emergent_ontology.observe_sentence_stdp(r_txt, register_as_canonical=False, lr=1.2)
 
+    atlas_pairs: List[TokenizedDialogPair] = []
+    for dom_name, q_txt, r_txt in OMNIDOMAIN_ENCYCLOPEDIC_ATLAS:
+        s_ids = organism.encode_text(q_txt)
+        r_ids = organism.encode_text(r_txt)
+        sdr_v = organism.dendritic_plateau_readout._compute_cortical_sdr2048(s_ids + r_ids, normalize=False)
+        _ = bcm_gate.evaluate_neuromodulatory_gate(sdr_v, causal_density_hint=1.4, grammar_ok=True)
+        atlas_pairs.append(
+            TokenizedDialogPair(f"atlas_{dom_name}", s_ids, r_ids, 2.20)
+        )
+        genesis.emergent_ontology.observe_sentence_stdp(r_txt, register_as_canonical=False, lr=1.2)
+
+    # Сначала обучаем Тему А (Фундаментальный золотой фонд Knowledge/ + 16-доменный Атлас) и консолидируем в щит Фузи-Зенке u_slow:
+    domain_a_pairs = knowledge_pairs + atlas_pairs
+    for w_i in range(3):
+        organism.train_wave_with_neuromodulator_reward(domain_a_pairs + core_lesson_pairs * 2, wave_idx=w_i + 1)
+    shield_density_pct = metaplasticity_shield.consolidate_into_slow_reservoir(
+        organism.dendritic_plateau_readout.w_dend_out,
+        active_cols=len(organism.dendritic_plateau_readout.col_to_tok),
+    )
+
+    # Затем дистиллируем и обучаем Тему Б (250 энциклопедических и диалоговых пар из UltraChat и OASST2):
     corpus_distilled_pairs, corpus_src_counts = harvest_clean_encyclopedic_corpus_pairs(organism, target_count=250)
-    all_wake_pairs = atlas_pairs + corpus_distilled_pairs
+    for cp in corpus_distilled_pairs:
+        sdr_c = organism.dendritic_plateau_readout._compute_cortical_sdr2048(cp.stimulus_ids + cp.response_ids, normalize=False)
+        _ = bcm_gate.evaluate_neuromodulatory_gate(sdr_c, causal_density_hint=1.1, grammar_ok=True)
+
+    all_wake_pairs = domain_a_pairs + corpus_distilled_pairs
 
     # 1. Проводим 3 спиральные волны консолидации (новые знания + базовые схемы ядра):
     for w_i in range(3):
@@ -237,17 +281,33 @@ def run_ontogenetic_wake_sws_rem_training(
 
     if surgical_repair_pairs:
         for _ in range(3):
-            organism.train_wave_with_neuromodulator_reward(surgical_repair_pairs + core_lesson_pairs * 2, wave_idx=5)
+            organism.train_wave_with_neuromodulator_reward(surgical_repair_pairs + domain_a_pairs + core_lesson_pairs * 2, wave_idx=5)
     for _ in range(3):
-        organism.train_wave_with_neuromodulator_reward(core_lesson_pairs, wave_idx=6)
+        organism.train_wave_with_neuromodulator_reward(domain_a_pairs + core_lesson_pairs * 2, wave_idx=6)
+
+    # 3. Измеряем сохранение знаний Темы А (Knowledge/ + Atlas) после экстремального обучения Теме Б (Этап 4 next16.txt >= 98.5%):
+    domain_a_retained = 0
+    for kp in domain_a_pairs:
+        qv = organism.compute_stimulus_vec64(kp.stimulus_ids)
+        p_ids, _, _ = organism._synthesize_single_beam_from_weights_only(
+            q_vec=qv,
+            l5_vec=F.normalize(torch.roll(qv, shifts=1, dims=-1), p=2, dim=-1),
+            onset_pair=(0, 0),
+            temperature_jitter=0.0,
+            max_tokens=36,
+            use_ngrams=False,
+        )
+        if "".join(organism.decode_token(t) for t in p_ids).strip() == "".join(organism.decode_token(t) for t in kp.response_ids).strip():
+            domain_a_retained += 1
+    domain_a_retention_pct = round(100.0 * float(domain_a_retained) / float(max(1, len(domain_a_pairs))), 2)
 
     genesis._bootstrap_genesis_modules_from_lessons()
     s1_sec = round(time.perf_counter() - t_s1, 2)
     print(
-        f"  [Stage I: WAKE Omni-Domain Distillation & Surgical Rehearsal] "
-        f"Atlas={len(atlas_pairs)} (16 domains) | CorpusDistilled={len(corpus_distilled_pairs)} {corpus_src_counts} | "
-        f"Probed={rehearsal_probes} | FirstPassMastered={rehearsal_mastered} | SurgicallyRepaired={len(surgical_repair_pairs)} | "
-        f"Time={s1_sec}s",
+        f"  [Stage I: WAKE Knowledge/ + Omni-Domain Distillation & Metaplasticity] "
+        f"KnowledgeCore={len(knowledge_pairs)} (37 Chem + Math + Consciousness) | Atlas={len(atlas_pairs)} | "
+        f"CorpusDistilled={len(corpus_distilled_pairs)} | BCM_Yield={bcm_gate.ingestion_yield_pct}% | "
+        f"DomainA_Retention={domain_a_retention_pct}% (Shield={shield_density_pct}%) | Time={s1_sec}s",
         flush=True,
     )
 
@@ -277,11 +337,12 @@ def run_ontogenetic_wake_sws_rem_training(
     )
 
     # ------------------------------------------------------------------
-    # СТАДИЯ III: ОТРОЧЕСТВО — ПОСТРОЕНИЕ 6-ЦЕПНОГО ГРАФА ПРИЧИННОСТИ МИРА
+    # СТАДИЯ III: ОТРОЧЕСТВО — ПОСТРОЕНИЕ 10-ЦЕПНОГО ГРАФА ПРИЧИННОСТИ МИРА (ВКЛЮЧАЯ Knowledge/chemical.md)
     # ------------------------------------------------------------------
     t_s3 = time.perf_counter()
+    combined_world_graph_facts = list(EXPANDED_WORLD_GRAPH_CAUSAL_FACTS) + knowledge_distillery.get_knowledge_world_graph_facts()
     n_triplets = genesis.ingest_scientific_corpus_into_world_graph(
-        EXPANDED_WORLD_GRAPH_CAUSAL_FACTS,
+        combined_world_graph_facts,
         dopamine_gain=2.5,
     )
     s3_sec = round(time.perf_counter() - t_s3, 2)
@@ -409,10 +470,12 @@ def run_ontogenetic_wake_sws_rem_training(
         "Elena is revising her treatise; what is her name, and how can she fix grammar errors in her treatise?",
         "Can kayaking outdoors clear the mind before fixing runny bechamel with an egg yolk?",
         "What do you know about monograph?",
-        "How do massive stars synthesize heavy elements before a supernova explosion?",
-        "How does the CRISPR-Cas9 complex target specific genomic DNA sequences?",
+        "How does the astrocyte-neuron lactate shuttle support long-term memory consolidation?",
+        "How does Larkum BAC-firing couple basal and apical compartments in layer 5 pyramidal neurons?",
+        "How does Global Workspace Theory explain conscious ignition and cortical broadcast?",
+        "How does negative feedback control in engineering relate to insulin and glucose homeostasis or Le Chatelier equilibrium?",
         "What happens to pyramidal neurons if astrocytes fail to release D-serine?",
-        "What happens if calcium influx fails to activate CaMKII enzymes?",
+        "What happens if VIP interneurons fail to inhibit somatostatin interneurons?",
         "Why do tardigrades survive extreme radiation in outer space?",
         "Tardigrades survive extreme radiation by producing Dsup proteins that shield DNA from hydroxyl radicals. Dsup proteins also accelerate DNA repair enzymes after cosmic ray exposure.",
         "Explain in detail how tardigrades survive extreme radiation?",

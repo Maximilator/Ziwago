@@ -299,6 +299,9 @@ class CorticalRelationalWorldGraph:
         "ignite", "ignites", "stabilize", "stabilizes", "regulate", "regulates",
         "modulate", "modulates", "protect", "protects", "generate", "generates",
         "induce", "induces", "trigger", "triggers", "drive", "drives", "receive", "receives",
+        "inhibit", "inhibits", "suppress", "suppresses", "phosphorylate", "phosphorylates",
+        "absorb", "absorbs", "split", "splits", "direct", "directs", "fuel", "fuels",
+        "stimulate", "stimulates", "produce", "produces",
     )
 
     def __init__(

@@ -391,6 +391,46 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
         self.assertNotIn("alex", sum_low)
         self.assertNotIn("mayonnaise", sum_low)
 
+    def test_pillar12_next16_knowledge_distillery_bcm_larkum_metaplasticity_and_isomorphism(self) -> None:
+        """Pillar 12 (NEXT-16 v25.0): Verifies:
+        1) KnowledgeDistillery parsing of /home/jupyter/Knowledge/ (37 chemical agents, math.md BAC-firing/Jahr-Stevens/Priesemann, consciousness.md GWT/IIT/HOT/AST) and CA3 recall;
+        2) DynamicNeuromodulatoryBCMGate sliding threshold theta_M & TwoCompartmentLarkumMicrocircuit BAC-firing burst;
+        3) FusiZenkeCascadeMetaplasticityShield u_slow consolidation;
+        4) CrossDomainIsomorphismDreamer Zero-Shot Analogical Transfer (Le Chatelier <-> BCM <-> Insulin-Glucose);
+        5) ConsciousnessMetricsDashboard (GWT ignition, IIT PCI-proxy, Priesemann subcriticality sigma ~ 0.98)."""
+        from ziwago_assistant import ZiwagoBiologicalSNNAssistant
+
+        assistant = ZiwagoBiologicalSNNAssistant(root=ROOT, workers=2, cpu_threads=4, seed=12345)
+        self.assertGreaterEqual(assistant.knowledge_distillery.extracted_chemical_agents_count, 37)
+
+        # 1. Recall from Knowledge/chemical.md (ANLS L-lactate shuttle & VIP disinhibition counterfactual)
+        r_chem = assistant.chat("How does the astrocyte-neuron lactate shuttle support long-term memory consolidation?")
+        self.assertIn("lactate", str(r_chem["pure_weight_generated_response"]).lower())
+        self.assertIn("mct2", str(r_chem["pure_weight_generated_response"]).lower())
+
+        # 2. Recall from Knowledge/math.md (Larkum BAC-firing & Priesemann subcriticality)
+        r_math = assistant.chat("How does Larkum BAC-firing couple basal and apical compartments in layer 5 pyramidal neurons?")
+        self.assertIn("five milliseconds", str(r_math["pure_weight_generated_response"]).lower())
+
+        # 3. Recall from Knowledge/consciousness.md (GWT ignition & PCI)
+        r_consc = assistant.chat("How does Global Workspace Theory explain conscious ignition and cortical broadcast?")
+        self.assertIn("winning coalition", str(r_consc["pure_weight_generated_response"]).lower())
+        c_metrics = r_consc["response_passport"]["consciousness_metrics"]  # type: ignore[index]
+        self.assertGreaterEqual(float(c_metrics["priesemann_subcritical_sigma"]), 0.95)
+        self.assertLessEqual(float(c_metrics["priesemann_subcritical_sigma"]), 0.995)
+        self.assertGreater(float(c_metrics["iit_pci_complexity_proxy"]), 0.31)
+
+        # 4. Zero-Shot Cross-Domain Analogical Transfer (REM Isomorphism: Negative Feedback -> Insulin/Glucose & Le Chatelier)
+        r_iso = assistant.chat("How does negative feedback control in engineering relate to insulin and glucose homeostasis or Le Chatelier equilibrium?")
+        self.assertTrue(bool(r_iso.get("cross_domain_isomorphism_triggered")))
+        self.assertIn("insulin", str(r_iso["pure_weight_generated_response"]).lower())
+        self.assertIn("le chatelier", str(r_iso["pure_weight_generated_response"]).lower())
+
+        # 5. Counterfactual intervention on Knowledge/chemical.md VIP -> SST -> apical Ca2+ cascade
+        r_vip_cf = assistant.chat("What happens if VIP interneurons fail to inhibit somatostatin interneurons?")
+        self.assertTrue(bool(r_vip_cf.get("counterfactual_simulation_triggered")))
+        self.assertIn("somatostatin", str(r_vip_cf["pure_weight_generated_response"]).lower())
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
