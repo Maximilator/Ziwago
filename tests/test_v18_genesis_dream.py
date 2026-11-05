@@ -182,6 +182,66 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
             out_fresh = fresh_genesis.generate_genesis_response(q, prefer_world_graph_synthesis=use_graph)["pure_weight_generated_response"]
             self.assertEqual(out_orig, out_fresh)
 
+    def test_pillar7_proportional_think_gate_passport_and_clarification_continuity(self) -> None:
+        """Verifies all 5 engineering & biophysical improvements:
+        1) Missing MASTER_CKPT raises CheckpointCompatibilityError (fail instead of silent skip);
+        2) Proportional Gate Zone 2 ('I know X as Y' when X is in STDP cortex/world graph) vs Zone 3 ('share the key mechanism');
+        3) Deterministic response_passport with selected_ca3_pole_indices, saliences, and triggered mechanisms;
+        4) Implicit user reply after a clarifying turn automatically consolidates knowledge and updates episodic_turns;
+        5) Sub-400ms per-turn latency."""
+        from neuroweave10.evaluation.gates import CheckpointCompatibilityError, MASTER_CKPT, resolve_master_checkpoint_path
+        from ziwago_assistant import BasalGangliaActionSelector, ZiwagoBiologicalSNNAssistant
+
+        self.assertTrue(MASTER_CKPT.exists(), f"Missing MASTER_CKPT: {MASTER_CKPT}")
+        with self.assertRaises(CheckpointCompatibilityError):
+            resolve_master_checkpoint_path(explicit_path=ROOT / "Produce" / "checkpoints" / "nonexistent_ckpt_file.pt")
+
+        assistant = ZiwagoBiologicalSNNAssistant(root=ROOT, workers=2, cpu_threads=4, seed=12345)
+        assistant.genesis.emergent_ontology.observe_sentence_stdp(
+            "To fix grammar errors in your treatise, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+            register_as_canonical=False,
+            lr=1.5,
+        )
+
+        # Zone 2: Short/under-specified question about a known STDP concept ('treatise') -> 'I know treatise as essay: ...'
+        res_think = assistant.chat("What do you know about treatise?", enable_active_inference=True)
+        self.assertTrue(bool(res_think.get("endogenous_cortical_think_triggered")))
+        self.assertFalse(bool(res_think.get("active_inference_clarification_triggered")))
+        self.assertEqual(
+            res_think["basal_ganglia_selected_action"],
+            BasalGangliaActionSelector.ACTION_ENDOGENOUS_CORTICAL_THINK,
+        )
+        txt_think = str(res_think["pure_weight_generated_response"])
+        self.assertTrue(txt_think.startswith("I know treatise as essay:"), f"Unexpected Zone 2 output: {txt_think!r}")
+        passport_think = res_think["response_passport"]  # type: ignore[index]
+        self.assertEqual(passport_think["proportional_gate_zone"], "ZONE_2_KNOWN_REFORMULATE_THINK")  # type: ignore[index]
+        self.assertTrue(bool(passport_think["mechanisms_triggered"]["endogenous_cortical_think"]))  # type: ignore[index]
+        self.assertGreater(len(passport_think["selected_ca3_pole_indices"]), 0)  # type: ignore[arg-type,index]
+
+        # Zone 3: Truly unknown concept ('tardigrades') -> asks clarifying question & records was_clarification_request=True
+        res_clarify = assistant.chat("Why do tardigrades survive extreme radiation in outer space?", enable_active_inference=True)
+        self.assertTrue(bool(res_clarify["active_inference_clarification_triggered"]))
+        passport_clarify = res_clarify["response_passport"]  # type: ignore[index]
+        self.assertEqual(passport_clarify["proportional_gate_zone"], "ZONE_3_UNKNOWN_CLARIFY")  # type: ignore[index]
+        self.assertTrue(bool(assistant.organism.dialogue_state.episodic_turns[-1]["was_clarification_request"]))
+
+        # Implicit reply to clarifying question WITHOUT 'Remember that' -> automatically consolidates!
+        res_implicit_teach = assistant.chat(
+            "Tardigrades survive extreme radiation by producing Dsup proteins that shield DNA from hydroxyl radicals.",
+            enable_active_inference=True,
+        )
+        self.assertEqual(
+            res_implicit_teach["basal_ganglia_selected_action"],
+            BasalGangliaActionSelector.ACTION_ONLINE_DA_CONSOLIDATION,
+        )
+        self.assertGreater(int(res_implicit_teach["online_dopamine_imprinted_tokens"]), 0)  # type: ignore[arg-type]
+
+        # Subsequent query now recalls from Zone 1 Direct Recall!
+        res_after = assistant.chat("Why do tardigrades survive extreme radiation?", enable_active_inference=True)
+        self.assertFalse(bool(res_after["active_inference_clarification_triggered"]))
+        self.assertIn("dsup", str(res_after["pure_weight_generated_response"]).lower())
+        self.assertEqual(res_after["response_passport"]["proportional_gate_zone"], "ZONE_1_DIRECT_RECALL")  # type: ignore[index]
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

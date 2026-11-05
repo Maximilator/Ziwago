@@ -41,11 +41,30 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple
 import torch
 
 CHECKPOINT_SCHEMA_VERSION = "ziwago.checkpoint.v16.2"
+MASTER_CKPT_REL_PATH = Path("Produce") / "checkpoints" / "ziwago_v18_1_genesis_omniscient_master.pt"
+MASTER_CKPT = Path(__file__).resolve().parents[2] / MASTER_CKPT_REL_PATH
 
 
 class CheckpointCompatibilityError(ValueError):
     """Выбрасывается при нарушении контракта самодостаточного чекпоинта (отсутствие карты колонок,
     проекторов, состояния коры/SON/химии, несовпадение версии схемы, SHA-256 токенизатора или размерностей)."""
+
+
+def resolve_master_checkpoint_path(root: Optional[Path] = None, explicit_path: Optional[Path] = None) -> Path:
+    """Единый резолвер мастер-чекпоинта (`MASTER_CKPT`):
+    Вместо тихого `skip` или отката к необученной сети жёстко выбрасывает `CheckpointCompatibilityError`,
+    если файл мастер-чекпоинта отсутствует на диске."""
+    if explicit_path is not None:
+        ckpt = Path(explicit_path)
+    elif root is not None:
+        ckpt = Path(root) / MASTER_CKPT_REL_PATH
+    else:
+        ckpt = MASTER_CKPT
+    if not ckpt.exists():
+        raise CheckpointCompatibilityError(
+            f"CRITICAL: Master checkpoint file does not exist at {ckpt} (silent skip is forbidden)."
+        )
+    return ckpt
 
 
 def compute_tokenizer_sha256(vocab_path: Path, merges_path: Path) -> str:

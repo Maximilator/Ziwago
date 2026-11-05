@@ -27,10 +27,12 @@ if str(ROOT) not in sys.path:
 
 from neuroweave10.evaluation.gates import (
     HOLD_OUT_EXAM_SUITE,
+    MASTER_CKPT,
     CheckpointCompatibilityError,
     UnifiedCurriculumGates,
     evaluate_grammar_and_artifacts,
     evaluate_novel_knowledge_generalization,
+    resolve_master_checkpoint_path,
     validate_self_contained_checkpoint,
 )
 from train_ziwago_v14_pure_synaptic_dialogue import (
@@ -322,11 +324,10 @@ class TestZiwagoV16RoundTripAndGates(unittest.TestCase):
         self.assertIn("chromophores", txt_learned)
 
     def test_v16_master_checkpoint_disk_reproduces_golden_with_seed_99999(self) -> None:
-        """Directly loads Produce/checkpoints/ziwago_v16_0_10B_omniscient_master.pt with seed=99999
+        """Directly loads MASTER_CKPT with seed=99999 (failing hard if missing instead of skipping)
         and verifies byte-for-byte reproduction of tests/golden_v16_expected_outputs.json."""
-        master_ckpt = ROOT / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
-        if not master_ckpt.exists():
-            self.skipTest("Master checkpoint not present on disk")
+        self.assertTrue(MASTER_CKPT.exists(), f"Missing canonical MASTER_CKPT: {MASTER_CKPT}")
+        master_ckpt = resolve_master_checkpoint_path(ROOT)
 
         master_org = ZiwagoPureSynapticDialogueOrganismV14(
             root=ROOT,

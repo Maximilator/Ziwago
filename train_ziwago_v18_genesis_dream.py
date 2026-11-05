@@ -47,8 +47,10 @@ from neuroweave10.cortex.genesis_engine import (
 )
 from neuroweave10.evaluation.gates import (
     HOLD_OUT_EXAM_SUITE,
+    MASTER_CKPT,
     UnifiedCurriculumGates,
     evaluate_grammar_and_artifacts,
+    resolve_master_checkpoint_path,
 )
 from train_ziwago_v14_pure_synaptic_dialogue import (
     TokenizedDialogPair,
@@ -124,14 +126,39 @@ class ZiwagoGenesisDreamOrganismV18:
 
         self._bootstrap_trajectories: List[Tuple[torch.Tensor, Sequence[int], float]] = []
         self.loaded_genesis_state_from_ckpt: bool = False
+        self.loaded_checkpoint_info: Optional[Dict[str, object]] = None
+        self.core_organism.external_think_resolver_fn = self._resolve_cortical_think_concept
 
         if auto_load_checkpoint:
-            default_ckpt = self.root / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
-            ckpt_to_load = Path(checkpoint_path) if checkpoint_path is not None else default_ckpt
-            if ckpt_to_load.exists():
-                self.load_genesis_checkpoint(ckpt_to_load, strict_schema=True)
+            ckpt_to_load = resolve_master_checkpoint_path(root=self.root, explicit_path=checkpoint_path)
+            self.loaded_checkpoint_info = self.load_genesis_checkpoint(ckpt_to_load, strict_schema=True)
             if not self.loaded_genesis_state_from_lessons_or_ckpt():
                 self._bootstrap_genesis_modules_from_lessons()
+
+    def _resolve_cortical_think_concept(self, utterance: str) -> Optional[Dict[str, object]]:
+        """Эндогенный кортикальный цикл размышления `THINK` (`Zone 2 — 'I know X as Y'`):
+        Проверяет, известен ли концепт вопроса $X$ в `CorticalRelationalWorldGraph` или в `EmergentOntologicalRoleDiscovery`."""
+        # 1. Проверяем Граф Каузальных Триплетов Мира (если вопрос касается узла в графе триплетов):
+        g_syn = self.world_graph.synthesize_novel_sentence_from_graph(
+            utterance,
+            valence_generator=self.valence_wave_generator,
+            get_vec64_fn=self.core_organism.get_vec64,
+            decode_fn=self.core_organism.decode_token,
+        )
+        if g_syn is not None and int(g_syn.get("hops_traversed", 0)) >= 1:  # type: ignore[arg-type]
+            chain = g_syn["triplet_chain"]  # type: ignore[index]
+            subj_x = str(chain[0][0])
+            rel_y = f"a causal agent that {chain[0][1]} {chain[0][2]}"
+            return {
+                "known_in_cortex": True,
+                "query_concept_x": subj_x,
+                "canonical_concept_y": rel_y,
+                "direct_graph_sentence": str(g_syn["synthesized_sentence"]),
+                "think_trace": f"Zone2_WorldGraphThink: traversed {g_syn['hops_traversed']} hop(s) from {subj_x!r}",
+            }
+
+        # 2. Проверяем самоорганизовавшуюся STDP-онтологию L2/3 BA22:
+        return self.emergent_ontology.think_and_resolve_known_concept(utterance)
 
     def loaded_genesis_state_from_lessons_or_ckpt(self) -> bool:
         return self.loaded_genesis_state_from_ckpt and len(self.valence_wave_generator.col_to_tok) > 0
@@ -223,13 +250,19 @@ class ZiwagoGenesisDreamOrganismV18:
         return info
 
     def load_genesis_checkpoint(self, path: Path, strict_schema: bool = True) -> Dict[str, object]:
-        """Загружает единый самодостаточный чекпоинт ядра `v16.2` и всех 5 столпов `Genesis v18.1`."""
-        val_info = self.core_organism.load_self_contained_checkpoint(path, strict_schema=strict_schema)
-        payload = torch.load(path, map_location="cpu", weights_only=False)
+        """Загружает единый самодостаточный чекпоинт ядра `v16.2` и всех 5 столпов `Genesis v18.1` за один вызов `torch.load`!"""
+        ckpt_p = resolve_master_checkpoint_path(explicit_path=Path(path))
+        payload = torch.load(ckpt_p, map_location="cpu", weights_only=False)
+        val_info = self.core_organism.load_self_contained_checkpoint(
+            ckpt_p,
+            strict_schema=strict_schema,
+            preloaded_payload=payload,
+        )
         gen_state = payload.get("genesis_v18_state")
         if isinstance(gen_state, dict):
             self.load_genesis_state_dict(gen_state)
             self.loaded_genesis_state_from_ckpt = True
+        self.loaded_checkpoint_info = val_info
         return val_info
 
     def generate_genesis_response(

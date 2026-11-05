@@ -773,6 +773,71 @@ class EmergentOntologicalRoleDiscovery:
 
         return discovered
 
+    def think_and_resolve_known_concept(
+        self,
+        utterance: str,
+        min_stdp_Factory_cosine: float = 0.22,
+    ) -> Optional[Dict[str, object]]:
+        """Эндогенный кортикальный цикл размышления (`Zone 2 Proportional Gate — THINK: 'I know X as Y'`):
+        Разделяет состояния «не знаю (`Zone 3`)» и «знаю концепт $X$ в самоорганизовавшейся STDP-коре, но не нашла
+        готовой заученной формулировки для короткого/нестандартного вопроса (`Zone 2`)».
+        Находит для известного коре концепта $X$ ближайший канонический концепт $Y$ и его схему в `CA3`."""
+        p_strip = " .,!?;:'()[]{}" + chr(34)
+        generic_query_verbs = {
+            "know", "describe", "think", "mean", "means", "work", "works",
+            "handle", "deal", "used", "using", "tell", "something", "anything",
+        }
+        utt_words = [
+            w.strip(p_strip).lower()
+            for w in utterance.split()
+            if len(w.strip(p_strip)) >= 4
+            and w.strip(p_strip).lower() not in self.FUNCTION_WORDS_ONLY
+            and w.strip(p_strip).lower() not in generic_query_verbs
+        ]
+        if not utt_words:
+            return None
+
+        best_match: Optional[Dict[str, object]] = None
+        best_overall_sim = -1.0
+
+        for w_x in utt_words:
+            v_x = self.word_context_sdr.get(w_x)
+            if v_x is None or float(v_x.norm().item()) < 1e-5:
+                continue
+            v_x_norm = F.normalize(v_x, p=2, dim=0)
+
+            for w_y in self.canonical_anchors:
+                if w_y == w_x or w_y in generic_query_verbs:
+                    continue
+                v_y = self.word_context_sdr.get(w_y)
+                if v_y is None or float(v_y.norm().item()) < 1e-5:
+                    continue
+                sim = float(torch.dot(v_x_norm, F.normalize(v_y, p=2, dim=0)).item())
+                if sim > best_overall_sim:
+                    # Ищем схему, в которой w_y выступает тематическим слотом ответа
+                    matched_schema_words: List[str] = []
+                    for v_all, v_resp in self.schema_records:
+                        if w_y in v_resp:
+                            matched_schema_words = sorted(v_all)
+                            break
+                    if matched_schema_words:
+                        best_overall_sim = sim
+                        best_match = {
+                            "known_in_cortex": True,
+                            "query_concept_x": w_x,
+                            "canonical_concept_y": w_y,
+                            "stdp_cosine": round(sim, 4),
+                            "schema_cue_words": matched_schema_words,
+                            "think_trace": (
+                                f"Zone2_EndogenousThink: resolved known cortical concept {w_x!r} -> "
+                                f"canonical schema concept {w_y!r} (STDP_cos={sim:.4f})"
+                            ),
+                        }
+
+        if best_match is not None and best_overall_sim >= min_stdp_Factory_cosine:
+            return best_match
+        return None
+
     def export_state_dict(self) -> Dict[str, object]:
         return {
             "word_context_sdr": {k: v.detach().clone() for k, v in self.word_context_sdr.items()},

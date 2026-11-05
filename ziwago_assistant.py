@@ -27,6 +27,10 @@ ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from neuroweave10.evaluation.gates import (
+    MASTER_CKPT,
+    resolve_master_checkpoint_path,
+)
 from train_ziwago_v14_pure_synaptic_dialogue import (
     TokenizedDialogPair,
     ZiwagoPureSynapticDialogueOrganismV14,
@@ -39,15 +43,17 @@ from train_ziwago_v18_genesis_dream import ZiwagoGenesisDreamOrganismV18
 
 class BasalGangliaActionSelector:
     r"""Стриарный маршрутизатор когнитивных действий (`Basal Ganglia D1 Direct Go / D2 Indirect NoGo`):
-    Оценивает входной стимул, резонанс `CA3` и эпистемическую неопределённость `SON`, выбирая одно из 5 действий:
+    Оценивает входной стимул, резонанс `CA3` и пропорциональный гейт `SON`, выбирая одно из 6 действий:
       - `ACTION_EPISODIC_MEMORY_RECALL`: запрос к эпизодическому графу рабочей памяти `BA46`;
       - `ACTION_ONLINE_DA_CONSOLIDATION`: дофаминовая запись нового факта или многопредложенческого эпизода;
-      - `ACTION_ACTIVE_INFERENCE_CLARIFY`: встречный уточняющий вопрос от `SON` при высокой неопределённости;
+      - `ACTION_ENDOGENOUS_CORTICAL_THINK`: концепт $X$ известен в STDP-коре/графе, ответ в форме `'I know X as Y'`;
+      - `ACTION_ACTIVE_INFERENCE_CLARIFY`: встречный уточняющий вопрос от `SON` при истинной неизвестности (`Zone 3`);
       - `ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS`: 2-хоповый транзитивный вывод ($A \implies B \implies C$) или абзац из цепи `CA3`;
       - `ACTION_DIRECT_SYNAPTIC_RESPONSE`: прямой одно- или двухклаузальный синтез через 8,192 NMDA-ветви."""
 
     ACTION_EPISODIC_MEMORY_RECALL = "ACTION_EPISODIC_MEMORY_RECALL"
     ACTION_ONLINE_DA_CONSOLIDATION = "ACTION_ONLINE_DA_CONSOLIDATION"
+    ACTION_ENDOGENOUS_CORTICAL_THINK = "ACTION_ENDOGENOUS_CORTICAL_THINK"
     ACTION_ACTIVE_INFERENCE_CLARIFY = "ACTION_ACTIVE_INFERENCE_CLARIFY"
     ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS = "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS"
     ACTION_DIRECT_SYNAPTIC_RESPONSE = "ACTION_DIRECT_SYNAPTIC_RESPONSE"
@@ -60,16 +66,19 @@ class BasalGangliaActionSelector:
         wants_multi_hop_or_paragraph: bool,
         ca3_resonance: float,
         active_inference_triggered: bool = False,
+        endogenous_think_triggered: bool = False,
     ) -> Tuple[str, Dict[str, float]]:
         d1_episodic = 2.5 if is_episodic_query else 0.05
         d1_consolidate = 2.4 if is_teaching_or_identity else 0.05
-        d1_clarify = 2.3 if (active_inference_triggered or (not is_teaching_or_identity and not is_episodic_query and ca3_resonance < 0.38)) else 0.1
-        d1_multihop = 2.0 if (wants_multi_hop_or_paragraph and not active_inference_triggered) else 0.15
-        d1_direct = 1.6 if not active_inference_triggered else 0.2
+        d1_think = 2.35 if endogenous_think_triggered else 0.08
+        d1_clarify = 2.3 if (active_inference_triggered and not endogenous_think_triggered) else 0.1
+        d1_multihop = 2.0 if (wants_multi_hop_or_paragraph and not active_inference_triggered and not endogenous_think_triggered) else 0.15
+        d1_direct = 1.6 if (not active_inference_triggered and not endogenous_think_triggered) else 0.2
 
         scores = {
             self.ACTION_EPISODIC_MEMORY_RECALL: round(d1_episodic, 4),
             self.ACTION_ONLINE_DA_CONSOLIDATION: round(d1_consolidate, 4),
+            self.ACTION_ENDOGENOUS_CORTICAL_THINK: round(d1_think, 4),
             self.ACTION_ACTIVE_INFERENCE_CLARIFY: round(d1_clarify, 4),
             self.ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS: round(d1_multihop, 4),
             self.ACTION_DIRECT_SYNAPTIC_RESPONSE: round(d1_direct, 4),
@@ -79,7 +88,7 @@ class BasalGangliaActionSelector:
 
 
 class ZiwagoBiologicalSNNAssistant:
-    """Единый фасад функционального биологического SNN-ассистента Ziwago v17.0."""
+    """Единый фасад функционального биологического SNN-ассистента Ziwago-Genesis v18.1."""
 
     def __init__(
         self,
@@ -90,26 +99,25 @@ class ZiwagoBiologicalSNNAssistant:
         seed: int = 42,
     ):
         self.root = Path(root)
+        # Единый резолвер мастер-чекпоинта (MASTER_CKPT): жёсткий fail вместо тихого skip!
+        ckpt_to_load = resolve_master_checkpoint_path(root=self.root, explicit_path=checkpoint_path)
         self.genesis = ZiwagoGenesisDreamOrganismV18(
             root=self.root,
-            checkpoint_path=checkpoint_path,
+            checkpoint_path=ckpt_to_load,
             workers=workers,
             cpu_threads=cpu_threads,
             seed=seed,
+            auto_load_checkpoint=True,
         )
         self.organism = self.genesis.core_organism
         self.organism.use_ngrams = False
         self.basal_ganglia = BasalGangliaActionSelector()
-        self.loaded_checkpoint_info: Optional[Dict[str, object]] = None
-
-        default_ckpt = self.root / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
-        ckpt_to_load = Path(checkpoint_path) if checkpoint_path is not None else default_ckpt
-        if ckpt_to_load.exists():
-            self.loaded_checkpoint_info = self.genesis.load_genesis_checkpoint(ckpt_to_load, strict_schema=True)
+        self.loaded_checkpoint_info: Optional[Dict[str, object]] = self.genesis.loaded_checkpoint_info
 
     def teach_multi_sentence_episode(self, teaching_text: str) -> Dict[str, object]:
-        r"""Обучает ассистента одному или нескольким связанным предложениям под всплеском `DA + ACh`
-        и связывает их полюса направленным STDP-синапсом `w_ca3_episode_links` ($p_1 \longrightarrow p_2$)."""
+        r"""Обучает ассистента одному или нескольким связанным предложениям под всплеском `DA + ACh`,
+        связывает их полюса направленным STDP-синапсом `w_ca3_episode_links` ($p_1 \longrightarrow p_2$)
+        и обновляет самоорганизующуюся STDP-онтологию и Граф Мира."""
         clean = teaching_text.strip()
         for pref in ("Remember that ", "remember that ", "Note that ", "note that ", "Learn that ", "learn that ", "Fact: ", "fact: "):
             if clean.startswith(pref):
@@ -117,20 +125,21 @@ class ZiwagoBiologicalSNNAssistant:
                 break
         raw_sents = [s.strip() for s in clean.replace("!", ".").split(".") if len(s.strip().split()) >= 4]
         if not raw_sents:
-            return {"sentences_imprinted": 0, "episode_links_created": 0}
+            return {"sentences_imprinted": 0, "episode_links_created": 0, "pole_vecs": []}
 
         pole_vecs: List[torch.Tensor] = []
         total_toks = 0
         for idx, s_txt in enumerate(raw_sents):
             sent_full = (s_txt[0].upper() + s_txt[1:] if s_txt[0].islower() else s_txt) + "."
+            self.genesis.emergent_ontology.observe_sentence_stdp(sent_full, register_as_canonical=True, lr=1.8)
+            self.genesis.world_graph.extract_and_consolidate_sentence(sent_full, dopamine_gain=2.5)
             s_ids = self.organism.encode_text(sent_full)
             if idx > 0:
-                # Делаем ключ второго предложения эпизода ортогональным первому, чтобы они образовали цепь p1 -> p2
                 q_ids = self.organism.encode_text(f"Continuation episode {idx}: " + sent_full)
             else:
                 q_ids = s_ids
-            pair = TokenizedDialogPair("assistant_online_episode", q_ids, s_ids, quality_reward_hint=2.8)
-            for _ in range(4):
+            pair = TokenizedDialogPair("assistant_online_episode", q_ids, s_ids, quality_reward_hint=3.2)
+            for _ in range(3):
                 self.organism.train_wave_with_neuromodulator_reward([pair], wave_idx=1)
             p_strip = " .,!?;:'()[]{}" + chr(34)
             stop_w = {"the", "a", "an", "to", "of", "in", "on", "is", "are", "was", "were", "and", "or", "for", "with"}
@@ -151,6 +160,8 @@ class ZiwagoBiologicalSNNAssistant:
             "sentences_imprinted": len(raw_sents),
             "tokens_imprinted": total_toks,
             "episode_links_created": links_created,
+            "pole_vecs": pole_vecs,
+            "clean_fact": ". ".join(raw_sents) + ".",
         }
 
     def chat(
@@ -159,45 +170,118 @@ class ZiwagoBiologicalSNNAssistant:
         max_tokens: int = 48,
         enable_active_inference: bool = True,
     ) -> Dict[str, object]:
-        """Выполняет один полный цикл работы биологического SNN-ассистента с выбором действия в Базальных Ганглиях."""
+        """Выполняет один полный цикл работы биологического SNN-ассистента с выбором действия в Базальных Ганглиях,
+        пропорциональным гейтом `THINK` (`'I know X as Y'`) и полным сохранением эпизодической истории на уточняющих ходах."""
         t0 = time.perf_counter()
         low = user_utterance.strip().lower()
         is_ep = self.organism.dialogue_state.is_episodic_history_query(user_utterance)
-        is_teach = any(low.startswith(p) for p in ("remember that ", "note that ", "learn that ", "fact: "))
-        is_ident_fact = any(p in low for p in ("my name is", "i am building", "i'm building")) and "?" not in user_utterance
+        explicit_teach = any(low.startswith(p) for p in ("remember that ", "note that ", "learn that ", "fact: "))
+        is_ident_fact = any(
+            p in low for p in ("my name is", "i am building", "i'm building", "i am designing", "i'm designing")
+        ) and "?" not in user_utterance
+
+        # Если предыдущий ход был встречным уточняющим вопросом SON (was_clarification_request == True),
+        # а собеседник отвечает утвердительным объяснением (даже без префикса 'Remember that'!),
+        # ассистент автоматически распознаёт это как ответ на свой вопрос и консолидирует знание!
+        prev_was_clarify = bool(
+            self.organism.dialogue_state.episodic_turns
+            and self.organism.dialogue_state.episodic_turns[-1].get("was_clarification_request", False)
+        )
+        implicit_reply_to_clarify = (
+            prev_was_clarify
+            and "?" not in user_utterance
+            and not is_ep
+            and not is_ident_fact
+            and len(user_utterance.split()) >= 5
+        )
+        is_teach = explicit_teach or implicit_reply_to_clarify
+
         wants_mh = any(m in low for m in ("step by step", "causal chain", "consequently", "how does that lead to"))
         wants_para = any(m in low for m in ("in detail", "elaborate", "full paragraph", "two sentences"))
 
         episode_teach_info: Dict[str, object] = {}
         if is_teach:
             episode_teach_info = self.teach_multi_sentence_episode(user_utterance)
+            if int(episode_teach_info.get("sentences_imprinted", 0)) >= 1:  # type: ignore[arg-type]
+                pole_vecs_taught: List[torch.Tensor] = episode_teach_info.get("pole_vecs", [])  # type: ignore[assignment]
+                self.organism._record_pole_telemetry_from_vectors(pole_vecs_taught, [2.8] * len(pole_vecs_taught))
+                u_ids = self.organism.encode_text(user_utterance)
+                q_raw_vec = self.organism.compute_stimulus_vec64(u_ids)
+                ack_resp = (
+                    f"Consolidated {episode_teach_info['sentences_imprinted']} sentence(s) "
+                    f"({episode_teach_info['tokens_imprinted']} BPE tokens, "
+                    f"{episode_teach_info['episode_links_created']} CA3 episode link(s)) "
+                    f"into the 8,192-branch NMDA matrix and Protected Core Bank: "
+                    f"{episode_teach_info['clean_fact']}"
+                )
+                passport = self.organism._build_response_passport(
+                    stimulus_ids=u_ids,
+                    proportional_gate_zone="ZONE_1_ONLINE_DA_CONSOLIDATION",
+                    son_vte_grounding="consolidated_online_episode",
+                    think_trace=f"OnlineConsolidation: imprinted {episode_teach_info['sentences_imprinted']} sentence(s) into poles {self.organism.last_selected_ca3_pole_indices}",
+                )
+                self.organism.dialogue_state.record_turn_and_poles(
+                    stimulus_vec64=q_raw_vec,
+                    activated_poles=pole_vecs_taught or [q_raw_vec],
+                    utterance=user_utterance,
+                    response_text=str(episode_teach_info["clean_fact"]),
+                    role_filler_bindings={},
+                    selected_ca3_pole_indices=list(self.organism.last_selected_ca3_pole_indices),
+                    response_passport=passport,
+                )
+                bg_action, bg_scores = self.basal_ganglia.select_action(
+                    utterance=user_utterance,
+                    is_episodic_query=False,
+                    is_teaching_or_identity=True,
+                    wants_multi_hop_or_paragraph=False,
+                    ca3_resonance=2.8,
+                )
+                t_clean = dict(episode_teach_info)
+                t_clean.pop("pole_vecs", None)
+                return {
+                    "stimulus": user_utterance,
+                    "ngrams_mode": "OFF (Online DA + ACh Episode Consolidation)",
+                    "active_moe_columns": ["Col5_HIPPOCAMPAL_CA3", "Col9_PFC_BA46"],
+                    "conversational_domain": self.organism.dialogue_state.active_domain,
+                    "remembered_user_name": self.organism.dialogue_state.user_name,
+                    "role_filler_bindings_applied": {},
+                    "arcuate_token_pointer_injections": 0,
+                    "reafferent_stranger_check_interventions": 0,
+                    "episode_chain_sentences_generated": int(episode_teach_info["sentences_imprinted"]),  # type: ignore[arg-type]
+                    "multi_hop_rollout_used": False,
+                    "active_inference_clarification_triggered": False,
+                    "endogenous_cortical_think_triggered": False,
+                    "ca3_top1_resonance": 2.8,
+                    "epistemic_uncertainty": 0.0,
+                    "ba44_syntax_bridge_connector": "",
+                    "swr_consolidated_into_nmda_matrix": True,
+                    "online_dopamine_imprinted_tokens": episode_teach_info["tokens_imprinted"],
+                    "pure_weight_generated_response": ack_resp,
+                    "response_passport": passport,
+                    "basal_ganglia_selected_action": bg_action,
+                    "basal_ganglia_d1_scores": bg_scores,
+                    "episode_teaching_telemetry": t_clean,
+                    "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+                    "assistant_turn_latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+                }
 
         res = self.organism.pure_neural_generate_response(
             user_utterance=user_utterance,
             max_tokens=max_tokens,
             use_ngrams=False,
             enable_multi_hop=wants_mh,
-            enable_active_inference=enable_active_inference and not is_teach,
+            enable_active_inference=enable_active_inference,
             enable_episode_chain=wants_para,
         )
-
-        if is_teach and int(episode_teach_info.get("sentences_imprinted", 0)) >= 1:
-            ack_resp = (
-                f"Consolidated {episode_teach_info['sentences_imprinted']} sentence(s) "
-                f"({episode_teach_info['tokens_imprinted']} BPE tokens, "
-                f"{episode_teach_info['episode_links_created']} CA3 episode link(s)) "
-                f"into the 8,192-branch NMDA matrix and Protected Core Bank."
-            )
-            res["pure_weight_generated_response"] = ack_resp
-            res["online_dopamine_imprinted_tokens"] = episode_teach_info["tokens_imprinted"]
 
         bg_action, bg_scores = self.basal_ganglia.select_action(
             utterance=user_utterance,
             is_episodic_query=is_ep,
-            is_teaching_or_identity=(is_teach or is_ident_fact),
+            is_teaching_or_identity=is_ident_fact,
             wants_multi_hop_or_paragraph=(wants_mh or wants_para or bool(res.get("multi_hop_rollout_used"))),
             ca3_resonance=float(res.get("ca3_top1_resonance", 1.0)),  # type: ignore[arg-type]
             active_inference_triggered=bool(res.get("active_inference_clarification_triggered", False)),
+            endogenous_think_triggered=bool(res.get("endogenous_cortical_think_triggered", False)),
         )
 
         res["basal_ganglia_selected_action"] = bg_action
