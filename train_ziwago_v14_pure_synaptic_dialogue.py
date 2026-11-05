@@ -122,13 +122,9 @@ class ThetaGammaRoleFillerBinder:
 
     def _has_domain_context_for_slot(self, canonical_slot: str, words_set: set[str], low_utt: str) -> bool:
         """Предохранитель A5 (Context-Gated Role x Filler Binding):
-        Запрещает абсурдные внеконтекстные подстановки (например, `'paper on quantum gravity'` -> `'essay'`),
-        требуя либо наличия доменных маркеров соответствующей схемы в реплике, либо прямого концептуального запроса."""
-        if any(
-            low_utt.startswith(p)
-            for p in ("what do you know about ", "tell me about ", "how would you describe ")
-        ):
-            return True
+        Запрещает внеконтекстные подстановки в `Zone 1` (например, `'paper on quantum gravity'` -> `'essay'`),
+        требуя наличия доменных маркеров соответствующей схемы в реплике; открытые концептуальные запросы
+        (`'What do you know about treatise?'`) направляются в `Zone 2 (THINK: 'I know X as Y')`."""
         ctx_markers = self.SLOT_DOMAIN_CONTEXT_MARKERS.get(canonical_slot, ())
         if not ctx_markers:
             return True
@@ -2484,6 +2480,7 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             and (self.dialogue_state.is_identity_query(question_text) or active_user in q_words_low)
         )
 
+        min_req_stems = 1 if len(q_stems) <= 1 else 2
         if identity_match:
             closure_score = 0.96
             reason = "verified_session_identity_closure"
@@ -2493,9 +2490,12 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         elif domain_schema_match:
             closure_score = 0.88
             reason = "canonical_domain_schema_paraphrase_closure"
-        elif stem_overlap >= 1:
+        elif stem_overlap >= min_req_stems:
             closure_score = min(0.95, 0.82 + 0.04 * stem_overlap)
             reason = "direct_lexical_concept_closure"
+        elif stem_overlap == 1:
+            closure_score = 0.42
+            reason = "insufficient_single_stem_coincidence"
         else:
             closure_score = 0.0
             reason = "ungrounded_semantic_mismatch"

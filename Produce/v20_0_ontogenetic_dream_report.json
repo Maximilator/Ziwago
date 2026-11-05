@@ -1,0 +1,477 @@
+{
+  "version": "Ziwago-Genesis v21.0 Omni-Domain Ontogenetic Wake-SWS-REM Master",
+  "master_checkpoint_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v18_1_genesis_omniscient_master.pt",
+  "checkpoint_validation": {
+    "valid": true,
+    "schema_version": "ziwago.checkpoint.v16.2",
+    "tokenizer_sha256": "d16567cd4d433cc4f5ae8a566e04c9d0f1959e2ca6d43706712a2dad66ba09f5",
+    "active_vocab_columns": 10358
+  },
+  "stage1_wake_omnidomain_distillation": {
+    "atlas_domains_count": 16,
+    "atlas_pairs_count": 28,
+    "corpus_distilled_pairs_count": 250,
+    "corpus_source_breakdown": {
+      "ultrachat": 156,
+      "oasst2": 94
+    },
+    "schemas_probed": 285,
+    "first_pass_mastered": 278,
+    "surgically_repaired": 7,
+    "valence_wave_vocab_cols": 147,
+    "elapsed_sec": 85.03
+  },
+  "stage2_stdp_ontology_self_organization": {
+    "stdp_vocab_size": 13785,
+    "dynamic_stdp_role_map": {
+      "kayaking": "running",
+      "treatise": "essay",
+      "bechamel": "mayonnaise",
+      "ganache": "mayonnaise",
+      "rowing": "running"
+    },
+    "elapsed_sec": 0.01
+  },
+  "stage3_cortical_world_graph": {
+    "total_causal_triplets": 6,
+    "zero_pos_edge_vocab_cols": 74,
+    "elapsed_sec": 0.44
+  },
+  "stage4_sws_and_rem_dreaming": {
+    "sws_sanitization_report": {
+      "poles_before": 338,
+      "poles_after": 282,
+      "pruned_garbage_poles": 56
+    },
+    "final_verified_ca3_poles": 283,
+    "rem_compositional_dreams": [
+      {
+        "dream_prompt": "Why does a runny mayonnaise sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
+        "dream_synthesis": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+        "semantic_closure_score": 1.0,
+        "swr_consolidated": true
+      },
+      {
+        "dream_prompt": "Can running outdoors clear the mind before writing an essay without grammar errors?",
+        "dream_synthesis": "Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+        "semantic_closure_score": 1.0,
+        "swr_consolidated": true
+      }
+    ],
+    "rem_analogical_dreams": [
+      {
+        "dream_prompt": "Can kayaking outdoors clear the mind before fixing grammar errors in my treatise?",
+        "dream_synthesis": "Staying active is a wonderful habit, and kayaking outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your treatise, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+        "bindings": {
+          "running": "kayaking",
+          "essay": "treatise"
+        },
+        "semantic_closure_score": 1.0
+      },
+      {
+        "dream_prompt": "How can I fix runny bechamel with an egg yolk?",
+        "dream_synthesis": "Yes, it is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+        "bindings": {
+          "mayonnaise": "bechamel"
+        },
+        "semantic_closure_score": 0.99
+      }
+    ],
+    "rem_counterfactual_dreams": [
+      {
+        "counterfactual_response": "If astrocytes fail to release gliotransmitters such as d-serine , d-serine cannot bind to glycine sites on apical nmda receptors , and consequently apical nmda receptors cannot ignite dendritic plateau potentials in pyramidal neurons .",
+        "hops_inverted": 3,
+        "inverted_triplet_chain": [
+          [
+            "~astrocytes",
+            "~release gliotransmitters such as",
+            "~d-serine"
+          ],
+          [
+            "~d-serine",
+            "~binds to glycine sites on",
+            "~apical nmda receptors"
+          ],
+          [
+            "~apical nmda receptors",
+            "~ignite",
+            "~dendritic plateau potentials in pyramidal neurons"
+          ]
+        ],
+        "source": "world_graph_counterfactual_cascade",
+        "think_trace": "BA10_CounterfactualSim: inverted 3-hop causal chain do(~astrocytes) => ~dendritic plateau potentials in pyramidal neurons"
+      },
+      {
+        "counterfactual_response": "If calcium influx fail to activate camkii enzymes in dendritic spines .",
+        "hops_inverted": 1,
+        "inverted_triplet_chain": [
+          [
+            "~calcium influx",
+            "~activates",
+            "~camkii enzymes in dendritic spines"
+          ]
+        ],
+        "source": "world_graph_counterfactual_cascade",
+        "think_trace": "BA10_CounterfactualSim: inverted 1-hop causal chain do(~calcium influx) => ~camkii enzymes in dendritic spines"
+      },
+      {
+        "counterfactual_response": "If solar photons in thylakoid membranes split water molecules to fail to release oxygen .",
+        "hops_inverted": 1,
+        "inverted_triplet_chain": [
+          [
+            "~solar photons in thylakoid membranes split water molecules to",
+            "~release",
+            "~oxygen"
+          ]
+        ],
+        "source": "world_graph_counterfactual_cascade",
+        "think_trace": "BA10_CounterfactualSim: inverted 1-hop causal chain do(~solar photons in thylakoid membranes split water molecules to) => ~oxygen"
+      }
+    ],
+    "elapsed_sec": 23.14
+  },
+  "stage5_self_play_and_golden_verification": {
+    "golden_byte_for_byte_matches": "8/8",
+    "self_play_15_turn_log": [
+      {
+        "turn": 1,
+        "user": "Where is Bel Pre Road located?",
+        "response": "The Silk Road had a significant impact on the fashion and clothing styles of Central Asia.",
+        "basal_ganglia_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+        "thalamic_speech_act": "ACT_DIRECT_RECALL",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          15
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col1_LEXICAL_SEMANTICS",
+            "Col2_ENCYCLOPEDIC_FACTS"
+          ],
+          [
+            "Col5_CAUSAL_PHYSICS",
+            "Col0_SYNTAX_BA44"
+          ]
+        ],
+        "latency_ms": 336.59
+      },
+      {
+        "turn": 2,
+        "user": "Hello! My name is Elena, and I am designing a neuromorphic chip with spiking synapses.",
+        "response": "Your name is Elena, and you are designing a neuromorphic chip with spiking synapses.",
+        "basal_ganglia_action": "ACTION_ONLINE_DA_CONSOLIDATION",
+        "thalamic_speech_act": "ACT_IDENTITY_PROFILE",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          284
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col4_NARRATIVE_EPISODIC",
+            "Col3_PRAGMATIC_DIALOG"
+          ],
+          [
+            "Col0_SYNTAX_BA44",
+            "Col4_NARRATIVE_EPISODIC"
+          ]
+        ],
+        "latency_ms": 1184.31
+      },
+      {
+        "turn": 3,
+        "user": "Wait, do you remember what my name is and what I am designing?",
+        "response": "Your name is Elena, and you are designing a neuromorphic chip with spiking synapses.",
+        "basal_ganglia_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+        "thalamic_speech_act": "ACT_IDENTITY_PROFILE",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          284
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col4_NARRATIVE_EPISODIC",
+            "Col3_PRAGMATIC_DIALOG"
+          ],
+          [
+            "Col0_SYNTAX_BA44",
+            "Col4_NARRATIVE_EPISODIC"
+          ]
+        ],
+        "latency_ms": 370.54
+      },
+      {
+        "turn": 4,
+        "user": "Elena is revising her treatise; what is her name, and how can she fix grammar errors in her treatise?",
+        "response": "Her name is Elena, and she is designing a neuromorphic chip with spiking synapses, and to fix grammar errors in her treatise, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+        "basal_ganglia_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+        "thalamic_speech_act": "ACT_DIRECT_RECALL",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          284,
+          5
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col4_NARRATIVE_EPISODIC",
+            "Col3_PRAGMATIC_DIALOG"
+          ],
+          [
+            "Col6_THEORY_OF_MIND",
+            "Col4_NARRATIVE_EPISODIC"
+          ],
+          [
+            "Col1_LEXICAL_SEMANTICS",
+            "Col2_ENCYCLOPEDIC_FACTS"
+          ]
+        ],
+        "latency_ms": 998.83
+      },
+      {
+        "turn": 5,
+        "user": "Can kayaking outdoors clear the mind before fixing runny bechamel with an egg yolk?",
+        "response": "Staying active is a wonderful habit, and kayaking outdoors is one of my favorite ways to clear the mind, before it is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+        "basal_ganglia_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+        "thalamic_speech_act": "ACT_DIRECT_RECALL",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          6,
+          4
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col1_LEXICAL_SEMANTICS",
+            "Col4_NARRATIVE_EPISODIC"
+          ],
+          [
+            "Col6_THEORY_OF_MIND",
+            "Col5_CAUSAL_PHYSICS"
+          ],
+          [
+            "Col2_ENCYCLOPEDIC_FACTS",
+            "Col0_SYNTAX_BA44"
+          ]
+        ],
+        "latency_ms": 1084.16
+      },
+      {
+        "turn": 6,
+        "user": "What do you know about monograph?",
+        "response": "I know monograph as essay: to fix grammar errors in your monograph, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+        "basal_ganglia_action": "ACTION_ENDOGENOUS_CORTICAL_THINK",
+        "thalamic_speech_act": "ACT_DIRECT_RECALL",
+        "proportional_gate_zone": "ZONE_2_KNOWN_REFORMULATE_THINK",
+        "selected_ca3_poles": [
+          5
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col1_LEXICAL_SEMANTICS",
+            "Col1_LEXICAL_SEMANTICS"
+          ],
+          [
+            "Col2_ENCYCLOPEDIC_FACTS",
+            "Col4_NARRATIVE_EPISODIC"
+          ]
+        ],
+        "latency_ms": 789.17
+      },
+      {
+        "turn": 7,
+        "user": "How do massive stars synthesize heavy elements before a supernova explosion?",
+        "response": "Massive stars fuse lighter nuclei into iron within their cores before gravitational collapse triggers explosive supernova nucleosynthesis.",
+        "basal_ganglia_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+        "thalamic_speech_act": "ACT_DIRECT_RECALL",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          189
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col4_NARRATIVE_EPISODIC",
+            "Col7_EXECUTIVE_PFC"
+          ],
+          [
+            "Col3_PRAGMATIC_DIALOG",
+            "Col7_EXECUTIVE_PFC"
+          ]
+        ],
+        "latency_ms": 483.32
+      },
+      {
+        "turn": 8,
+        "user": "How does the CRISPR-Cas9 complex target specific genomic DNA sequences?",
+        "response": "A guide RNA directs the Cas9 endonuclease to a complementary genomic sequence next to a protospacer adjacent motif.",
+        "basal_ganglia_action": "ACTION_DIRECT_SYNAPTIC_RESPONSE",
+        "thalamic_speech_act": "ACT_DIRECT_RECALL",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          195
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col2_ENCYCLOPEDIC_FACTS",
+            "Col5_CAUSAL_PHYSICS"
+          ],
+          [
+            "Col7_EXECUTIVE_PFC",
+            "Col1_LEXICAL_SEMANTICS"
+          ]
+        ],
+        "latency_ms": 433.58
+      },
+      {
+        "turn": 9,
+        "user": "What happens to pyramidal neurons if astrocytes fail to release D-serine?",
+        "response": "If astrocytes fail to release gliotransmitters such as d-serine , d-serine cannot bind to glycine sites on apical nmda receptors , and consequently apical nmda receptors cannot ignite dendritic plateau potentials in pyramidal neurons .",
+        "basal_ganglia_action": "ACTION_COUNTERFACTUAL_SIMULATION",
+        "thalamic_speech_act": "ACT_COUNTERFACTUAL_INTERVENTION",
+        "proportional_gate_zone": "ZONE_1_COUNTERFACTUAL_MENTAL_SIMULATION",
+        "selected_ca3_poles": [
+          175
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col5_CAUSAL_PHYSICS",
+            "Col4_NARRATIVE_EPISODIC"
+          ],
+          [
+            "Col15_METACOG_BA10",
+            "Col3_BROCA_BA44"
+          ]
+        ],
+        "latency_ms": 534.43
+      },
+      {
+        "turn": 10,
+        "user": "What happens if calcium influx fails to activate CaMKII enzymes?",
+        "response": "If calcium influx fail to activate camkii enzymes in dendritic spines .",
+        "basal_ganglia_action": "ACTION_COUNTERFACTUAL_SIMULATION",
+        "thalamic_speech_act": "ACT_COUNTERFACTUAL_INTERVENTION",
+        "proportional_gate_zone": "ZONE_1_COUNTERFACTUAL_MENTAL_SIMULATION",
+        "selected_ca3_poles": [
+          47
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col2_ENCYCLOPEDIC_FACTS",
+            "Col1_LEXICAL_SEMANTICS"
+          ],
+          [
+            "Col15_METACOG_BA10",
+            "Col3_BROCA_BA44"
+          ]
+        ],
+        "latency_ms": 489.5
+      },
+      {
+        "turn": 11,
+        "user": "Why do tardigrades survive extreme radiation in outer space?",
+        "response": "I notice you are asking about tardigrades survive extreme, which has high epistemic uncertainty in my current CA3 memory; could you share the key mechanism or principle so I can consolidate it into my dendritic synapses?",
+        "basal_ganglia_action": "ACTION_ACTIVE_INFERENCE_CLARIFY",
+        "thalamic_speech_act": "ACT_DIRECT_RECALL",
+        "proportional_gate_zone": "ZONE_3_UNKNOWN_CLARIFY",
+        "selected_ca3_poles": [
+          145
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col1_LEXICAL_SEMANTICS",
+            "Col5_CAUSAL_PHYSICS"
+          ],
+          [
+            "Col2_ENCYCLOPEDIC_FACTS",
+            "Col5_CAUSAL_PHYSICS"
+          ]
+        ],
+        "latency_ms": 503.71
+      },
+      {
+        "turn": 12,
+        "user": "Tardigrades survive extreme radiation by producing Dsup proteins that shield DNA from hydroxyl radicals. Dsup proteins also accelerate DNA repair enzymes after cosmic ray exposure.",
+        "response": "Consolidated 2 sentence(s) (34 BPE tokens, 1 CA3 episode link(s)) into the 8,192-branch NMDA matrix and Protected Core Bank: Tardigrades survive extreme radiation by producing Dsup proteins that shield DNA from hydroxyl radicals. Dsup proteins also accelerate DNA repair enzymes after cosmic ray exposure.",
+        "basal_ganglia_action": "ACTION_ONLINE_DA_CONSOLIDATION",
+        "thalamic_speech_act": "ACT_ONLINE_CONSOLIDATION",
+        "proportional_gate_zone": "ZONE_1_ONLINE_DA_CONSOLIDATION",
+        "selected_ca3_poles": [
+          285,
+          286
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col5_HIPPOCAMPAL_CA3",
+            "Col9_PFC_BA46"
+          ]
+        ],
+        "latency_ms": 799.48
+      },
+      {
+        "turn": 13,
+        "user": "Explain in detail how tardigrades survive extreme radiation?",
+        "response": "Tardigrades survive extreme radiation by producing Dsup proteins that shield DNA from hydroxyl radicals. Dsup proteins also accelerate DNA repair enzymes after cosmic ray exposure.",
+        "basal_ganglia_action": "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS",
+        "thalamic_speech_act": "ACT_MULTI_HOP_OR_PARAGRAPH",
+        "proportional_gate_zone": "ZONE_1_DIRECT_RECALL",
+        "selected_ca3_poles": [
+          285
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col1_LEXICAL_SEMANTICS",
+            "Col7_EXECUTIVE_PFC"
+          ],
+          [
+            "Col7_EXECUTIVE_PFC",
+            "Col5_CAUSAL_PHYSICS"
+          ]
+        ],
+        "latency_ms": 704.68
+      },
+      {
+        "turn": 14,
+        "user": "What happens if tardigrades lack Dsup proteins?",
+        "response": "If tardigrades lack Dsup proteins, tardigrades cannot survive extreme radiation, and consequently Dsup proteins cannot shield DNA from hydroxyl radicals.",
+        "basal_ganglia_action": "ACTION_COUNTERFACTUAL_SIMULATION",
+        "thalamic_speech_act": "ACT_COUNTERFACTUAL_INTERVENTION",
+        "proportional_gate_zone": "ZONE_1_COUNTERFACTUAL_MENTAL_SIMULATION",
+        "selected_ca3_poles": [
+          285
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col6_THEORY_OF_MIND",
+            "Col4_NARRATIVE_EPISODIC"
+          ],
+          [
+            "Col15_METACOG_BA10",
+            "Col3_BROCA_BA44"
+          ]
+        ],
+        "latency_ms": 1131.12
+      },
+      {
+        "turn": 15,
+        "user": "Can you summarize what we discussed across our conversation so far?",
+        "response": "With Elena, we have completed 14 grounded dialogue turns covering general dialogue, self identity, essay grammar, culinary emulsion, neuroscience (exploring road, located, hello, name, elena), most recently concluding that if tardigrades lack Dsup proteins, tardigrades cannot survive extreme radiation, and consequently Dsup proteins cannot shield DNA from hydroxyl radicals.",
+        "basal_ganglia_action": "ACTION_EPISODIC_MEMORY_RECALL",
+        "thalamic_speech_act": "ACT_EPISODIC_REFLECTION",
+        "proportional_gate_zone": "ZONE_1_EPISODIC_RECALL",
+        "selected_ca3_poles": [
+          285
+        ],
+        "cortical_trajectory_trace": [
+          [
+            "Col6_THEORY_OF_MIND",
+            "Col4_NARRATIVE_EPISODIC"
+          ],
+          [
+            "Col15_METACOG_BA10",
+            "Col3_BROCA_BA44"
+          ]
+        ],
+        "latency_ms": 5.23
+      }
+    ],
+    "elapsed_sec": 46.91
+  },
+  "total_elapsed_sec": 163.54
+}

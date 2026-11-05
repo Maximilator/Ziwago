@@ -349,9 +349,17 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
 
         assistant = ZiwagoBiologicalSNNAssistant(root=ROOT, workers=2, cpu_threads=4, seed=12345)
 
-        # A4: Verify MASTER_CKPT has been apoptotically sanitized (< 100 poles, 1,914 zombie poles removed)
+        # A4: Verify MASTER_CKPT has been expanded to >= 250 verified omni-domain poles with 0 zombie poles remaining
         n_poles = int(assistant.organism.dendritic_plateau_readout.w_ca3_attractors.shape[0])
-        self.assertLessEqual(n_poles, 100, f"Expected sanitized CA3 poles <= 100, got {n_poles}")
+        self.assertGreaterEqual(n_poles, 250, f"Expected >= 250 verified omni-domain CA3 poles, got {n_poles}")
+        san_check = assistant.organism.execute_sws_ca3_apoptotic_pole_sanitization()
+        self.assertEqual(san_check["pruned_garbage_poles"], 0, f"Expected 0 garbage poles in MASTER_CKPT, got {san_check}")
+
+        # Verify Omni-Domain Encyclopedic Recall (Astrophysics & CRISPR Genetics):
+        r_astro = assistant.chat("How do massive stars synthesize heavy elements before a supernova explosion?", enable_active_inference=True)
+        self.assertIn("supernova", str(r_astro["pure_weight_generated_response"]).lower())
+        r_crispr = assistant.chat("How does the CRISPR-Cas9 complex target specific genomic DNA sequences?", enable_active_inference=True)
+        self.assertIn("cas9", str(r_crispr["pure_weight_generated_response"]).lower())
 
         # A1: 'Bel Pre Road' word salad is blocked
         r_bel = assistant.chat("Where is Bel Pre Road located?", enable_active_inference=True)
@@ -374,10 +382,12 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
         self.assertTrue(bool(r_pauls["active_inference_clarification_triggered"]))
         self.assertNotIn("mayonnaise", str(r_pauls["pure_weight_generated_response"]).lower())
 
-        # A3: Episodic memory summary contains ZERO ungrounded or clarification responses as conclusions
+        # A3: Episodic memory summary contains ONLY the 2 grounded conclusions ('cas9') and ZERO of the 4 ungrounded/clarification turns
         r_sum = assistant.chat("Can you summarize what we discussed across our conversation so far?", enable_active_inference=True)
         sum_low = str(r_sum["pure_weight_generated_response"]).lower()
-        self.assertIn("no verified conclusions have been consolidated", sum_low)
+        self.assertIn("completed 2 grounded dialogue turns", sum_low)
+        self.assertIn("cas9", sum_low)
+        self.assertNotIn("bel pre", sum_low)
         self.assertNotIn("alex", sum_low)
         self.assertNotIn("mayonnaise", sum_low)
 
