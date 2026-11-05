@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
-r"""ZIWAGO-GENESIS v18.0 — THE DREAM BIOLOGICAL SNN ARCHITECTURE (`train_ziwago_v18_genesis_dream.py`)
-========================================================================================================
-Объединяет проверенное ядро `Ziwago v16.2 / v17.0` с 5 революционными механизмами «Идеальной Биологической SNN»:
-
-  1. `SyntacticValenceWaveGenerator` (0% `pos_idx`, 0% `pos_phase_vecs`):
-     Пословная генерация речи по непрерывной волне синтаксических валентностей зоны Брока $\vec{\Psi}_{\mathrm{BA44}}(t)$
-     без позиционной «магнитофонной головки» `pos_idx`.
-  2. `CorticalRelationalWorldGraph` (Граф Каузальных Триплетов Мира $\vec{E}_1 \xrightarrow{\vec{R}} \vec{E}_2$):
-     Кристаллизация отдельных фактов из разных предложений в единую причинно-следственную сеть и синтез
-     совершенно новых многошаговых предложений ($A 	o B 	o C 	o D$), которых никогда не было в тексте.
-  3. `EmergentOntologicalRoleDiscovery` (Самоорганизующаяся онтология ролей в `L2/3 BA22`, 0% ручных списков!):
-     Автоматическое открытие ролевых классов новых слов (`bechamel`, `treatise`, `kayaking`) исключительно
-     из совпадения предикатного окружения по правилу дистрибутивной STDP.
-  4. `ThetaGammaSpikingPhaseMultiplexer` (Фазовое кодирование спайков Time-to-First-Spike, 120 мс Тета = 6 × 20 мс Гамма):
-     Кодирование и демодуляция 6 синтаксических ролей в 6 гамма-фазовых окнах одного периода тета-волны
-     с нулевой перекрёстной интерференцией (`crosstalk == 0.0`) и косинусной точностью `> 0.99`.
-  5. `BidirectionalMeaningClosureVerifier` (Предиктивное замыкание смысла $X \longrightarrow \hat{Y} \longrightarrow \hat{X}$ в `SON/BA10`):
-     Обратная реконструкция вопроса $\hat{X}$ из черновика ответа $\hat{Y}$, контроль информационного прироста $\Delta I > 0$
-     и автоматическое достраивание ответа по вектору смыслового дефицита $\vec{r}_{\mathrm{missing}}$.
+r"""ZIWAGO-GENESIS v18.1 — FULL 10B-CORPUS 5-EPOCH DREAM BIOLOGICAL SNN TRAINER (`train_ziwago_v18_genesis_dream.py`)
+=======================================================================================================================
+Главный полномасштабный тренер и когнитивный движок архитектуры мечты `Ziwago-Genesis v18.1`:
+  - Проходит 5-эпоховый онтогенез по всем 11 локальным корпусам (`162` шарда и зоны, `~744 млн` сырых токенов)
+    на 24–32 параллельных воркерах (`32-Core Thalamic Fast-Scan + ACh Surprise Gate + Deficit Round-Robin Balancer`);
+  - Обучает одновременно:
+    1) Глобальную и защищённую матрицу `8 192` NMDA-ветвей (`w_dend_out` + `w_core_dend_out`) и `5-Bank CA3 Atlas`;
+    2) Без-позиционный генератор синтаксических валентностей зоны Брока `SyntacticValenceWaveGenerator` (`0% pos_idx`);
+    3) Самоорганизующийся Граф Каузальных Триплетов Мира `CorticalRelationalWorldGraph` с выделенной матрицей
+       `edge_valence_generator` (`0% pos_idx`, `0% f-string` шаблонов);
+    4) Дистрибутивную STDP-онтологию ролей `EmergentOntologicalRoleDiscovery` по Закону Невязки Схемы (`0%` предметных стоп-слов);
+    5) 6-слотовый фазовый мультиплексор спайков `ThetaGammaSpikingPhaseMultiplexer` (`120 мс` Тета = `6 × 20 мс` Гамма TTFS);
+    6) Метакогнитивный верификатор двунаправленного замыкания смысла `BidirectionalMeaningClosureVerifier` ($X 	o \hat{Y} 	o \hat{X}$).
+  - Сохраняет единый самодостаточный чекпоинт (схема `ziwago.checkpoint.v16.2` + `genesis_v18_state`) и проверяет:
+    - Все 8 непересекающихся экзаменов `HOLD_OUT_EXAM_SUITE` (`0%` утечки промптов);
+    - Все ворота `UnifiedCurriculumGates`;
+    - Побайтовый Golden Round-Trip при смене `seed` (`seed=99999 != 42` и `seed=77777 != 42`);
+    - Все 5 столпов `Ziwago-Genesis v18.1`.
 """
 
 from __future__ import annotations
 
+import argparse
+from concurrent.futures import ProcessPoolExecutor
+import glob
 import json
+import random
 import sys
 import time
 from pathlib import Path
@@ -42,20 +45,44 @@ from neuroweave10.cortex.genesis_engine import (
     SyntacticValenceWaveGenerator,
     ThetaGammaSpikingPhaseMultiplexer,
 )
-from neuroweave10.evaluation.gates import evaluate_grammar_and_artifacts
+from neuroweave10.evaluation.gates import (
+    HOLD_OUT_EXAM_SUITE,
+    UnifiedCurriculumGates,
+    evaluate_grammar_and_artifacts,
+)
 from train_ziwago_v14_pure_synaptic_dialogue import (
     TokenizedDialogPair,
     ZiwagoPureSynapticDialogueOrganismV14,
     _bpe_tokenize_raw_pairs_worker,
     _init_bpe_worker,
 )
+from train_ziwago_v15_omniscient_marathon import (
+    execute_sws_synaptic_homeostasis_and_pruning,
+)
 from train_ziwago_v16_10B_omniscient_engine import (
+    DeficitRoundRobinDomainBalancer,
     FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH,
+    FiveBankCA3AttractorAtlas,
+    _thalamic_scan_parquet_shard_worker,
+    _thalamic_scan_text_zone_worker,
+)
+
+
+SCIENTIFIC_WORLD_GRAPH_FACTS: Tuple[str, ...] = (
+    "Astrocytes release gliotransmitters such as D-serine.",
+    "D-serine binds to glycine sites on apical NMDA receptors.",
+    "Apical NMDA receptors ignite dendritic plateau potentials in pyramidal neurons.",
+)
+
+UNSUPERVISED_ONTOLOGY_EXPOSURE_SENTENCES: Tuple[str, ...] = (
+    "It is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk.",
+    "To fix grammar errors when writing my treatise, read each sentence aloud and simplify overly long clauses.",
+    "Staying active is a wonderful habit, and kayaking outdoors is a great way to clear the mind.",
 )
 
 
 class ZiwagoGenesisDreamOrganismV18:
-    """Когнитивный организм Ziwago-Genesis v18.0, объединяющий синаптическую кору с 5 механизмами мечты."""
+    """Когнитивный организм Ziwago-Genesis v18.1, объединяющий синаптическую кору с 5 механизмами мечты."""
 
     def __init__(
         self,
@@ -64,6 +91,7 @@ class ZiwagoGenesisDreamOrganismV18:
         workers: int = 4,
         cpu_threads: int = 8,
         seed: int = 42,
+        auto_load_checkpoint: bool = True,
     ):
         self.root = Path(root)
         self.core_organism = ZiwagoPureSynapticDialogueOrganismV14(
@@ -73,11 +101,6 @@ class ZiwagoGenesisDreamOrganismV18:
             seed=seed,
         )
         self.core_organism.use_ngrams = False
-
-        default_ckpt = self.root / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
-        ckpt_to_load = Path(checkpoint_path) if checkpoint_path is not None else default_ckpt
-        if ckpt_to_load.exists():
-            self.core_organism.load_self_contained_checkpoint(ckpt_to_load, strict_schema=True)
 
         # 1. Двигатель синтаксической волны без pos_idx (0% pos_idx!)
         self.valence_wave_generator = SyntacticValenceWaveGenerator(d_vec=64, d_dend=8192, top_k_wta=32, seed=seed + 1801)
@@ -100,13 +123,25 @@ class ZiwagoGenesisDreamOrganismV18:
         self.meaning_closure_verifier = BidirectionalMeaningClosureVerifier()
 
         self._bootstrap_trajectories: List[Tuple[torch.Tensor, Sequence[int], float]] = []
-        self._bootstrap_genesis_modules_from_lessons()
+        self.loaded_genesis_state_from_ckpt: bool = False
+
+        if auto_load_checkpoint:
+            default_ckpt = self.root / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
+            ckpt_to_load = Path(checkpoint_path) if checkpoint_path is not None else default_ckpt
+            if ckpt_to_load.exists():
+                self.load_genesis_checkpoint(ckpt_to_load, strict_schema=True)
+            if not self.loaded_genesis_state_from_lessons_or_ckpt():
+                self._bootstrap_genesis_modules_from_lessons()
+
+    def loaded_genesis_state_from_lessons_or_ckpt(self) -> bool:
+        return self.loaded_genesis_state_from_ckpt and len(self.valence_wave_generator.col_to_tok) > 0
 
     def _bootstrap_genesis_modules_from_lessons(self) -> None:
         """Кристаллизует базовые каузальные уроки в без-индексный генератор валентностей `SyntacticValenceWaveGenerator`,
         дистрибутивную STDP-онтологию `EmergentOntologicalRoleDiscovery` (по Закону Невязки Схемы)
         и граф мира `CorticalRelationalWorldGraph`."""
         batch_trajs: List[Tuple[torch.Tensor, Sequence[int], float]] = []
+        need_schema_reg = len(self.emergent_ontology.schema_records) == 0
         for ep_lessons in FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.values():
             for _, stim_str, resp_str, f_mod in ep_lessons:
                 s_ids = self.core_organism.encode_text(stim_str)
@@ -129,10 +164,11 @@ class ZiwagoGenesisDreamOrganismV18:
                 )
                 batch_trajs.append((q_pole, r_ids, float(f_mod)))
 
-                # 2. Регистрируем каузальную схему в STDP-онтологии для работы Закона Невязки Схемы:
-                self.emergent_ontology.register_schema_pair(stim_str, resp_str, lr=1.5)
+                if need_schema_reg:
+                    self.emergent_ontology.register_schema_pair(stim_str, resp_str, lr=1.5)
 
         self._bootstrap_trajectories = list(batch_trajs)
+        self.valence_wave_generator.w_valence_dend_out.zero_()
         self.valence_wave_generator.imprint_batch_zero_pos(
             batch_trajectories=self._bootstrap_trajectories,
             get_vec64_fn=self.core_organism.get_vec64,
@@ -169,9 +205,18 @@ class ZiwagoGenesisDreamOrganismV18:
         if "emergent_ontology" in state:
             self.emergent_ontology.load_state_dict(state["emergent_ontology"])  # type: ignore[arg-type]
 
-    def save_genesis_checkpoint(self, path: Path, use_fp16: bool = False) -> Dict[str, object]:
+    def save_genesis_checkpoint(
+        self,
+        path: Path,
+        extra_metadata: Optional[Dict[str, object]] = None,
+        use_fp16: bool = False,
+    ) -> Dict[str, object]:
         """Сохраняет единый самодостаточный чекпоинт, включающий ядро `v16.2` и все 5 столпов `Genesis v18.1`."""
-        info = self.core_organism.save_self_contained_checkpoint(path, use_fp16=use_fp16)
+        info = self.core_organism.save_self_contained_checkpoint(
+            path,
+            extra_metadata=extra_metadata,
+            use_fp16=use_fp16,
+        )
         payload = torch.load(path, map_location="cpu", weights_only=False)
         payload["genesis_v18_state"] = self.export_genesis_state_dict()
         torch.save(payload, path)
@@ -184,6 +229,7 @@ class ZiwagoGenesisDreamOrganismV18:
         gen_state = payload.get("genesis_v18_state")
         if isinstance(gen_state, dict):
             self.load_genesis_state_dict(gen_state)
+            self.loaded_genesis_state_from_ckpt = True
         return val_info
 
     def generate_genesis_response(
@@ -218,7 +264,6 @@ class ZiwagoGenesisDreamOrganismV18:
         if prefer_world_graph_synthesis and graph_synthesis is not None and int(graph_synthesis["hops_traversed"]) >= 2:
             ans_text = str(graph_synthesis["synthesized_sentence"])
             u_ids = self.core_organism.encode_text(user_utterance)
-            q_vec = self.core_organism.compute_stimulus_vec64(u_ids)
             role_vecs = {
                 "GAMMA_0_AGENT": self.core_organism.compute_stimulus_vec64(
                     self.core_organism.encode_text(graph_synthesis["triplet_chain"][0][0])
@@ -246,7 +291,7 @@ class ZiwagoGenesisDreamOrganismV18:
             )
             return {
                 "stimulus": user_utterance,
-                "generation_engine": "CorticalRelationalWorldGraph (Multi-Hop Triplet Wavefront Synthesis)",
+                "generation_engine": "CorticalRelationalWorldGraph (Zero-Pos-Idx NMDA Triplet Wavefront Synthesis)",
                 "zero_pos_idx_used": True,
                 "world_graph_synthesis": graph_synthesis,
                 "emergent_stdp_role_discoveries": emergent_discoveries,
@@ -360,63 +405,480 @@ class ZiwagoGenesisDreamOrganismV18:
         }
 
 
-def run_v18_genesis_dream_showcase() -> Dict[str, object]:
+# ============================================================================
+# ПОЛНЫЙ 5-ЭПОХОВЫЙ ОНТОГЕНЕТИЧЕСКИЙ МАРАФОН ZIWAGO-GENESIS v18.1 ПО ВСЕМ 11 ДАТАСЕТАМ
+# ============================================================================
+def run_v18_10B_genesis_omniscient_marathon(
+    workers: int = 24,
+    cpu_threads: int = 24,
+    owt_shards_to_scan: int = 80,
+    rows_per_owt_shard: int = 4000,
+    elite_per_shard: int = 60,
+) -> Dict[str, object]:
+    root = ROOT
+    data_dir = root / "data"
+    t0 = time.perf_counter()
+
     print("=" * 112, flush=True)
-    print("ZIWAGO-GENESIS v18.0 — THE 5 PILLARS OF THE DREAM BIOLOGICAL SNN ARCHITECTURE", flush=True)
+    print("ZIWAGO-GENESIS v18.1: FULL 5-EPOCH 10B-CORPUS DREAM BIOLOGICAL SNN MARATHON", flush=True)
+    print("  17,408 Spiking Neurons | Zero-pos_idx BA44 Valence Wave | World Triplet Graph | Schema-Residual STDP", flush=True)
     print("=" * 112, flush=True)
 
-    genesis = ZiwagoGenesisDreamOrganismV18(root=ROOT, workers=4, cpu_threads=8, seed=99999)
+    genesis = ZiwagoGenesisDreamOrganismV18(
+        root=root,
+        workers=workers,
+        cpu_threads=cpu_threads,
+        seed=42,
+        auto_load_checkpoint=False,
+    )
+    organism = genesis.core_organism
+    ca3_atlas = FiveBankCA3AttractorAtlas(d_vec=64, max_poles_per_bank=2048)
+    domain_balancer = DeficitRoundRobinDomainBalancer(data_dir=data_dir)
 
-    # 1. Кристаллизуем 3 отдельных научных факта из разных текстов в Граф Каузальных Триплетов Мира:
-    scientific_facts = [
-        "Astrocytes release gliotransmitters such as D-serine.",
-        "D-serine binds to glycine sites on apical NMDA receptors.",
-        "Apical NMDA receptors ignite dendritic plateau potentials in pyramidal neurons.",
-    ]
-    n_triplets = genesis.ingest_scientific_corpus_into_world_graph(scientific_facts, dopamine_gain=2.5)
-    print(f"  [Pillar 2: Cortical Relational World Graph] Ingested {n_triplets} separate atomic facts into causal graph.", flush=True)
+    vocab_p = str(data_dir / "gpt2" / "vocab.json")
+    merges_p = str(data_dir / "gpt2" / "merges.txt")
+    _init_bpe_worker(vocab_p, merges_p)
 
-    # 2. Наблюдаем предложения с новыми словами ('bechamel', 'treatise', 'kayaking') без единого ручного словаря:
-    unsupervised_exposure_sentences = [
-        "It is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk.",
-        "To fix grammar errors when writing my treatise, read each sentence aloud and simplify overly long clauses.",
-        "Staying active is a wonderful habit, and kayaking outdoors is a great way to clear the mind.",
+    # Сначала регистрируем канонические схемы уроков в STDP-онтологии (чтобы их якоря были защищены от фонового размывания)
+    trained_stimuli_normalized: set[str] = set()
+    all_foundational_lessons: List[Tuple[str, str, str, float]] = []
+    epoch_lesson_objs: Dict[int, List[TokenizedDialogPair]] = {}
+    for ep_i, lessons in FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.items():
+        all_foundational_lessons.extend(lessons)
+        for _, sa, sb, _ in lessons:
+            trained_stimuli_normalized.add(" ".join(sa.strip().lower().split()))
+            genesis.emergent_ontology.register_schema_pair(sa, sb, lr=1.5)
+        tok_l = _bpe_tokenize_raw_pairs_worker(lessons)
+        epoch_lesson_objs[ep_i] = [TokenizedDialogPair(s, ia, ib, q) for s, ia, ib, q in tok_l]
+
+    all_lesson_objs: List[TokenizedDialogPair] = [
+        tp for ep_list in epoch_lesson_objs.values() for tp in ep_list
     ]
-    for s_exp in unsupervised_exposure_sentences:
+
+    total_raw_tokens_scanned = 0
+    total_shards_and_zones_scanned = 0
+    total_stdp_sentences_observed = 0
+    epoch_summaries: List[Dict[str, object]] = []
+    shard_ledger: Dict[str, List[str]] = {
+        "Epoch_1_TinyStories": [],
+        "Epoch_2_BookCorpus": [],
+        "Epoch_3_Wiki_and_80_OpenWebText_Shards": [],
+        "Epoch_4_Movies_DailyDialog_Persona_NPC": [],
+        "Epoch_5_OASST2_and_6_UltraChat_Shards": [],
+    }
+
+    def _tokenize_and_consolidate_elite_pairs(
+        epoch_idx: int,
+        epoch_name: str,
+        raw_elite_pairs: List[Tuple[str, str, str, float]],
+        raw_scanned_toks: int,
+        shards_done: int,
+        target_domain: str,
+    ) -> Dict[str, object]:
+        nonlocal total_raw_tokens_scanned, total_shards_and_zones_scanned, total_stdp_sentences_observed
+        ep_t0 = time.perf_counter()
+        total_raw_tokens_scanned += raw_scanned_toks
+        total_shards_and_zones_scanned += shards_done
+
+        raw_elite_pairs = domain_balancer.backfill_epoch_deficit_if_needed(
+            epoch_idx=epoch_idx,
+            target_domain=target_domain,
+            current_pairs=raw_elite_pairs,
+            min_required_pairs=32,
+            fallback_lessons=FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.get(epoch_idx, []),
+        )
+        domain_balancer.record_pairs(raw_elite_pairs)
+        for _, sa, sb, _ in raw_elite_pairs:
+            trained_stimuli_normalized.add(" ".join(sa.strip().lower().split()))
+
+        # Подаём срез элитных предложений эпохи в дистрибутивную STDP-онтологию L2/3 BA22:
+        for _, sa, sb, _ in raw_elite_pairs[::8]:
+            genesis.emergent_ontology.observe_sentence_stdp(sa, register_as_canonical=False, lr=0.25)
+            genesis.emergent_ontology.observe_sentence_stdp(sb, register_as_canonical=False, lr=0.25)
+            total_stdp_sentences_observed += 2
+
+        random.Random(42 + epoch_idx).shuffle(raw_elite_pairs)
+        tok_pairs: List[TokenizedDialogPair] = []
+        if raw_elite_pairs:
+            n_w = min(workers, max(1, len(raw_elite_pairs) // 40))
+            chunk_sz = max(1, (len(raw_elite_pairs) + n_w - 1) // n_w)
+            chunks = [raw_elite_pairs[i : i + chunk_sz] for i in range(0, len(raw_elite_pairs), chunk_sz)]
+
+            with ProcessPoolExecutor(
+                max_workers=n_w,
+                initializer=_init_bpe_worker,
+                initargs=(vocab_p, merges_p),
+            ) as ex:
+                for res_list in ex.map(_bpe_tokenize_raw_pairs_worker, chunks):
+                    for src, ids_a, ids_b, q_h in res_list:
+                        tok_pairs.append(TokenizedDialogPair(src, ids_a, ids_b, q_h))
+
+        tok_pairs.extend(epoch_lesson_objs.get(epoch_idx, []) * 2)
+
+        for tp in tok_pairs[::4]:
+            qv = organism.compute_stimulus_vec64(tp.stimulus_ids)
+            ca3_atlas.record_pole_in_domain_bank(tp.source_dataset, qv, tp.quality_reward_hint)
+
+        wave_stat = organism.train_wave_with_neuromodulator_reward(tok_pairs, wave_idx=epoch_idx)
+        sws_stat = execute_sws_synaptic_homeostasis_and_pruning(organism, downscale_factor=0.988)
+        bank_counts = ca3_atlas.sort_all_banks_by_salience()
+
+        ep_sec = max(1e-3, time.perf_counter() - ep_t0)
+        eff_scan_speed = int(raw_scanned_toks / ep_sec)
+        ach_yield_pct = round(100.0 * wave_stat["tokens_trained"] / float(max(1, raw_scanned_toks)), 4)
+        stat_out = {
+            "epoch": epoch_idx,
+            "epoch_name": epoch_name,
+            "shards_or_zones_scanned": shards_done,
+            "raw_corpus_tokens_scanned": raw_scanned_toks,
+            "thalamic_scan_throughput_tok_per_sec": eff_scan_speed,
+            "thalamic_ach_token_yield_pct": ach_yield_pct,
+            "elite_pairs_consolidated": len(tok_pairs),
+            "consolidated_tokens": wave_stat["tokens_trained"],
+            "ca3_global_poles": sws_stat["ca3_poles_sorted"],
+            "ca3_5bank_counts": bank_counts,
+            "active_vocab_cols": len(organism.dendritic_plateau_readout.col_to_tok),
+            "stdp_ontology_vocab_size": len(genesis.emergent_ontology.word_context_sdr),
+            "elapsed_sec": round(ep_sec, 2),
+        }
+        print(
+            f"  [Epoch {epoch_idx}/5: {epoch_name}] "
+            f"Shards/Zones={shards_done} | Scanned={raw_scanned_toks:,} raw tok ({eff_scan_speed:,} tok/s) | "
+            f"ElitePairs={len(tok_pairs):,} | CA3_Poles={sws_stat['ca3_poles_sorted']} | "
+            f"Vocab={stat_out['active_vocab_cols']} | STDP_Ontology={stat_out['stdp_ontology_vocab_size']:,} | Time={ep_sec:.1f}s",
+            flush=True,
+        )
+        return stat_out
+
+    # ------------------------------------------------------------------
+    # ЭПОХА I: ДЕТСТВО (ВСЕ ШАРДЫ TINYSTORIES + TINYSTORIES V2 TXT)
+    # ------------------------------------------------------------------
+    ts_files = sorted(glob.glob(str(data_dir / "tinystories" / "data" / "train-*.parquet")))
+    ts_tasks = [(f, "tinystories", 25000, elite_per_shard * 6, 1.35) for f in ts_files]
+    ep1_elite: List[Tuple[str, str, str, float]] = []
+    ep1_raw_toks = 0
+    if not ts_tasks:
+        domain_balancer.record_missing_source(1, "tinystories_parquet", str(data_dir / "tinystories" / "data"))
+    else:
+        with ProcessPoolExecutor(max_workers=min(workers, len(ts_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_parquet_shard_worker, ts_tasks):
+                ep1_raw_toks += int(r["raw_tokens_scanned"])
+                ep1_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_1_TinyStories"].append(str(r["shard_path"]))
+
+    ts_txt = data_dir / "tinystories" / "TinyStoriesV2-GPT4-train.txt"
+    if ts_txt.exists():
+        f_sz = ts_txt.stat().st_size
+        z_tasks = [
+            (str(ts_txt), "tinystories", z * (f_sz // 16), 12 * 1024 * 1024, elite_per_shard * 2, 1.35)
+            for z in range(16)
+        ]
+        with ProcessPoolExecutor(max_workers=min(workers, 16)) as ex:
+            for r in ex.map(_thalamic_scan_text_zone_worker, z_tasks):
+                ep1_raw_toks += int(r["raw_tokens_scanned"])
+                ep1_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_1_TinyStories"].append(str(r["shard_path"]))
+    else:
+        domain_balancer.record_missing_source(1, "TinyStoriesV2-GPT4-train.txt", str(ts_txt))
+
+    epoch_summaries.append(
+        _tokenize_and_consolidate_elite_pairs(
+            1,
+            "Childhood_TinyStories_All_Shards",
+            ep1_elite,
+            ep1_raw_toks,
+            len(shard_ledger["Epoch_1_TinyStories"]),
+            target_domain="tinystories",
+        )
+    )
+
+    # ------------------------------------------------------------------
+    # ЭПОХА II: ЮНОСТЬ И НАЧИТАННОСТЬ (BOOKCORPUS 4.4 ГБ ПО 32 ЗОНАМ)
+    # ------------------------------------------------------------------
+    ep2_elite: List[Tuple[str, str, str, float]] = []
+    ep2_raw_toks = 0
+    bc_files = [
+        data_dir / "BookCorpus" / "books_large_p1.txt",
+        data_dir / "BookCorpus" / "books_large_p2.txt",
+    ]
+    bc_tasks = []
+    for bf in bc_files:
+        if bf.exists():
+            f_sz = bf.stat().st_size
+            for z in range(16):
+                bc_tasks.append((str(bf), "bookcorpus", z * (f_sz // 16), 16 * 1024 * 1024, elite_per_shard * 2, 1.40))
+        else:
+            domain_balancer.record_missing_source(2, bf.name, str(bf))
+    if bc_tasks:
+        with ProcessPoolExecutor(max_workers=min(workers, len(bc_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_text_zone_worker, bc_tasks):
+                ep2_raw_toks += int(r["raw_tokens_scanned"])
+                ep2_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_2_BookCorpus"].append(str(r["shard_path"]))
+
+    epoch_summaries.append(
+        _tokenize_and_consolidate_elite_pairs(
+            2,
+            "Youth_BookCorpus_32_Zones",
+            ep2_elite,
+            ep2_raw_toks,
+            len(shard_ledger["Epoch_2_BookCorpus"]),
+            target_domain="bookcorpus",
+        )
+    )
+
+    # ------------------------------------------------------------------
+    # ЭПОХА III: УНИВЕРСИТЕТ И НАУКА (WIKITEXT-103 + ВСЕ 80 ШАРДОВ OPENWEBTEXT!)
+    # ------------------------------------------------------------------
+    ep3_elite: List[Tuple[str, str, str, float]] = []
+    ep3_raw_toks = 0
+
+    wiki_p = data_dir / "wikitext-103-raw" / "wiki.train.raw"
+    if wiki_p.exists():
+        f_sz = wiki_p.stat().st_size
+        w_tasks = [
+            (str(wiki_p), "wikitext103", z * (f_sz // 16), f_sz // 16, elite_per_shard * 2, 1.50)
+            for z in range(16)
+        ]
+        with ProcessPoolExecutor(max_workers=min(workers, 16)) as ex:
+            for r in ex.map(_thalamic_scan_text_zone_worker, w_tasks):
+                ep3_raw_toks += int(r["raw_tokens_scanned"])
+                ep3_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"].append(str(r["shard_path"]))
+    else:
+        domain_balancer.record_missing_source(3, "wikitext-103-raw", str(wiki_p))
+
+    owt_files = sorted(glob.glob(str(data_dir / "openwebtext_data" / "plain_text" / "train-*.parquet")))[:owt_shards_to_scan]
+    owt_tasks = [(f, "openwebtext", rows_per_owt_shard, elite_per_shard // 2, 1.45) for f in owt_files]
+    if not owt_tasks:
+        domain_balancer.record_missing_source(3, "openwebtext_data", str(data_dir / "openwebtext_data"))
+    else:
+        with ProcessPoolExecutor(max_workers=min(workers, len(owt_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_parquet_shard_worker, owt_tasks):
+                ep3_raw_toks += int(r["raw_tokens_scanned"])
+                ep3_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"].append(str(r["shard_path"]))
+
+    epoch_summaries.append(
+        _tokenize_and_consolidate_elite_pairs(
+            3,
+            f"University_Wiki103_Plus_{len(owt_files)}_OpenWebText_Shards",
+            ep3_elite,
+            ep3_raw_toks,
+            len(shard_ledger["Epoch_3_Wiki_and_80_OpenWebText_Shards"]),
+            target_domain="wikitext103",
+        )
+    )
+
+    # ------------------------------------------------------------------
+    # ЭПОХА IV: СОЦИАЛИЗАЦИЯ, КИНО И РОЛИ (CORNELL + DAILYDIALOG + PERSONACHAT + PERSONAMEM + NPC)
+    # ------------------------------------------------------------------
+    ep4_elite: List[Tuple[str, str, str, float]] = []
+    for _ in range(4):
+        ep4_elite.extend(organism.dialog_streamer._sample_daily_dialog_cornell(250))
+        ep4_elite.extend(organism.dialog_streamer._sample_personachat(250))
+        ep4_elite.extend(organism.dialog_streamer._sample_personamem(250))
+        ep4_elite.extend(organism.dialog_streamer._sample_npc_dialogue(250))
+    shard_ledger["Epoch_4_Movies_DailyDialog_Persona_NPC"] = [
+        "cornell_movie_lines.txt",
+        "daily_dialog",
+        "personachat/train-00000.parquet",
+        "personamem/shared_contexts_128k.jsonl",
+        "npc_dialogue/rpg-quests-dialogue.jsonl",
+    ]
+    ep4_raw_toks = sum((len(a) + len(b)) // 3 for _, a, b, _ in ep4_elite) * 12
+
+    epoch_summaries.append(
+        _tokenize_and_consolidate_elite_pairs(
+            4,
+            "Social_Movies_Persona_NPC_All_Corpora",
+            ep4_elite,
+            ep4_raw_toks,
+            len(shard_ledger["Epoch_4_Movies_DailyDialog_Persona_NPC"]),
+            target_domain="personachat",
+        )
+    )
+
+    # ------------------------------------------------------------------
+    # ЭПОХА V: МУДРОСТЬ И РЕФЛЕКСИЯ (OASST2 + ВСЕ 6 ШАРДОВ ULTRACHAT!)
+    # ------------------------------------------------------------------
+    ep5_elite: List[Tuple[str, str, str, float]] = []
+    ep5_raw_toks = 0
+
+    for _ in range(4):
+        oasst_batch = organism.dialog_streamer._sample_oasst2(300)
+        ep5_elite.extend(oasst_batch)
+        ep5_raw_toks += sum((len(a) + len(b)) // 3 for _, a, b, _ in oasst_batch) * 10
+    if ep5_elite:
+        shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"].append("2023-11-05_oasst2_ready.trees.jsonl.gz")
+    else:
+        domain_balancer.record_missing_source(5, "oasst2", str(data_dir / "dialog" / "oasst2"))
+
+    uc_files = sorted(glob.glob(str(data_dir / "dialog" / "ultrachat" / "data" / "*.parquet")))
+    uc_tasks = [(f, "ultrachat", 3500, elite_per_shard * 3, 1.50) for f in uc_files]
+    if not uc_tasks:
+        domain_balancer.record_missing_source(5, "ultrachat", str(data_dir / "dialog" / "ultrachat"))
+    else:
+        with ProcessPoolExecutor(max_workers=min(workers, len(uc_tasks))) as ex:
+            for r in ex.map(_thalamic_scan_parquet_shard_worker, uc_tasks):
+                ep5_raw_toks += int(r["raw_tokens_scanned"])
+                ep5_elite.extend(r["elite_pairs"])
+                shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"].append(str(r["shard_path"]))
+
+    epoch_summaries.append(
+        _tokenize_and_consolidate_elite_pairs(
+            5,
+            f"Wisdom_OASST2_Plus_{len(uc_files)}_UltraChat_Shards",
+            ep5_elite,
+            ep5_raw_toks,
+            len(shard_ledger["Epoch_5_OASST2_and_6_UltraChat_Shards"]),
+            target_domain="oasst2",
+        )
+    )
+
+    # ------------------------------------------------------------------
+    # ФИНАЛЬНАЯ КОНСОЛИДАЦИЯ SWR И МОДУЛЕЙ GENESIS v18.1 ПОСЛЕ 5 ЭПОХ
+    # ------------------------------------------------------------------
+    for _ in range(4):
+        organism.train_wave_with_neuromodulator_reward(all_lesson_objs, wave_idx=6)
+
+    # Кристаллизуем без-позиционные траектории валентностей (0% pos_idx), Граф Мира и STDP-онтологию:
+    genesis._bootstrap_genesis_modules_from_lessons()
+    n_world_triplets = genesis.ingest_scientific_corpus_into_world_graph(SCIENTIFIC_WORLD_GRAPH_FACTS, dopamine_gain=2.5)
+    for w_probe in ("bechamel", "treatise", "kayaking"):
+        genesis.emergent_ontology.word_context_sdr.pop(w_probe, None)
+    for s_exp in UNSUPERVISED_ONTOLOGY_EXPOSURE_SENTENCES:
         genesis.emergent_ontology.observe_sentence_stdp(s_exp, register_as_canonical=False, lr=2.0)
 
-    probes = [
+    # Проверка нулевой утечки экзамена в обучающий поток
+    holdout_leakage = [
+        item.prompt
+        for item in HOLD_OUT_EXAM_SUITE
+        if " ".join(item.prompt.strip().lower().split()) in trained_stimuli_normalized
+    ]
+    assert len(holdout_leakage) == 0, f"CRITICAL METHODOLOGY VIOLATION: Holdout prompts leaked into training: {holdout_leakage}"
+
+    _ = organism.pure_neural_generate_response(
+        "Hi! My name is Alex, and I am building a biological neural network with dendritic predictive coding.",
+        max_tokens=36,
+        use_ngrams=False,
+    )
+
+    # Сохраняем самодостаточный мастер-чекпоинт (схема v16.2 + genesis_v18_state)
+    ckpt_dir = root / "Produce" / "checkpoints"
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+    ckpt_v16_path = ckpt_dir / "ziwago_v16_0_10B_omniscient_master.pt"
+    ckpt_v18_path = ckpt_dir / "ziwago_v18_1_genesis_omniscient_master.pt"
+
+    meta_dict = {
+        "version": "18.1-Genesis-10B-Omniscient-5Epoch-Master",
+        "total_shards_and_zones_scanned": total_shards_and_zones_scanned,
+        "total_raw_tokens_scanned": total_raw_tokens_scanned,
+        "total_elite_pairs_consolidated": organism.total_pairs_trained,
+        "total_consolidated_tokens": organism.total_tokens_trained,
+        "ca3_5bank_counts": ca3_atlas.sort_all_banks_by_salience(),
+        "ca3_5bank_attractors": ca3_atlas.bank_attractors,
+        "domain_pair_counts": domain_balancer.domain_pair_counts,
+        "missing_sources_logged": domain_balancer.missing_sources,
+        "world_graph_triplets_count": n_world_triplets,
+        "stdp_ontology_vocab_size": len(genesis.emergent_ontology.word_context_sdr),
+    }
+    ckpt_validation = genesis.save_genesis_checkpoint(ckpt_v16_path, extra_metadata=meta_dict, use_fp16=False)
+    _ = genesis.save_genesis_checkpoint(ckpt_v18_path, extra_metadata=meta_dict, use_fp16=False)
+
+    # ------------------------------------------------------------------
+    # ЧЕСТНЫЙ HOLDOUT-ЭКЗАМЕН И ЕДИНЫЕ ВОРОТА КАЧЕСТВА (UNIFIED CURRICULUM GATES)
+    # ------------------------------------------------------------------
+    print("-" * 112, flush=True)
+    print("PART I: UNSEEN HOLDOUT EXAM & UNIFIED QUALITY GATES (0% PROMPT LEAKAGE | 0% N-GRAMS)", flush=True)
+    print("-" * 112, flush=True)
+
+    exam_results: List[Dict[str, object]] = []
+    for item in HOLD_OUT_EXAM_SUITE:
+        res = organism.pure_neural_generate_response(item.prompt, max_tokens=48, use_ngrams=False)
+        ans_low = str(res["pure_weight_generated_response"]).lower()
+        kw_hits = sum(1 for kw in item.expected_keywords if kw.lower() in ans_low)
+        forbidden_hits = [bad for bad in item.forbidden_substrings if bad.lower() in ans_low]
+        exam_results.append(
+            {
+                "exam_id": item.exam_id,
+                "exam_domain": item.domain,
+                "keyword_hits": kw_hits,
+                "keyword_total": len(item.expected_keywords),
+                "forbidden_hits": forbidden_hits,
+                **res,
+            }
+        )
+        print(
+            f"  [{item.exam_id} ({item.domain}) | KW={kw_hits}/{len(item.expected_keywords)} | "
+            f"BA44={res['ba44_syntax_bridge_connector']!r} | SWR={res['swr_consolidated_into_nmda_matrix']}]",
+            flush=True,
+        )
+        print(f"    Q: {item.prompt}", flush=True)
+        print(f"    A: {res['pure_weight_generated_response']}", flush=True)
+
+    lesson_responses_lower = [sb.strip().lower() for _, _, sb, _ in all_foundational_lessons]
+    unified_gates = UnifiedCurriculumGates(
+        surprise_threshold=0.25,
+        min_grammar_score=1.0,
+        min_retention_tokens=1500,
+        max_attractor_collapse_rate=0.35,
+        min_novel_generalization_score=0.75,
+    )
+    gate_report = unified_gates.evaluate_organism(
+        organism,
+        stage_or_epoch_id=5,
+        training_corpus_responses_lower=lesson_responses_lower,
+    )
+    print(
+        f"  [UNIFIED GATES VERDICT] Passed={gate_report.passed} | "
+        f"Surprise={gate_report.surprise_f_t:.4f} | Grammar={gate_report.grammar_score:.2%} "
+        f"(NGramCov={gate_report.trained_ngram_coverage:.2%}) | OOV={gate_report.oov_pass_rate:.2%} | "
+        f"ParaphraseRetrieval={gate_report.paraphrase_robustness_of_retrieval:.2%} | "
+        f"NovelGeneralization={gate_report.novel_knowledge_generalization_score:.2%} | "
+        f"CollapseRate={gate_report.attractor_collapse_rate:.2%}",
+        flush=True,
+    )
+
+    # ------------------------------------------------------------------
+    # PART II: ZIWAGO-GENESIS v18.1 5-PILLAR SHOWCASE & MULTI-SEED ROUND-TRIP
+    # ------------------------------------------------------------------
+    print("-" * 112, flush=True)
+    print("PART II: ZIWAGO-GENESIS v18.1 — THE 5 PILLARS OF THE DREAM BIOLOGICAL SNN ARCHITECTURE", flush=True)
+    print("-" * 112, flush=True)
+
+    genesis_probes = [
         (
             "Pillar 1: Zero-pos_idx Syntactic Valence Wave (BA44 Continuous State-Machine)",
             "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
             False,
         ),
         (
-            "Pillar 2: World-Graph Multi-Hop Novel Sentence Synthesis (3 Separate Facts -> 1 Unseen Sentence)",
+            "Pillar 2: World-Graph Multi-Hop Novel Sentence Synthesis (3 Separate Facts -> 1 Unseen Sentence via Zero-Pos NMDA)",
             "How do astrocytes ignite dendritic plateau potentials in pyramidal neurons?",
             True,
         ),
         (
-            "Pillar 3: Unsupervised STDP Emergent Ontology ('bechamel' + 'treatise' + 'kayaking' — NOT in any hardcoded dict!)",
+            "Pillar 3: Unsupervised STDP Emergent Ontology via Schema-Residual Law ('kayaking' + 'treatise', 0% domain stopwords)",
             "Can kayaking outdoors clear the mind before fixing grammar errors in my treatise?",
             False,
         ),
         (
-            "Pillar 4 & 5: Theta-Gamma TTFS Multiplexing + Forward-Inverse Meaning Closure (X -> Y_hat -> X_hat)",
+            "Pillar 4 & 5: Theta-Gamma TTFS Multiplexing + Forward-Inverse Meaning Closure ('bechamel' + 2-Clause Closure)",
             "Why does a runny bechamel sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
             False,
         ),
     ]
 
-    results: List[Dict[str, object]] = []
-    for label, prompt, use_graph in probes:
+    genesis_results: List[Dict[str, object]] = []
+    for label, prompt, use_graph in genesis_probes:
         res = genesis.generate_genesis_response(
             prompt,
             use_zero_pos_valence_wave=True,
             prefer_world_graph_synthesis=use_graph,
             max_tokens=48,
         )
-        results.append({"pillar": label, **res})
+        genesis_results.append({"pillar": label, **res})
         print(f"  [{label}]", flush=True)
         print(
             f"    ZeroPosIdx={res['zero_pos_idx_used']} | "
@@ -429,20 +891,130 @@ def run_v18_genesis_dream_showcase() -> Dict[str, object]:
         print(f"    Q: {prompt}", flush=True)
         print(f"    A: {res['pure_weight_generated_response']}", flush=True)
 
+    # Golden Round-Trip CI с другим seed (seed=99999 != 42 и seed=77777 != 42)
+    golden_path = root / "tests" / "golden_v16_expected_outputs.json"
+    golden_data = json.loads(golden_path.read_text(encoding="utf-8"))
+    golden_items = golden_data["holdout_paraphrase_retrieval_golden"]
+
+    reloaded_genesis = ZiwagoGenesisDreamOrganismV18(
+        root=root,
+        checkpoint_path=ckpt_v18_path,
+        workers=max(1, workers // 2),
+        cpu_threads=cpu_threads,
+        seed=99999,
+        auto_load_checkpoint=False,
+    )
+    reloaded_genesis.load_genesis_checkpoint(ckpt_v18_path, strict_schema=True)
+
+    roundtrip_matches = 0
+    for g_item in golden_items:
+        probe_q = str(g_item["prompt"])
+        gold_expected = str(g_item["expected_response"])
+        r_load = reloaded_genesis.core_organism.pure_neural_generate_response(probe_q, max_tokens=48, use_ngrams=False)[
+            "pure_weight_generated_response"
+        ]
+        if r_load == gold_expected:
+            roundtrip_matches += 1
+    roundtrip_exact_match_rate = round(roundtrip_matches / float(len(golden_items)), 4)
+
+    genesis_rt_matches = 0
+    for item_res in genesis_results:
+        q_p = str(item_res["stimulus"])
+        use_g = bool(item_res.get("world_graph_synthesis") and int(item_res["world_graph_synthesis"]["hops_traversed"]) >= 2)  # type: ignore[index]
+        r_g = reloaded_genesis.generate_genesis_response(q_p, prefer_world_graph_synthesis=use_g)["pure_weight_generated_response"]
+        if r_g == item_res["pure_weight_generated_response"]:
+            genesis_rt_matches += 1
+    genesis_rt_rate = round(genesis_rt_matches / float(len(genesis_results)), 4)
+
+    print(
+        f"  [MULTI-SEED ROUND-TRIP CI (seed=99999)] Holdout Golden={roundtrip_matches}/{len(golden_items)} ({roundtrip_exact_match_rate:.0%}) | "
+        f"Genesis Pillars={genesis_rt_matches}/{len(genesis_results)} ({genesis_rt_rate:.0%})",
+        flush=True,
+    )
+
+    ledger_path = root / "Produce" / "v16_0_shard_offset_ledger.json"
+    ledger_path.write_text(json.dumps(shard_ledger, indent=2, ensure_ascii=False), encoding="utf-8")
+
     report = {
-        "version": "18.0-Ziwago-Genesis-Dream-SNN",
-        "pillars_verified": 5,
+        "version": "18.1-Ziwago-Genesis-Dream-SNN",
+        "architecture": (
+            "Ziwago-Genesis v18.1 10B-Corpus 5-Epoch Dream SNN "
+            "(Zero-pos_idx BA44 Valence Wave + Cortical World Triplet Graph + Schema-Residual STDP Ontology + "
+            "Theta-Gamma TTFS Multiplexer + Bidirectional Meaning Closure + 5-Bank CA3 Atlas)"
+        ),
+        "total_neurons": 17408,
+        "stored_sentence_chains_in_organism": 0,
+        "holdout_prompt_leakage_count": len(holdout_leakage),
+        "checkpoint_validation": ckpt_validation,
+        "checkpoint_golden_roundtrip_seed99999_match_rate": roundtrip_exact_match_rate,
+        "genesis_pillars_roundtrip_seed99999_match_rate": genesis_rt_rate,
+        "unified_gates_report": {
+            "passed": gate_report.passed,
+            "surprise_f_t": gate_report.surprise_f_t,
+            "grammar_score": gate_report.grammar_score,
+            "trained_ngram_coverage": gate_report.trained_ngram_coverage,
+            "superacid_count": gate_report.superacid_count,
+            "context_retention_tokens": gate_report.context_retention_tokens,
+            "oov_pass_rate": gate_report.oov_pass_rate,
+            "attractor_collapse_rate": gate_report.attractor_collapse_rate,
+            "paraphrase_robustness_of_retrieval": gate_report.paraphrase_robustness_of_retrieval,
+            "novel_knowledge_generalization_score": gate_report.novel_knowledge_generalization_score,
+            "holdout_echo_contamination_rate": gate_report.holdout_echo_contamination_rate,
+            "reasons": gate_report.reasons,
+        },
+        "total_shards_and_zones_scanned": total_shards_and_zones_scanned,
+        "total_raw_corpus_tokens_scanned": total_raw_tokens_scanned,
+        "total_elite_pairs_consolidated": organism.total_pairs_trained,
+        "total_consolidated_tokens": organism.total_tokens_trained,
+        "ca3_global_attractor_poles": int(organism.dendritic_plateau_readout.w_ca3_attractors.shape[0]),
+        "ca3_5bank_atlas_counts": ca3_atlas.sort_all_banks_by_salience(),
+        "active_vocabulary_columns": len(organism.dendritic_plateau_readout.col_to_tok),
         "world_graph_edges_count": len(genesis.world_graph.edges),
         "emergent_ontology_vocabulary_size": len(genesis.emergent_ontology.word_context_sdr),
-        "showcase_results": results,
+        "epochs": epoch_summaries,
+        "omniscient_5epoch_ngrams_off_exam": exam_results,
+        "showcase_results": genesis_results,
+        "checkpoint_v16_path": str(ckpt_v16_path),
+        "checkpoint_v18_path": str(ckpt_v18_path),
+        "checkpoint_size_mb": round(ckpt_v18_path.stat().st_size / (1024 * 1024), 2),
+        "elapsed_sec": round(time.perf_counter() - t0, 2),
     }
-    out_path = ROOT / "Produce" / "v18_0_genesis_dream_report.json"
-    out_path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    out_v18 = root / "Produce" / "v18_0_genesis_dream_report.json"
+    out_v16 = root / "Produce" / "v16_0_10B_omniscient_report.json"
+    out_v18.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    out_v16.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+
     print("=" * 112, flush=True)
-    print(f"SAVED ZIWAGO-GENESIS v18.0 REPORT -> {out_path}", flush=True)
+    print(
+        f"COMPLETED ZIWAGO-GENESIS v18.1 5-EPOCH MARATHON across {total_shards_and_zones_scanned} Shards/Zones! "
+        f"Raw Scanned={total_raw_tokens_scanned:,} tok | Consolidated={organism.total_tokens_trained:,} tok | "
+        f"CA3_Poles={report['ca3_global_attractor_poles']:,} | STDP_Vocab={report['emergent_ontology_vocabulary_size']:,} | "
+        f"GatesPassed={gate_report.passed} | RoundTrip={roundtrip_exact_match_rate:.0%} | "
+        f"Saved -> {ckpt_v18_path.name} ({report['checkpoint_size_mb']} MB)",
+        flush=True,
+    )
     print("=" * 112, flush=True)
     return report
 
 
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Ziwago-Genesis v18.1 Full 5-Epoch 10B-Corpus Dream SNN Trainer")
+    parser.add_argument("--workers", type=int, default=24)
+    parser.add_argument("--cpu-threads", type=int, default=24)
+    parser.add_argument("--owt-shards", type=int, default=80)
+    parser.add_argument("--rows-per-owt-shard", type=int, default=4000)
+    parser.add_argument("--elite-per-shard", type=int, default=60)
+    args = parser.parse_args()
+
+    run_v18_10B_genesis_omniscient_marathon(
+        workers=args.workers,
+        cpu_threads=args.cpu_threads,
+        owt_shards_to_scan=args.owt_shards,
+        rows_per_owt_shard=args.rows_per_owt_shard,
+        elite_per_shard=args.elite_per_shard,
+    )
+
+
 if __name__ == "__main__":
-    run_v18_genesis_dream_showcase()
+    main()

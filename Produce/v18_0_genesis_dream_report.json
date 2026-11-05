@@ -1,8 +1,677 @@
 {
-  "version": "18.0-Ziwago-Genesis-Dream-SNN",
-  "pillars_verified": 5,
+  "version": "18.1-Ziwago-Genesis-Dream-SNN",
+  "architecture": "Ziwago-Genesis v18.1 10B-Corpus 5-Epoch Dream SNN (Zero-pos_idx BA44 Valence Wave + Cortical World Triplet Graph + Schema-Residual STDP Ontology + Theta-Gamma TTFS Multiplexer + Bidirectional Meaning Closure + 5-Bank CA3 Atlas)",
+  "total_neurons": 17408,
+  "stored_sentence_chains_in_organism": 0,
+  "holdout_prompt_leakage_count": 0,
+  "checkpoint_validation": {
+    "valid": true,
+    "schema_version": "ziwago.checkpoint.v16.2",
+    "tokenizer_sha256": "d16567cd4d433cc4f5ae8a566e04c9d0f1959e2ca6d43706712a2dad66ba09f5",
+    "active_vocab_columns": 9509
+  },
+  "checkpoint_golden_roundtrip_seed99999_match_rate": 1.0,
+  "genesis_pillars_roundtrip_seed99999_match_rate": 1.0,
+  "unified_gates_report": {
+    "passed": true,
+    "surprise_f_t": 0.0741,
+    "grammar_score": 1.0,
+    "trained_ngram_coverage": 0.9782,
+    "superacid_count": 0,
+    "context_retention_tokens": 278672,
+    "oov_pass_rate": 1.0,
+    "attractor_collapse_rate": 0.0,
+    "paraphrase_robustness_of_retrieval": 1.0,
+    "novel_knowledge_generalization_score": 1.0,
+    "holdout_echo_contamination_rate": 0.0,
+    "reasons": [
+      "ALL UNIFIED GATES PASSED"
+    ]
+  },
+  "total_shards_and_zones_scanned": 162,
+  "total_raw_corpus_tokens_scanned": 743966813,
+  "total_elite_pairs_consolidated": 15364,
+  "total_consolidated_tokens": 565839,
+  "ca3_global_attractor_poles": 1977,
+  "ca3_5bank_atlas_counts": {
+    "Bank0_BA22_Stories": 711,
+    "Bank1_BA38_Books": 958,
+    "Bank2_BA7_BA39_Science_Web": 1075,
+    "Bank3_BA44_BA45_Movies_Social": 689,
+    "Bank4_BA46_BA10_Wisdom_Assistant": 204
+  },
+  "active_vocabulary_columns": 9509,
   "world_graph_edges_count": 3,
-  "emergent_ontology_vocabulary_size": 143,
+  "emergent_ontology_vocabulary_size": 13626,
+  "epochs": [
+    {
+      "epoch": 1,
+      "epoch_name": "Childhood_TinyStories_All_Shards",
+      "shards_or_zones_scanned": 20,
+      "raw_corpus_tokens_scanned": 72225538,
+      "thalamic_scan_throughput_tok_per_sec": 7180706,
+      "thalamic_ach_token_yield_pct": 0.1102,
+      "elite_pairs_consolidated": 3362,
+      "consolidated_tokens": 79578,
+      "ca3_global_poles": 296,
+      "ca3_5bank_counts": {
+        "Bank0_BA22_Stories": 711,
+        "Bank1_BA38_Books": 0,
+        "Bank2_BA7_BA39_Science_Web": 0,
+        "Bank3_BA44_BA45_Movies_Social": 0,
+        "Bank4_BA46_BA10_Wisdom_Assistant": 0
+      },
+      "active_vocab_cols": 904,
+      "stdp_ontology_vocab_size": 1245,
+      "elapsed_sec": 10.06
+    },
+    {
+      "epoch": 2,
+      "epoch_name": "Youth_BookCorpus_32_Zones",
+      "shards_or_zones_scanned": 32,
+      "raw_corpus_tokens_scanned": 130975925,
+      "thalamic_scan_throughput_tok_per_sec": 10142986,
+      "thalamic_ach_token_yield_pct": 0.0686,
+      "elite_pairs_consolidated": 3842,
+      "consolidated_tokens": 89838,
+      "ca3_global_poles": 660,
+      "ca3_5bank_counts": {
+        "Bank0_BA22_Stories": 711,
+        "Bank1_BA38_Books": 958,
+        "Bank2_BA7_BA39_Science_Web": 0,
+        "Bank3_BA44_BA45_Movies_Social": 0,
+        "Bank4_BA46_BA10_Wisdom_Assistant": 0
+      },
+      "active_vocab_cols": 1890,
+      "stdp_ontology_vocab_size": 2897,
+      "elapsed_sec": 12.91
+    },
+    {
+      "epoch": 3,
+      "epoch_name": "University_Wiki103_Plus_80_OpenWebText_Shards",
+      "shards_or_zones_scanned": 96,
+      "raw_corpus_tokens_scanned": 527765992,
+      "thalamic_scan_throughput_tok_per_sec": 8635748,
+      "thalamic_ach_token_yield_pct": 0.0435,
+      "elite_pairs_consolidated": 4317,
+      "consolidated_tokens": 229345,
+      "ca3_global_poles": 1656,
+      "ca3_5bank_counts": {
+        "Bank0_BA22_Stories": 711,
+        "Bank1_BA38_Books": 958,
+        "Bank2_BA7_BA39_Science_Web": 1075,
+        "Bank3_BA44_BA45_Movies_Social": 0,
+        "Bank4_BA46_BA10_Wisdom_Assistant": 0
+      },
+      "active_vocab_cols": 8254,
+      "stdp_ontology_vocab_size": 8187,
+      "elapsed_sec": 61.11
+    },
+    {
+      "epoch": 4,
+      "epoch_name": "Social_Movies_Persona_NPC_All_Corpora",
+      "shards_or_zones_scanned": 5,
+      "raw_corpus_tokens_scanned": 9007668,
+      "thalamic_scan_throughput_tok_per_sec": 377824,
+      "thalamic_ach_token_yield_pct": 1.2241,
+      "elite_pairs_consolidated": 2800,
+      "consolidated_tokens": 110266,
+      "ca3_global_poles": 1890,
+      "ca3_5bank_counts": {
+        "Bank0_BA22_Stories": 711,
+        "Bank1_BA38_Books": 958,
+        "Bank2_BA7_BA39_Science_Web": 1075,
+        "Bank3_BA44_BA45_Movies_Social": 689,
+        "Bank4_BA46_BA10_Wisdom_Assistant": 0
+      },
+      "active_vocab_cols": 9032,
+      "stdp_ontology_vocab_size": 11665,
+      "elapsed_sec": 23.84
+    },
+    {
+      "epoch": 5,
+      "epoch_name": "Wisdom_OASST2_Plus_8_UltraChat_Shards",
+      "shards_or_zones_scanned": 9,
+      "raw_corpus_tokens_scanned": 3991690,
+      "thalamic_scan_throughput_tok_per_sec": 304746,
+      "thalamic_ach_token_yield_pct": 1.384,
+      "elite_pairs_consolidated": 1007,
+      "consolidated_tokens": 55244,
+      "ca3_global_poles": 1975,
+      "ca3_5bank_counts": {
+        "Bank0_BA22_Stories": 711,
+        "Bank1_BA38_Books": 958,
+        "Bank2_BA7_BA39_Science_Web": 1075,
+        "Bank3_BA44_BA45_Movies_Social": 689,
+        "Bank4_BA46_BA10_Wisdom_Assistant": 204
+      },
+      "active_vocab_cols": 9504,
+      "stdp_ontology_vocab_size": 13616,
+      "elapsed_sec": 13.1
+    }
+  ],
+  "omniscient_5epoch_ngrams_off_exam": [
+    {
+      "exam_id": "holdout_1_paraphrase_neuroscience",
+      "exam_domain": "Epoch 3 Science (Paraphrase Retrieval Robustness)",
+      "keyword_hits": 4,
+      "keyword_total": 4,
+      "forbidden_hits": [],
+      "stimulus": "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "conversational_domain": "neuroscience",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.8383,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col1_LEXICAL_SEMANTICS_1": 0.2086,
+        "Col2_ENCYCLOPEDIC_FACTS_2": 0.2738
+      },
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.5665,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.439
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.5665,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.439
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 31,
+          "stimulus_alignment_cos": 0.5665,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.439
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 31,
+      "pure_weight_generated_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 1224.96
+    },
+    {
+      "exam_id": "holdout_2_paraphrase_culinary_science",
+      "exam_domain": "Epoch 3+5 Culinary + Cortical Neuroscience",
+      "keyword_hits": 4,
+      "keyword_total": 4,
+      "forbidden_hits": [],
+      "stimulus": "Why does a runny mayonnaise sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "conversational_domain": "culinary_emulsion",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.3869,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col3_PRAGMATIC_DIALOG_11": 0.3649,
+        "Col4_NARRATIVE_EPISODIC_12": 0.3396
+      },
+      "ba44_syntax_bridge_connector": ", while",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 63,
+          "stimulus_alignment_cos": 0.4896,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3968
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 63,
+          "stimulus_alignment_cos": 0.4896,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3968
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 63,
+          "stimulus_alignment_cos": 0.4896,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3968
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 63,
+      "pure_weight_generated_response": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2811.37
+    },
+    {
+      "exam_id": "holdout_3_paraphrase_writing_fitness",
+      "exam_domain": "Epoch 4+5 Essay Writing + Outdoor Fitness",
+      "keyword_hits": 4,
+      "keyword_total": 4,
+      "forbidden_hits": [],
+      "stimulus": "Before fixing a runny mayonnaise emulsion, how does running outdoors help clear the mind?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col1_LEXICAL_SEMANTICS",
+        "Col2_ENCYCLOPEDIC_FACTS"
+      ],
+      "conversational_domain": "culinary_emulsion",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.0677,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col2_ENCYCLOPEDIC_FACTS_2": 0.1838,
+        "Col1_LEXICAL_SEMANTICS_9": 0.6207
+      },
+      "ba44_syntax_bridge_connector": ", before",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 54,
+          "stimulus_alignment_cos": 0.2241,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2507
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 54,
+          "stimulus_alignment_cos": 0.2241,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2507
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 54,
+          "stimulus_alignment_cos": 0.2241,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2507
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 54,
+      "pure_weight_generated_response": "Yes, it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, before staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2489.73
+    },
+    {
+      "exam_id": "holdout_4_conversational_identity_recall",
+      "exam_domain": "Conversational State Recall (What is my name?)",
+      "keyword_hits": 4,
+      "keyword_total": 4,
+      "forbidden_hits": [],
+      "stimulus": "Remind me, what is my name and what project am I building?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "conversational_domain": "self_identity",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.5,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col1_LEXICAL_SEMANTICS_1": 0.344,
+        "Col4_NARRATIVE_EPISODIC_12": 0.2256
+      },
+      "ba44_syntax_bridge_connector": "",
+      "swr_consolidated_into_nmda_matrix": false,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 20,
+          "stimulus_alignment_cos": 0.5762,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.4444
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 20,
+      "pure_weight_generated_response": "Your name is Alex, and you are building a biological neural network with dendritic predictive coding.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 890.31
+    },
+    {
+      "exam_id": "holdout_5_tpj_third_person_shift",
+      "exam_domain": "TPJ 3rd-Person Deictic Shift + Compositional Bridge",
+      "keyword_hits": 4,
+      "keyword_total": 4,
+      "forbidden_hits": [],
+      "stimulus": "Alex is testing his model; what is his name, and how can he fix grammar errors when writing an essay?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col4_NARRATIVE_EPISODIC",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "conversational_domain": "essay_grammar",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.638,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col3_PRAGMATIC_DIALOG_11": 0.0,
+        "Col4_NARRATIVE_EPISODIC_12": 0.2207
+      },
+      "ba44_syntax_bridge_connector": ", and",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 46,
+          "stimulus_alignment_cos": 0.2433,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2613
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 46,
+          "stimulus_alignment_cos": 0.2433,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2613
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 46,
+          "stimulus_alignment_cos": 0.2433,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2613
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 46,
+      "pure_weight_generated_response": "His name is Alex, and he is building a biological neural network with dendritic predictive coding, and to fix grammar errors in his essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2142.67
+    },
+    {
+      "exam_id": "holdout_6_theta_phase_before_bridge",
+      "exam_domain": "Theta-Phase Queue + BA44 'before' Syntax Bridge",
+      "keyword_hits": 4,
+      "keyword_total": 4,
+      "forbidden_hits": [],
+      "stimulus": "Can running outdoors clear the mind before writing an essay without grammar errors?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col6_THEORY_OF_MIND",
+        "Col3_PRAGMATIC_DIALOG"
+      ],
+      "conversational_domain": "essay_grammar",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.4103,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col3_PRAGMATIC_DIALOG_3": 0.2563,
+        "Col6_THEORY_OF_MIND_6": 0.0
+      },
+      "ba44_syntax_bridge_connector": ", before",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2826,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2829
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2826,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2829
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 48,
+          "stimulus_alignment_cos": 0.2826,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2829
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 48,
+      "pure_weight_generated_response": "Staying active is a wonderful habit, and running outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2201.14
+    },
+    {
+      "exam_id": "holdout_7_roleplay_plus_neuroscience",
+      "exam_domain": "Epoch 3+4 NPC Lore + Cortical Neuroscience",
+      "keyword_hits": 4,
+      "keyword_total": 4,
+      "forbidden_hits": [],
+      "stimulus": "Greetings, guardian of the ancient stone arch, how do pyramidal neurons integrate sensory input?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col5_CAUSAL_PHYSICS",
+        "Col1_LEXICAL_SEMANTICS"
+      ],
+      "conversational_domain": "neuroscience",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 2.7794,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col1_LEXICAL_SEMANTICS_1": 0.0,
+        "Col5_CAUSAL_PHYSICS_13": 0.3554
+      },
+      "ba44_syntax_bridge_connector": ", and",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 58,
+          "stimulus_alignment_cos": 0.2322,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2552
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 58,
+          "stimulus_alignment_cos": 0.2322,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2552
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 58,
+          "stimulus_alignment_cos": 0.2322,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.2552
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 58,
+      "pure_weight_generated_response": "Ah, you have arrived at the Echoing Glade, traveler; I have been waiting for one who seeks the ancient knowledge, and pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2415.11
+    },
+    {
+      "exam_id": "holdout_8_bidirectional_ca3",
+      "exam_domain": "Bidirectional CA3 (Response Tokens -> Dual Attractor)",
+      "keyword_hits": 2,
+      "keyword_total": 2,
+      "forbidden_hits": [],
+      "stimulus": "Why should a student check subject-verb agreement and read each sentence aloud, while whisking a fresh egg yolk to stabilize an emulsion?",
+      "ngrams_mode": "OFF (Pure 8192-Dendritic NMDA Matrix + BA44 Syntax Bridge)",
+      "active_moe_columns": [
+        "Col3_PRAGMATIC_DIALOG",
+        "Col7_EXECUTIVE_PFC"
+      ],
+      "conversational_domain": "culinary_emulsion",
+      "remembered_user_name": "Alex",
+      "role_filler_bindings_applied": {},
+      "arcuate_token_pointer_injections": 0,
+      "reafferent_stranger_check_interventions": 0,
+      "episode_chain_sentences_generated": 1,
+      "multi_hop_rollout_used": false,
+      "active_inference_clarification_triggered": false,
+      "ca3_top1_resonance": 1.9089,
+      "epistemic_uncertainty": 0.0,
+      "cortical_moe_branch_profile": {
+        "Col3_PRAGMATIC_DIALOG_3": 0.2677,
+        "Col7_EXECUTIVE_PFC_7": 0.4033
+      },
+      "ba44_syntax_bridge_connector": ", while",
+      "swr_consolidated_into_nmda_matrix": true,
+      "online_dopamine_imprinted_tokens": 0,
+      "vte_beams_evaluated": [
+        {
+          "trajectory_idx": 0,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_0",
+          "tokens_simulated": 55,
+          "stimulus_alignment_cos": 0.4211,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3591
+        },
+        {
+          "trajectory_idx": 1,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_1",
+          "tokens_simulated": 55,
+          "stimulus_alignment_cos": 0.4211,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3591
+        },
+        {
+          "trajectory_idx": 2,
+          "expert_route": "ngrams_OFF_pure_dendritic_matrix_beam_2",
+          "tokens_simulated": 55,
+          "stimulus_alignment_cos": 0.4211,
+          "synaptic_coherence": 3.0,
+          "conflict_energy": 0.05,
+          "son_free_energy_F": -0.3591
+        }
+      ],
+      "selected_beam_idx": 0,
+      "stopped_naturally_by_son_eos": true,
+      "generated_tokens_count": 55,
+      "pure_weight_generated_response": "To fix grammar errors in your essay, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses, while it is possible to fix runny mayonnaise by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes.",
+      "stored_sentence_chains_in_class": 0,
+      "latency_ms": 2387.52
+    }
+  ],
   "showcase_results": [
     {
       "pillar": "Pillar 1: Zero-pos_idx Syntactic Valence Wave (BA44 Continuous State-Machine)",
@@ -21,12 +690,12 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
-      "latency_ms": 43.17
+      "latency_ms": 44.75
     },
     {
-      "pillar": "Pillar 2: World-Graph Multi-Hop Novel Sentence Synthesis (3 Separate Facts -> 1 Unseen Sentence)",
+      "pillar": "Pillar 2: World-Graph Multi-Hop Novel Sentence Synthesis (3 Separate Facts -> 1 Unseen Sentence via Zero-Pos NMDA)",
       "stimulus": "How do astrocytes ignite dendritic plateau potentials in pyramidal neurons?",
-      "generation_engine": "CorticalRelationalWorldGraph (Multi-Hop Triplet Wavefront Synthesis)",
+      "generation_engine": "CorticalRelationalWorldGraph (Zero-Pos-Idx NMDA Triplet Wavefront Synthesis)",
       "zero_pos_idx_used": true,
       "world_graph_synthesis": {
         "synthesized_sentence": "Astrocytes release gliotransmitters such as d-serine, which binds to glycine sites on apical nmda receptors to ignite dendritic plateau potentials in pyramidal neurons.",
@@ -105,10 +774,10 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Astrocytes release gliotransmitters such as d-serine, which binds to glycine sites on apical nmda receptors to ignite dendritic plateau potentials in pyramidal neurons.",
-      "latency_ms": 43.04
+      "latency_ms": 53.33
     },
     {
-      "pillar": "Pillar 3: Unsupervised STDP Emergent Ontology ('bechamel' + 'treatise' + 'kayaking' — NOT in any hardcoded dict!)",
+      "pillar": "Pillar 3: Unsupervised STDP Emergent Ontology via Schema-Residual Law ('kayaking' + 'treatise', 0% domain stopwords)",
       "stimulus": "Can kayaking outdoors clear the mind before fixing grammar errors in my treatise?",
       "generation_engine": "SyntacticValenceWaveGenerator (0% pos_idx) + BidirectionalMeaningClosureVerifier",
       "zero_pos_idx_used": true,
@@ -136,10 +805,10 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Staying active is a wonderful habit, and kayaking outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your treatise, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
-      "latency_ms": 56.36
+      "latency_ms": 70.42
     },
     {
-      "pillar": "Pillar 4 & 5: Theta-Gamma TTFS Multiplexing + Forward-Inverse Meaning Closure (X -> Y_hat -> X_hat)",
+      "pillar": "Pillar 4 & 5: Theta-Gamma TTFS Multiplexing + Forward-Inverse Meaning Closure ('bechamel' + 2-Clause Closure)",
       "stimulus": "Why does a runny bechamel sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
       "generation_engine": "SyntacticValenceWaveGenerator (0% pos_idx) + BidirectionalMeaningClosureVerifier",
       "zero_pos_idx_used": true,
@@ -162,7 +831,11 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Yes, it is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
-      "latency_ms": 86.99
+      "latency_ms": 86.47
     }
-  ]
+  ],
+  "checkpoint_v16_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v16_0_10B_omniscient_master.pt",
+  "checkpoint_v18_path": "/home/jupyter/Neuroweave Ziwago/Produce/checkpoints/ziwago_v18_1_genesis_omniscient_master.pt",
+  "checkpoint_size_mb": 1135.36,
+  "elapsed_sec": 246.87
 }

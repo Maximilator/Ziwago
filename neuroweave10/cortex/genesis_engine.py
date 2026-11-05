@@ -685,6 +685,9 @@ class EmergentOntologicalRoleDiscovery:
                 continue
             if register_as_canonical and len(target_w) >= 4:
                 self.canonical_anchors.add(target_w)
+            elif not register_as_canonical and target_w in self.canonical_anchors:
+                # Защищаем консолидированные рецептивные поля канонических слотов от размывания фоновым веб-шумом
+                continue
             vec = self.word_context_sdr.get(target_w)
             if vec is None:
                 vec = torch.zeros(self.n_bins, dtype=torch.float32)
