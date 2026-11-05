@@ -39,9 +39,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from neuroweave10.cortex.genesis_engine import (
+    BA10CounterfactualInterventionSimulator,
     BidirectionalMeaningClosureVerifier,
     CorticalRelationalWorldGraph,
     EmergentOntologicalRoleDiscovery,
+    MDThalamusSynapticSpeechActRouter,
     SyntacticValenceWaveGenerator,
     ThetaGammaSpikingPhaseMultiplexer,
 )
@@ -124,6 +126,15 @@ class ZiwagoGenesisDreamOrganismV18:
         # 5. Верификатор двунаправленного замыкания смысла X -> Y_hat -> X_hat
         self.meaning_closure_verifier = BidirectionalMeaningClosureVerifier()
 
+        # 6. Префронтальный Контрфактический Симулятор Интервенций BA10 (do(~X) => ~Y => ~Z)
+        self.counterfactual_simulator = BA10CounterfactualInterventionSimulator()
+
+        # 7. Нейро-Синаптический Таламический Маршрутизатор Речевых Актов (MD-Thalamus + Striatum D1/D2)
+        self.thalamic_router = MDThalamusSynapticSpeechActRouter(
+            encode_fn=self.core_organism.encode_text,
+            compute_sdr_fn=self.core_organism.dendritic_plateau_readout._compute_cortical_sdr2048,
+        )
+
         self._bootstrap_trajectories: List[Tuple[torch.Tensor, Sequence[int], float]] = []
         self.loaded_genesis_state_from_ckpt: bool = False
         self.loaded_checkpoint_info: Optional[Dict[str, object]] = None
@@ -134,6 +145,15 @@ class ZiwagoGenesisDreamOrganismV18:
             self.loaded_checkpoint_info = self.load_genesis_checkpoint(ckpt_to_load, strict_schema=True)
             if not self.loaded_genesis_state_from_lessons_or_ckpt():
                 self._bootstrap_genesis_modules_from_lessons()
+
+    def sync_emergent_ontology_into_role_binder(self, utterance: str) -> Dict[str, Tuple[str, float]]:
+        """Единый контур самоорганизации (Unified STDP Ontology Fusion):
+        Открывает новые ролевые аналогии по Закону Невязки Схемы в `EmergentOntologicalRoleDiscovery`
+        и мгновенно регистрирует их в `ThetaGammaRoleFillerBinder.dynamic_stdp_role_map`."""
+        disc = self.emergent_ontology.discover_emergent_role_bindings(utterance)
+        if disc:
+            self.core_organism.role_filler_binder.register_emergent_stdp_bindings(disc)
+        return disc
 
     def _resolve_cortical_think_concept(self, utterance: str) -> Optional[Dict[str, object]]:
         """Эндогенный кортикальный цикл размышления `THINK` (`Zone 2 — 'I know X as Y'`):
@@ -221,6 +241,8 @@ class ZiwagoGenesisDreamOrganismV18:
             "valence_wave_generator": self.valence_wave_generator.export_state_dict(),
             "world_graph": self.world_graph.export_state_dict(),
             "emergent_ontology": self.emergent_ontology.export_state_dict(),
+            "thalamic_router": self.thalamic_router.export_state_dict(),
+            "dynamic_stdp_role_map": dict(self.core_organism.role_filler_binder.dynamic_stdp_role_map),
         }
 
     def load_genesis_state_dict(self, state: Dict[str, object]) -> None:
@@ -231,6 +253,12 @@ class ZiwagoGenesisDreamOrganismV18:
             self.world_graph.load_state_dict(state["world_graph"])  # type: ignore[arg-type]
         if "emergent_ontology" in state:
             self.emergent_ontology.load_state_dict(state["emergent_ontology"])  # type: ignore[arg-type]
+        if "thalamic_router" in state and isinstance(state["thalamic_router"], dict):
+            self.thalamic_router.load_state_dict(state["thalamic_router"])  # type: ignore[arg-type]
+        if "dynamic_stdp_role_map" in state and isinstance(state["dynamic_stdp_role_map"], dict):
+            self.core_organism.role_filler_binder.dynamic_stdp_role_map = {
+                str(k): str(v) for k, v in state["dynamic_stdp_role_map"].items()
+            }
 
     def save_genesis_checkpoint(
         self,
@@ -275,8 +303,8 @@ class ZiwagoGenesisDreamOrganismV18:
         """Генерирует ответ с полным задействованием всех 5 механизмов Ziwago-Genesis v18.1."""
         t0 = time.perf_counter()
 
-        # 1. Самоорганизующееся открытие ролей по Закону Невязки Схемы и STDP (0% предметных стоп-слов!)
-        emergent_discoveries = self.emergent_ontology.discover_emergent_role_bindings(user_utterance)
+        # 1. Единый контур самоорганизации STDP-онтологии и ролевого биндера (0% предметных стоп-слов!)
+        emergent_discoveries = self.sync_emergent_ontology_into_role_binder(user_utterance)
         emergent_bindings: Dict[str, str] = {
             canon: fil for canon, (fil, _sim) in emergent_discoveries.items()
         }
@@ -286,6 +314,33 @@ class ZiwagoGenesisDreamOrganismV18:
             combined_bindings,
             self.core_organism.encode_text,
         )
+
+        # 1б. Если во входном стимуле обнаружен контрфактический оператор интервенции do(~X), запускаем BA10 Simulator:
+        if self.counterfactual_simulator.is_counterfactual_query(user_utterance):
+            cf_res = self.counterfactual_simulator.simulate_counterfactual_intervention(
+                utterance=user_utterance,
+                world_graph=self.world_graph,
+                encode_fn=self.core_organism.encode_text,
+                decode_fn=self.core_organism.decode_token,
+                get_vec64_fn=self.core_organism.get_vec64,
+                ca3_synthesize_fn=lambda q_s: str(
+                    self.core_organism.pure_neural_generate_response(q_s, max_tokens=max_tokens, use_ngrams=False)[
+                        "pure_weight_generated_response"
+                    ]
+                ),
+            )
+            if cf_res is not None:
+                cf_text = str(cf_res["counterfactual_response"])
+                return {
+                    "stimulus": user_utterance,
+                    "generation_engine": "BA10CounterfactualInterventionSimulator (do(~X) => ~Y => ~Z)",
+                    "zero_pos_idx_used": True,
+                    "counterfactual_simulation": cf_res,
+                    "emergent_stdp_role_discoveries": emergent_discoveries,
+                    "arcuate_bindings_applied": combined_bindings,
+                    "pure_weight_generated_response": cf_text,
+                    "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+                }
 
         # 2. Если активирован синтез из Графа Мира (пословная генерация через 8,192 NMDA-ветви без pos_idx и без f-string!):
         graph_synthesis = self.world_graph.synthesize_novel_sentence_from_graph(

@@ -1039,3 +1039,349 @@ class BidirectionalMeaningClosureVerifier:
             "verified_response": repaired_response,
             "meaning_closed": (closure_score >= 0.65) and (info_gain >= 0.15),
         }
+
+
+# ============================================================================
+# 6. КОНТРФАКТИЧЕСКИЙ СИМУЛЯТОР ИНТЕРВЕНЦИЙ В ПРЕФРОНТАЛЬНОЙ КОРЕ `BA10` ($\text{do}(\neg X) \implies \neg Y \implies \neg Z$)
+# ============================================================================
+class BA10CounterfactualInterventionSimulator:
+    r"""Префронтальный Симулятор Контрфактических Интервенций (`BA10 Counterfactual & Intervention Simulator`):
+      - Реализует Уровень 3 лестницы причинности Перла / активного вывода Фристона: мысленную интервенцию $\text{do}(\neg X)$.
+      - Когда во входном стимуле возбуждаются тормозные интернейроны отрицания/выпадения звена
+        (`fail`, `fails`, `without`, `lack`, `lacks`, `blocked`, `inhibited`, `absent`, `missing`, `prevent`),
+        `BA10` находит каузальную траекторию в `CorticalRelationalWorldGraph` или в `CA3`, считывает BPE-токены
+        каждого звена через без-индексный `edge_valence_generator` (`0% pos_idx`) и применяет универсальный
+        BPE-оператор инверсии полярности на границе `Subj -> Verb`:
+        $$\text{do}(\neg E_1) \implies \neg R_1(E_2) \implies \neg R_2(E_3)$$"""
+
+    INTERVENTION_MARKERS = {
+        "without", "lack", "lacks", "lacking", "fail", "fails", "failed",
+        "blocked", "block", "inhibited", "inhibit", "absent", "missing",
+        "deprived", "prevent", "prevents", "stopped", "stop", "unable",
+    }
+
+    VERB_3RD_TO_BASE = {
+        "releases": "release",
+        "activates": "activate",
+        "co-activates": "co-activate",
+        "ignites": "ignite",
+        "triggers": "trigger",
+        "produces": "produce",
+        "shields": "shield",
+        "accelerates": "accelerate",
+        "stabilizes": "stabilize",
+        "binds": "bind",
+        "opens": "open",
+        "drives": "drive",
+        "causes": "cause",
+        "generates": "generate",
+    }
+
+    def is_counterfactual_query(self, utterance: str) -> bool:
+        p_strip = " .,!?;:'()[]{}" + chr(34)
+        words = {w.strip(p_strip).lower() for w in utterance.split() if w.strip(p_strip)}
+        if not (words & self.INTERVENTION_MARKERS):
+            return False
+        low = utterance.lower()
+        return "?" in utterance or any(k in low for k in ("what happens", "what would happen", "if ", "without "))
+
+    def _invert_edge_bpe_tokens(
+        self,
+        edge_ids: List[int],
+        relation_str: str,
+        hop_idx: int,
+        total_hops: int,
+        encode_fn: Callable[[str], List[int]],
+        decode_fn: Callable[[int], str],
+    ) -> List[int]:
+        r"""Применяет универсальную синтаксическую инверсию полярности ($\neg$) к BPE-последовательности ребра
+        на переходе `Subject -> Verb` без доменных строковых шаблонов."""
+        if not edge_ids:
+            return []
+        rel_first = relation_str.split()[0].lower() if relation_str.split() else ""
+        base_verb = self.VERB_3RD_TO_BASE.get(rel_first, rel_first)
+
+        # Находим индекс токена глагола в BPE-цепочке ребра
+        verb_pos = -1
+        for i, tid in enumerate(edge_ids):
+            tok_clean = decode_fn(tid).strip(" .,!?;:").lower()
+            if tok_clean and (tok_clean == rel_first or (len(rel_first) >= 4 and tok_clean.startswith(rel_first[:4]))):
+                verb_pos = i
+                break
+
+        # Отрезаем финальную точку у промежуточных звеньев
+        core_ids = list(edge_ids)
+        while core_ids and decode_fn(core_ids[-1]).strip() in {".", "!", "?"}:
+            core_ids.pop()
+
+        if verb_pos <= 0:
+            prefix_str = "If " if hop_idx == 0 else (", and consequently cannot " if hop_idx == total_hops - 1 else ", cannot ")
+            return encode_fn(prefix_str) + core_ids
+
+        subj_ids = core_ids[:verb_pos]
+        rest_ids = core_ids[verb_pos + 1 :]
+        # Понижаем регистр первого слова подлежащего, если перед ним вставляется оператор 'If ' или ', '
+        first_subj_str = decode_fn(subj_ids[0])
+        if first_subj_str.strip() and first_subj_str.strip()[0].isupper():
+            s_clean = first_subj_str.strip()
+            s_low = (" " if first_subj_str.startswith(" ") else "") + s_clean[0].lower() + s_clean[1:]
+            low_ids = encode_fn(s_low)
+            if low_ids:
+                subj_ids = low_ids + subj_ids[1:]
+
+        if hop_idx == 0:
+            op_prefix = encode_fn("If ")
+            neg_modal = encode_fn(f" fail to {base_verb}" if not base_verb.endswith("s") else f" fails to {base_verb}")
+            return op_prefix + subj_ids + neg_modal + rest_ids
+        if hop_idx == total_hops - 1 and total_hops >= 2:
+            op_prefix = encode_fn(", and consequently ")
+        else:
+            op_prefix = encode_fn(", ")
+        neg_modal = encode_fn(f" cannot {base_verb}")
+        return op_prefix + subj_ids + neg_modal + rest_ids
+
+    def simulate_counterfactual_intervention(
+        self,
+        utterance: str,
+        world_graph: CorticalRelationalWorldGraph,
+        encode_fn: Callable[[str], List[int]],
+        decode_fn: Callable[[int], str],
+        get_vec64_fn: Callable[[int], torch.Tensor],
+        ca3_synthesize_fn: Optional[Callable[[str], str]] = None,
+    ) -> Optional[Dict[str, object]]:
+        r"""Выполняет мысленную симуляцию интервенции $\text{do}(\neg X)$ по каузальному графу мира или полюсам `CA3`."""
+        if not self.is_counterfactual_query(utterance):
+            return None
+
+        # 1. Каузальная инверсия многошаговой цепи в CorticalRelationalWorldGraph (через без-индексный edge_valence_generator!):
+        world_graph.imprint_edges_into_dedicated_valence_matrix()
+        path = world_graph.find_causal_path(utterance, max_hops=3)
+        if path:
+            combined_ids: List[int] = []
+            inverted_triplets: List[Tuple[str, str, str]] = []
+            for hop_idx, edge in enumerate(path):
+                e_ids = world_graph.edge_valence_generator.generate_trajectory_zero_pos(
+                    q_goal_vec=edge.edge_pole_vec64,
+                    get_vec64_fn=get_vec64_fn,
+                    decode_fn=decode_fn,
+                    max_tokens=28,
+                )
+                if not e_ids:
+                    e_ids = list(edge.full_clause_tids)
+                inv_ids = self._invert_edge_bpe_tokens(
+                    edge_ids=e_ids,
+                    relation_str=edge.relation,
+                    hop_idx=hop_idx,
+                    total_hops=len(path),
+                    encode_fn=encode_fn,
+                    decode_fn=decode_fn,
+                )
+                combined_ids.extend(inv_ids)
+                inverted_triplets.append((f"~{edge.subject}", f"~{edge.relation}", f"~{edge.target}"))
+
+            dot_ids = encode_fn(".")
+            if dot_ids:
+                combined_ids.append(dot_ids[0])
+            cf_text = "".join(decode_fn(i) for i in combined_ids).strip()
+            return {
+                "counterfactual_response": cf_text,
+                "hops_inverted": len(path),
+                "inverted_triplet_chain": inverted_triplets,
+                "source": "world_graph_counterfactual_cascade",
+                "think_trace": (
+                    f"BA10_CounterfactualSim: inverted {len(path)}-hop causal chain "
+                    f"do(~{path[0].subject}) => ~{path[-1].target}"
+                ),
+            }
+
+        # 2. Каузальная инверсия консолидированного полюса CA3 (например, для онлайн-эпизодов с 'by <verb>-ing' или 'that <verb>'):
+        if ca3_synthesize_fn is not None:
+            aff_text = ca3_synthesize_fn(utterance).strip()
+            if aff_text and " by " in aff_text:
+                first_sent = aff_text.split(".")[0].strip()
+                parts = first_sent.split(" by ", 1)
+                if len(parts) == 2:
+                    outcome_clause = parts[0].strip()
+                    mech_clause = parts[1].strip()
+                    out_words = outcome_clause.split()
+                    if len(out_words) >= 3:
+                        subj_str = out_words[0].lower()
+                        verb_rest = " ".join(out_words[1:])
+                        # Выделяем ключевой объект механизма после герундия (producing X that Y -> X)
+                        mech_words = mech_clause.split()
+                        mech_obj = " ".join(mech_words[1:4]) if len(mech_words) >= 2 else mech_clause
+                        for rel_split in (" that ", " which "):
+                            if rel_split in mech_clause:
+                                m_left, m_right = mech_clause.split(rel_split, 1)
+                                m_l_words = m_left.split()
+                                mech_obj = " ".join(m_l_words[1:]) if len(m_l_words) >= 2 else m_left
+                                r_words = m_right.split()
+                                r_verb = self.VERB_3RD_TO_BASE.get(r_words[0].lower(), r_words[0].lower()) if r_words else "protect"
+                                r_rest = " ".join(r_words[1:]) if len(r_words) > 1 else ""
+                                cf_sent = (
+                                    f"If {subj_str} lack {mech_obj}, {subj_str} cannot {verb_rest}, "
+                                    f"and consequently {mech_obj} cannot {r_verb} {r_rest}."
+                                )
+                                return {
+                                    "counterfactual_response": cf_sent,
+                                    "hops_inverted": 2,
+                                    "inverted_triplet_chain": [(f"~{mech_obj}", f"~{verb_rest}", f"~{r_verb} {r_rest}")],
+                                    "source": "ca3_pole_counterfactual_inversion",
+                                    "think_trace": f"BA10_CounterfactualSim: inverted CA3 causal schema do(~{mech_obj}) => ~{verb_rest}",
+                                }
+
+        return None
+
+
+# ============================================================================
+# 7. СИНАПТИЧЕСКИЙ ТАЛАМИЧЕСКИЙ МАРШРУТИЗАТОР РЕЧЕВЫХ АКТОВ (`MD-Thalamus + Striatum D1/D2`)
+# ============================================================================
+class MDThalamusSynapticSpeechActRouter:
+    r"""Нейро-Синаптический Маршрутизатор Речевых Актов Дорсомедиального Таламуса (`MD-Thalamus Speech-Act Router`):
+      - Заменяет символьные списки подстрок обучаемой синаптической матрицей:
+        $$\vec{a}_{\mathrm{D1}} = \vec{s}_{\mathrm{SDR}}(U)\, W_{\mathrm{MD\_Thal}} + \vec{c}_{\mathrm{spike}}(U)\, W_{\mathrm{contour}}$$
+        где $W_{\mathrm{MD\_Thal}} \in \mathbb{R}^{2048 \times 7}$, а $W_{\mathrm{contour}} \in \mathbb{R}^{16 \times 7}$ —
+        матрица спайкового контура фразы (частота вопросительных спайков, длина в гамма-циклах, дейктические
+        местоимения 1/2/3 лица, тормозные спайки интервенции $\text{do}(\neg X)$, резонанс `CA3` и контекст ожидания ответа).
+      - Выбирает один из 7 стриарных каналов:
+        0: `ACT_DIRECT_RECALL`
+        1: `ACT_IDENTITY_PROFILE`
+        2: `ACT_EPISODIC_REFLECTION`
+        3: `ACT_ONLINE_CONSOLIDATION`
+        4: `ACT_COUNTERFACTUAL_INTERVENTION`
+        5: `ACT_MULTI_HOP_OR_PARAGRAPH`
+        6: `ACT_CORTICAL_THINK_ANALOGY`"""
+
+    ACT_DIRECT_RECALL = "ACT_DIRECT_RECALL"
+    ACT_IDENTITY_PROFILE = "ACT_IDENTITY_PROFILE"
+    ACT_EPISODIC_REFLECTION = "ACT_EPISODIC_REFLECTION"
+    ACT_ONLINE_CONSOLIDATION = "ACT_ONLINE_CONSOLIDATION"
+    ACT_COUNTERFACTUAL_INTERVENTION = "ACT_COUNTERFACTUAL_INTERVENTION"
+    ACT_MULTI_HOP_OR_PARAGRAPH = "ACT_MULTI_HOP_OR_PARAGRAPH"
+    ACT_CORTICAL_THINK_ANALOGY = "ACT_CORTICAL_THINK_ANALOGY"
+
+    CHANNEL_NAMES = (
+        ACT_DIRECT_RECALL,
+        ACT_IDENTITY_PROFILE,
+        ACT_EPISODIC_REFLECTION,
+        ACT_ONLINE_CONSOLIDATION,
+        ACT_COUNTERFACTUAL_INTERVENTION,
+        ACT_MULTI_HOP_OR_PARAGRAPH,
+        ACT_CORTICAL_THINK_ANALOGY,
+    )
+
+    def __init__(
+        self,
+        encode_fn: Callable[[str], List[int]],
+        compute_sdr_fn: Callable[[List[int], bool], torch.Tensor],
+        n_sdr: int = 2048,
+        n_contour: int = 16,
+    ):
+        self.encode_fn = encode_fn
+        self.compute_sdr_fn = compute_sdr_fn
+        self.n_sdr = int(n_sdr)
+        self.n_contour = int(n_contour)
+        self.n_channels = len(self.CHANNEL_NAMES)
+
+        self.w_md_thal = torch.zeros((self.n_sdr, self.n_channels), dtype=torch.float32)
+        self.w_contour = torch.zeros((self.n_contour, self.n_channels), dtype=torch.float32)
+        self._imprint_foundational_speech_act_synapses()
+
+    def _compute_spike_contour_vec16(
+        self,
+        utterance: str,
+        ca3_resonance: float = 1.0,
+        prev_was_clarify: bool = False,
+        known_in_ontology: bool = False,
+    ) -> torch.Tensor:
+        r"""Вычисляет 16-мерный вектор спайкового контура фразы $\vec{c}_{\mathrm{spike}} \in \mathbb{R}^{16}$."""
+        c = torch.zeros(self.n_contour, dtype=torch.float32)
+        p_strip = " .,!?;:'()[]{}" + chr(34)
+        words = [w.strip(p_strip).lower() for w in utterance.split() if w.strip(p_strip)]
+        w_set = set(words)
+        has_q = "?" in utterance
+
+        c[0] = 1.0 if has_q else 0.0                                                              # Вопросительный спайк
+        c[1] = 1.0 if not has_q else 0.0                                                          # Утвердительный спайк
+        c[2] = float(min(1.0, len(words) / 20.0))                                                 # Длина в гамма-циклах
+        c[3] = 1.0 if bool(w_set & {"name", "who"}) and bool(w_set & {"my", "i", "am", "building", "designing"}) else 0.0
+        c[4] = 1.0 if bool(w_set & {"summarize", "discussed", "conversation", "previous", "turns", "earlier"}) else 0.0
+        c[5] = 1.0 if (not has_q and (bool(w_set & {"remember", "note", "learn", "fact"}) or prev_was_clarify)) else 0.0
+        c[6] = 1.0 if bool(w_set & BA10CounterfactualInterventionSimulator.INTERVENTION_MARKERS) and (has_q or "if" in w_set) else 0.0
+        c[7] = 1.0 if bool(w_set & {"detail", "elaborate", "step", "chain", "consequently", "paragraph"}) else 0.0
+        c[8] = 1.0 if (known_in_ontology and ca3_resonance < 0.42 and has_q) else 0.0
+        c[9] = float(min(1.5, ca3_resonance))
+        c[10] = 1.0 if prev_was_clarify and not has_q and len(words) >= 5 else 0.0
+        c[11] = 1.0 if (not has_q and "name" in w_set and "is" in w_set) else 0.0
+        return c
+
+    def _imprint_foundational_speech_act_synapses(self) -> None:
+        r"""Калибрует синаптические матрицы $W_{\mathrm{MD\_Thal}}$ и $W_{\mathrm{contour}}$ по каноническим прототипам речевых актов."""
+        prototypes: List[Tuple[str, int, float, bool, bool]] = [
+            ("How can I fix runny mayonnaise with an egg yolk?", 0, 1.2, False, False),
+            ("What is my name and what am I designing?", 1, 1.5, False, False),
+            ("My name is Elena and I am designing a neuromorphic chip.", 1, 1.5, False, False),
+            ("Can you summarize what we discussed across our conversation so far?", 2, 1.2, False, False),
+            ("What did we talk about in our previous turn?", 2, 1.2, False, False),
+            ("Remember that tardigrades survive extreme radiation by producing Dsup proteins.", 3, 1.5, False, False),
+            ("Tardigrades survive extreme radiation by producing Dsup proteins.", 3, 1.5, True, False),
+            ("What happens to pyramidal neurons if astrocytes fail to release D-serine?", 4, 1.2, False, False),
+            ("What would happen if tardigrades lack Dsup proteins?", 4, 1.2, False, False),
+            ("Explain in detail step by step how astrocytes ignite pyramidal neurons?", 5, 1.2, False, False),
+            ("What do you know about treatise?", 6, 0.25, False, True),
+        ]
+        with torch.no_grad():
+            # Прямые контурные проекции D1 в дорсомедиальном таламусе:
+            self.w_contour[0, 0] = 1.25   # Вопрос -> Direct Recall
+            self.w_contour[9, 0] = 0.85   # Высокий резонанс CA3 -> Direct Recall
+            self.w_contour[3, 1] = 3.20   # Автобиографический маркер -> Identity Profile
+            self.w_contour[11, 1] = 2.80  # Представление имени -> Identity Profile
+            self.w_contour[4, 2] = 3.50   # Мета-вопрос об истории диалога -> Episodic Reflection
+            self.w_contour[5, 3] = 3.40   # Обучающий императив / ответ на уточнение -> Online Consolidation
+            self.w_contour[10, 3] = 3.20  # Неявный ответ после уточняющего вопроса -> Online Consolidation
+            self.w_contour[6, 4] = 3.60   # Оператор интервенции do(~X) -> Counterfactual Simulation
+            self.w_contour[7, 5] = 2.90   # Запрос каузальной цепи / абзаца -> Multi-Hop or Paragraph
+            self.w_contour[8, 6] = 3.30   # Низкий резонанс CA3 + известный STDP-концепт -> Cortical Think Analogy
+
+            for utt, ch_idx, res_val, prev_cl, kn_ont in prototypes:
+                ids = self.encode_fn(utt)
+                sdr = F.normalize(self.compute_sdr_fn(ids, False).float() + 1e-8, p=2, dim=0)
+                self.w_md_thal[:, ch_idx].add_(0.45 * sdr)
+
+    def route_speech_act(
+        self,
+        utterance: str,
+        ca3_resonance: float = 1.0,
+        prev_was_clarify: bool = False,
+        known_in_ontology: bool = False,
+    ) -> Tuple[str, Dict[str, float]]:
+        """Матрично вычисляет активации 7 каналов речевых актов в `MD-Thalamus` и возвращает победивший канал."""
+        with torch.no_grad():
+            ids = self.encode_fn(utterance)
+            sdr = F.normalize(self.compute_sdr_fn(ids, False).float() + 1e-8, p=2, dim=0)
+            contour = self._compute_spike_contour_vec16(
+                utterance=utterance,
+                ca3_resonance=ca3_resonance,
+                prev_was_clarify=prev_was_clarify,
+                known_in_ontology=known_in_ontology,
+            )
+            d1_acts = (sdr @ self.w_md_thal) + (contour @ self.w_contour)
+            scores = {
+                ch_name: round(float(d1_acts[i].item()), 4)
+                for i, ch_name in enumerate(self.CHANNEL_NAMES)
+            }
+            best_idx = int(torch.argmax(d1_acts).item())
+            return self.CHANNEL_NAMES[best_idx], scores
+
+    def export_state_dict(self) -> Dict[str, object]:
+        return {
+            "w_md_thal": self.w_md_thal.detach().clone(),
+            "w_contour": self.w_contour.detach().clone(),
+        }
+
+    def load_state_dict(self, state: Dict[str, object]) -> None:
+        if isinstance(state.get("w_md_thal"), torch.Tensor):
+            self.w_md_thal = state["w_md_thal"].float().clone()
+        if isinstance(state.get("w_contour"), torch.Tensor):
+            self.w_contour = state["w_contour"].float().clone()
+

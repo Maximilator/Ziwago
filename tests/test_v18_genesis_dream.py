@@ -32,7 +32,11 @@ from neuroweave10.cortex.genesis_engine import (
     ThetaGammaSpikingPhaseMultiplexer,
 )
 from neuroweave10.evaluation.gates import evaluate_grammar_and_artifacts
-from train_ziwago_v18_genesis_dream import ZiwagoGenesisDreamOrganismV18
+from train_ziwago_v18_genesis_dream import (
+    SCIENTIFIC_WORLD_GRAPH_FACTS,
+    UNSUPERVISED_ONTOLOGY_EXPOSURE_SENTENCES,
+    ZiwagoGenesisDreamOrganismV18,
+)
 
 
 class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
@@ -241,6 +245,98 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
         self.assertFalse(bool(res_after["active_inference_clarification_triggered"]))
         self.assertIn("dsup", str(res_after["pure_weight_generated_response"]).lower())
         self.assertEqual(res_after["response_passport"]["proportional_gate_zone"], "ZONE_1_DIRECT_RECALL")  # type: ignore[index]
+
+    def test_pillar8_ba10_counterfactual_intervention_simulator(self) -> None:
+        """Pillar 8: Verifies BA10CounterfactualInterventionSimulator (Level 3 Pearl Causal Ladder do(~X) => ~Y => ~Z)
+        on both the 3-hop World Graph causal chain and online-consolidated CA3 episodes."""
+        from ziwago_assistant import BasalGangliaActionSelector, ZiwagoBiologicalSNNAssistant
+
+        assistant = ZiwagoBiologicalSNNAssistant(root=ROOT, workers=2, cpu_threads=4, seed=12345)
+        assistant.genesis.ingest_scientific_corpus_into_world_graph(SCIENTIFIC_WORLD_GRAPH_FACTS, dopamine_gain=2.5)
+
+        # 1. 3-hop World Graph Counterfactual Cascade: do(~astrocytes) => ~D-serine => ~NMDA => ~pyramidal neurons
+        res_cf_graph = assistant.chat(
+            "What happens to pyramidal neurons if astrocytes fail to release D-serine?",
+            enable_active_inference=True,
+        )
+        self.assertTrue(bool(res_cf_graph.get("counterfactual_simulation_triggered")))
+        self.assertEqual(
+            res_cf_graph["basal_ganglia_selected_action"],
+            BasalGangliaActionSelector.ACTION_COUNTERFACTUAL_SIMULATION,
+        )
+        cf_txt = str(res_cf_graph["pure_weight_generated_response"])
+        self.assertTrue(cf_txt.startswith("If astrocytes fail to release"), f"Unexpected counterfactual: {cf_txt!r}")
+        self.assertIn("cannot bind", cf_txt.lower())
+        self.assertIn("and consequently", cf_txt.lower())
+        self.assertIn("cannot ignite dendritic plateau potentials in pyramidal neurons", cf_txt.lower())
+        self.assertTrue(bool(res_cf_graph["response_passport"]["mechanisms_triggered"]["counterfactual_simulation"]))  # type: ignore[index]
+
+        # 2. CA3 Episode Counterfactual Inversion: do(~Dsup proteins)
+        assistant.chat(
+            "Remember that tardigrades survive extreme radiation by producing Dsup proteins that shield DNA from hydroxyl radicals.",
+            enable_active_inference=True,
+        )
+        res_cf_ca3 = assistant.chat(
+            "What happens if tardigrades lack Dsup proteins?",
+            enable_active_inference=True,
+        )
+        self.assertTrue(bool(res_cf_ca3.get("counterfactual_simulation_triggered")))
+        cf_ca3_txt = str(res_cf_ca3["pure_weight_generated_response"]).lower()
+        self.assertIn("if tardigrades lack dsup proteins", cf_ca3_txt)
+        self.assertIn("cannot survive extreme radiation", cf_ca3_txt)
+        self.assertIn("cannot shield dna from hydroxyl radicals", cf_ca3_txt)
+
+    def test_pillar9_md_thalamus_synaptic_speech_act_router(self) -> None:
+        """Pillar 9: Verifies MDThalamusSynapticSpeechActRouter routes all 7 speech-act channels
+        via 2048-D SDR + 16-D Spike Contour matrix multiplication."""
+        from neuroweave10.cortex.genesis_engine import MDThalamusSynapticSpeechActRouter
+
+        router = self.genesis.thalamic_router
+        act_id, _ = router.route_speech_act("What is my name and what am I designing?")
+        self.assertEqual(act_id, MDThalamusSynapticSpeechActRouter.ACT_IDENTITY_PROFILE)
+
+        act_ep, _ = router.route_speech_act("Can you summarize what we discussed across our conversation so far?")
+        self.assertEqual(act_ep, MDThalamusSynapticSpeechActRouter.ACT_EPISODIC_REFLECTION)
+
+        act_teach, _ = router.route_speech_act(
+            "Tardigrades survive extreme radiation by producing Dsup proteins.",
+            prev_was_clarify=True,
+        )
+        self.assertEqual(act_teach, MDThalamusSynapticSpeechActRouter.ACT_ONLINE_CONSOLIDATION)
+
+        act_cf, _ = router.route_speech_act("What happens to pyramidal neurons if astrocytes fail to release D-serine?")
+        self.assertEqual(act_cf, MDThalamusSynapticSpeechActRouter.ACT_COUNTERFACTUAL_INTERVENTION)
+
+        act_mh, _ = router.route_speech_act("Explain in detail step by step how astrocytes ignite pyramidal neurons?")
+        self.assertEqual(act_mh, MDThalamusSynapticSpeechActRouter.ACT_MULTI_HOP_OR_PARAGRAPH)
+
+        act_think, _ = router.route_speech_act("What do you know about treatise?", ca3_resonance=0.20, known_in_ontology=True)
+        self.assertEqual(act_think, MDThalamusSynapticSpeechActRouter.ACT_CORTICAL_THINK_ANALOGY)
+
+    def test_pillar10_dynamic_16_column_cortical_trajectory_and_unified_stdp_ontology(self) -> None:
+        """Pillar 10: Verifies Unified STDP Ontology Fusion (EmergentOntologicalRoleDiscovery -> ThetaGammaRoleFillerBinder)
+        and Dynamic 16-Column Brodmann Trajectory Co-Modulation across multi-clause sentences."""
+        from ziwago_assistant import ZiwagoBiologicalSNNAssistant
+
+        assistant = ZiwagoBiologicalSNNAssistant(root=ROOT, workers=2, cpu_threads=4, seed=12345)
+        for s in UNSUPERVISED_ONTOLOGY_EXPOSURE_SENTENCES:
+            assistant.genesis.emergent_ontology.observe_sentence_stdp(s, register_as_canonical=False, lr=1.5)
+
+        res = assistant.chat(
+            "Can kayaking outdoors clear the mind before fixing grammar errors in my treatise?",
+            enable_active_inference=True,
+        )
+        # Verify emergent STDP bindings ('kayaking'->'running', 'treatise'->'essay') were fused into ThetaGammaRoleFillerBinder:
+        self.assertEqual(assistant.organism.role_filler_binder.dynamic_stdp_role_map.get("kayaking"), "running")
+        self.assertEqual(assistant.organism.role_filler_binder.dynamic_stdp_role_map.get("treatise"), "essay")
+        resp_low = str(res["pure_weight_generated_response"]).lower()
+        self.assertIn("kayaking", resp_low)
+        self.assertIn("treatise", resp_low)
+
+        # Verify Dynamic 16-Column Brodmann Trajectory Trace has >= 2 distinct cortical phase steps:
+        traj = res["response_passport"]["cortical_trajectory_trace"]  # type: ignore[index]
+        self.assertIsInstance(traj, list)
+        self.assertGreaterEqual(len(traj), 2)
 
 
 if __name__ == "__main__":

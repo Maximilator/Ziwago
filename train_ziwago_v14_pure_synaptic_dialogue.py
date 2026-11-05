@@ -99,19 +99,38 @@ class ThetaGammaRoleFillerBinder:
         "fox": ("owl", "badger", "squirrel", "wolf", "otter"),
     }
 
+    def __init__(self) -> None:
+        # Единый динамический банк ролевых аналогий, самоорганизующийся из латеральной STDP-коры (EmergentOntologicalRoleDiscovery):
+        self.dynamic_stdp_role_map: Dict[str, str] = {}
+
+    def register_emergent_stdp_bindings(self, discovered_map: Dict[str, Tuple[str, float]]) -> int:
+        """Сливает самоорганизовавшиеся STDP-аналогии (`canonical_slot -> (novel_filler, sim)`) напрямую в активный ролевой биндер."""
+        added = 0
+        for canon_slot, (novel_word, sim_val) in discovered_map.items():
+            if float(sim_val) >= 0.25 and novel_word and novel_word != canon_slot:
+                self.dynamic_stdp_role_map[novel_word.lower()] = canon_slot.lower()
+                added += 1
+        return added
+
     def extract_slot_bindings(self, utterance: str) -> Dict[str, str]:
         """Извлекает из реплики пользователя отображения `canonical_slot -> user_filler`,
-        используя как семантические семейства ролей, так и открытые синтаксические шаблоны."""
+        используя самоорганизовавшиеся STDP-аналогии (`dynamic_stdp_role_map`), семантические семейства ролей
+        и открытые синтаксические шаблоны."""
         low = utterance.lower()
         p_strip = " .,!?;:'()[]{}" + chr(34)
         words_clean = [w.strip(p_strip) for w in utterance.split() if w.strip(p_strip)]
         words_low = [w.lower() for w in words_clean]
         bindings: Dict[str, str] = {}
 
-        # 1. Проверка по семантическим семействам ролей (по целым словам/фразам)
+        # 0. Приоритетная проверка по самоорганизовавшимся STDP-ролям L2/3 BA22 (Unified STDP Ontology Fusion):
         words_set = set(words_low)
+        for novel_fil, canon_slot in self.dynamic_stdp_role_map.items():
+            if canon_slot not in low and novel_fil in words_set:
+                bindings[canon_slot] = novel_fil
+
+        # 1. Проверка по базовым семантическим семействам ролей (по целым словам/фразам)
         for canonical_slot, fillers in self.CANONICAL_ROLE_FAMILIES.items():
-            if canonical_slot in low:
+            if canonical_slot in low or canonical_slot in bindings:
                 continue
             for fil in fillers:
                 if (" " in fil and fil in low) or (fil in words_set):
@@ -2370,11 +2389,14 @@ class ZiwagoPureSynapticDialogueOrganismV14:
         think_trace: str = "",
         episodic_recall: bool = False,
         endogenous_cortical_think: bool = False,
+        counterfactual_simulation: bool = False,
+        thalamic_speech_act: str = "ACT_DIRECT_RECALL",
         arcuate_injections: int = 0,
         ba44_bridge: str = "",
     ) -> Dict[str, object]:
         """Формирует детерминированный проверяемый Паспорт Ответа (`response_passport`),
-        фиксирующий путь к мастер-чекпоинту, индексы и значимости выбранных полюсов `CA3`
+        фиксирующий путь к мастер-чекпоинту, индексы и значимости выбранных полюсов `CA3`,
+        динамическую траекторию 16 колонок коры (`cortical_trajectory_trace`), речевой акт `MD-Thalamus`
         и точный список всех сработавших биофизических механизмов."""
         return {
             "master_ckpt": str(getattr(self, "loaded_checkpoint_path", "")),
@@ -2382,6 +2404,8 @@ class ZiwagoPureSynapticDialogueOrganismV14:
             "selected_ca3_pole_saliences": list(getattr(self, "last_selected_ca3_pole_saliences", [])),
             "selected_ca3_pole_resonances": list(getattr(self, "last_selected_ca3_pole_resonances", [])),
             "proportional_gate_zone": proportional_gate_zone,
+            "thalamic_speech_act": thalamic_speech_act,
+            "cortical_trajectory_trace": list(getattr(self, "last_cortical_trajectory_trace", [])),
             "think_trace": think_trace,
             "mechanisms_triggered": {
                 "identity_profile": bool(getattr(self, "last_identity_profile_used", False)),
@@ -2390,6 +2414,7 @@ class ZiwagoPureSynapticDialogueOrganismV14:
                 "son_vte_grounding": son_vte_grounding,
                 "episodic_recall": bool(episodic_recall),
                 "endogenous_cortical_think": bool(endogenous_cortical_think),
+                "counterfactual_simulation": bool(counterfactual_simulation),
                 "arcuate_synaptic_pointer": bool(arcuate_injections > 0),
                 "ba44_syntax_bridge": ba44_bridge,
             },
@@ -2577,6 +2602,16 @@ class ZiwagoPureSynapticDialogueOrganismV14:
 
         self.moe_cortex.homeostatic_expert_theta.zero_()
         moe_out = self.moe_cortex.step(x_in=q_vec, domain_tag=None, f_mod=1.0, learn=False, k_active=2)
+        # Пошаговое ко-дирижирование 16 колонок коры Бродмана по фазам рождения предложения (Dynamic Cortical Trajectory):
+        self.last_cortical_trajectory_trace: List[List[str]] = [list(moe_out.active_expert_names)]
+        for extra_pole in ca3_clause_poles[1:]:
+            m_step = self.moe_cortex.step(x_in=extra_pole, domain_tag=None, f_mod=1.0, learn=False, k_active=2)
+            self.last_cortical_trajectory_trace.append(list(m_step.active_expert_names))
+        motor_phase_vec = F.normalize(torch.roll(ca3_clause_poles[-1], shifts=1, dims=-1), p=2, dim=-1)
+        m_motor = self.moe_cortex.step(x_in=motor_phase_vec, domain_tag=None, f_mod=1.0, learn=False, k_active=2)
+        if list(m_motor.active_expert_names) != self.last_cortical_trajectory_trace[-1]:
+            self.last_cortical_trajectory_trace.append(list(m_motor.active_expert_names))
+
         col_names = [f"{c.zcfg.name}_{idx}" for idx, c in enumerate(self.moe_cortex.columns)]
         cortical_branch_profile = self.dendritic_plateau_readout.compute_cortical_moe_branch_profile(
             q_vec=q_vec,

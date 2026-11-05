@@ -53,6 +53,7 @@ class BasalGangliaActionSelector:
 
     ACTION_EPISODIC_MEMORY_RECALL = "ACTION_EPISODIC_MEMORY_RECALL"
     ACTION_ONLINE_DA_CONSOLIDATION = "ACTION_ONLINE_DA_CONSOLIDATION"
+    ACTION_COUNTERFACTUAL_SIMULATION = "ACTION_COUNTERFACTUAL_SIMULATION"
     ACTION_ENDOGENOUS_CORTICAL_THINK = "ACTION_ENDOGENOUS_CORTICAL_THINK"
     ACTION_ACTIVE_INFERENCE_CLARIFY = "ACTION_ACTIVE_INFERENCE_CLARIFY"
     ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS = "ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS"
@@ -67,17 +68,20 @@ class BasalGangliaActionSelector:
         ca3_resonance: float,
         active_inference_triggered: bool = False,
         endogenous_think_triggered: bool = False,
+        counterfactual_triggered: bool = False,
     ) -> Tuple[str, Dict[str, float]]:
         d1_episodic = 2.5 if is_episodic_query else 0.05
         d1_consolidate = 2.4 if is_teaching_or_identity else 0.05
+        d1_counterfactual = 2.45 if counterfactual_triggered else 0.05
         d1_think = 2.35 if endogenous_think_triggered else 0.08
-        d1_clarify = 2.3 if (active_inference_triggered and not endogenous_think_triggered) else 0.1
-        d1_multihop = 2.0 if (wants_multi_hop_or_paragraph and not active_inference_triggered and not endogenous_think_triggered) else 0.15
-        d1_direct = 1.6 if (not active_inference_triggered and not endogenous_think_triggered) else 0.2
+        d1_clarify = 2.3 if (active_inference_triggered and not endogenous_think_triggered and not counterfactual_triggered) else 0.1
+        d1_multihop = 2.0 if (wants_multi_hop_or_paragraph and not active_inference_triggered and not endogenous_think_triggered and not counterfactual_triggered) else 0.15
+        d1_direct = 1.6 if (not active_inference_triggered and not endogenous_think_triggered and not counterfactual_triggered) else 0.2
 
         scores = {
             self.ACTION_EPISODIC_MEMORY_RECALL: round(d1_episodic, 4),
             self.ACTION_ONLINE_DA_CONSOLIDATION: round(d1_consolidate, 4),
+            self.ACTION_COUNTERFACTUAL_SIMULATION: round(d1_counterfactual, 4),
             self.ACTION_ENDOGENOUS_CORTICAL_THINK: round(d1_think, 4),
             self.ACTION_ACTIVE_INFERENCE_CLARIFY: round(d1_clarify, 4),
             self.ACTION_MULTI_HOP_OR_PARAGRAPH_SYNTHESIS: round(d1_multihop, 4),
@@ -170,19 +174,21 @@ class ZiwagoBiologicalSNNAssistant:
         max_tokens: int = 48,
         enable_active_inference: bool = True,
     ) -> Dict[str, object]:
-        """Выполняет один полный цикл работы биологического SNN-ассистента с выбором действия в Базальных Ганглиях,
-        пропорциональным гейтом `THINK` (`'I know X as Y'`) и полным сохранением эпизодической истории на уточняющих ходах."""
+        """Выполняет один полный цикл работы биологического SNN-ассистента с синаптическим таламическим маршрутизатором
+        речевых актов (`MD-Thalamus`), префронтальным контрфактическим симулятором `BA10` ($\text{do}(\neg X)$),
+        пропорциональным гейтом `THINK` (`'I know X as Y'`) и полным сохранением эпизодической истории."""
         t0 = time.perf_counter()
         low = user_utterance.strip().lower()
+
+        # 0. Слияние самоорганизовавшейся STDP-онтологии с ролевым биндером на каждом ходе:
+        emergent_disc = self.genesis.sync_emergent_ontology_into_role_binder(user_utterance)
+
         is_ep = self.organism.dialogue_state.is_episodic_history_query(user_utterance)
         explicit_teach = any(low.startswith(p) for p in ("remember that ", "note that ", "learn that ", "fact: "))
         is_ident_fact = any(
             p in low for p in ("my name is", "i am building", "i'm building", "i am designing", "i'm designing")
         ) and "?" not in user_utterance
 
-        # Если предыдущий ход был встречным уточняющим вопросом SON (was_clarification_request == True),
-        # а собеседник отвечает утвердительным объяснением (даже без префикса 'Remember that'!),
-        # ассистент автоматически распознаёт это как ответ на свой вопрос и консолидирует знание!
         prev_was_clarify = bool(
             self.organism.dialogue_state.episodic_turns
             and self.organism.dialogue_state.episodic_turns[-1].get("was_clarification_request", False)
@@ -195,9 +201,96 @@ class ZiwagoBiologicalSNNAssistant:
             and len(user_utterance.split()) >= 5
         )
         is_teach = explicit_teach or implicit_reply_to_clarify
-
         wants_mh = any(m in low for m in ("step by step", "causal chain", "consequently", "how does that lead to"))
         wants_para = any(m in low for m in ("in detail", "elaborate", "full paragraph", "two sentences"))
+
+        # 1. Матричная маршрутизация прагматического речевого акта в Дорсомедиальном Таламусе (MD-Thalamus):
+        thal_act, thal_scores = self.genesis.thalamic_router.route_speech_act(
+            utterance=user_utterance,
+            ca3_resonance=1.0,
+            prev_was_clarify=prev_was_clarify,
+            known_in_ontology=bool(emergent_disc),
+        )
+
+        # 2. Если активирован Контрфактический Симулятор BA10 (do(~X) => ~Y => ~Z):
+        if not is_teach and not is_ep and self.genesis.counterfactual_simulator.is_counterfactual_query(user_utterance):
+            cf_res = self.genesis.counterfactual_simulator.simulate_counterfactual_intervention(
+                utterance=user_utterance,
+                world_graph=self.genesis.world_graph,
+                encode_fn=self.organism.encode_text,
+                decode_fn=self.organism.decode_token,
+                get_vec64_fn=self.organism.get_vec64,
+                ca3_synthesize_fn=lambda q_s: str(
+                    self.organism.pure_neural_generate_response(q_s, max_tokens=max_tokens, use_ngrams=False)[
+                        "pure_weight_generated_response"
+                    ]
+                ),
+            )
+            if cf_res is not None:
+                cf_text = str(cf_res["counterfactual_response"])
+                u_ids = self.organism.encode_text(user_utterance)
+                q_raw_vec = self.organism.compute_stimulus_vec64(u_ids)
+                self.organism._record_pole_telemetry_from_vectors([q_raw_vec], [1.2])
+                m_step = self.organism.moe_cortex.step(x_in=q_raw_vec, domain_tag=None, f_mod=1.0, learn=False, k_active=2)
+                self.organism.last_cortical_trajectory_trace = [
+                    list(m_step.active_expert_names),
+                    ["Col15_METACOG_BA10", "Col3_BROCA_BA44"],
+                ]
+                passport = self.organism._build_response_passport(
+                    stimulus_ids=u_ids,
+                    proportional_gate_zone="ZONE_1_COUNTERFACTUAL_MENTAL_SIMULATION",
+                    son_vte_grounding="counterfactual_causal_inversion",
+                    think_trace=str(cf_res["think_trace"]),
+                    counterfactual_simulation=True,
+                    thalamic_speech_act=thal_act,
+                )
+                self.organism.dialogue_state.record_turn_and_poles(
+                    stimulus_vec64=q_raw_vec,
+                    activated_poles=[q_raw_vec],
+                    utterance=user_utterance,
+                    response_text=cf_text,
+                    role_filler_bindings={},
+                    selected_ca3_pole_indices=list(self.organism.last_selected_ca3_pole_indices),
+                    response_passport=passport,
+                )
+                bg_action, bg_scores = self.basal_ganglia.select_action(
+                    utterance=user_utterance,
+                    is_episodic_query=False,
+                    is_teaching_or_identity=False,
+                    wants_multi_hop_or_paragraph=False,
+                    ca3_resonance=1.2,
+                    counterfactual_triggered=True,
+                )
+                return {
+                    "stimulus": user_utterance,
+                    "ngrams_mode": "OFF (BA10 Counterfactual Intervention Mental Simulation)",
+                    "active_moe_columns": ["Col15_METACOG_BA10", "Col9_PFC_BA46", "Col3_BROCA_BA44"],
+                    "conversational_domain": self.organism.dialogue_state.active_domain,
+                    "remembered_user_name": self.organism.dialogue_state.user_name,
+                    "role_filler_bindings_applied": {},
+                    "arcuate_token_pointer_injections": 0,
+                    "reafferent_stranger_check_interventions": 0,
+                    "episode_chain_sentences_generated": 1,
+                    "multi_hop_rollout_used": True,
+                    "active_inference_clarification_triggered": False,
+                    "endogenous_cortical_think_triggered": False,
+                    "counterfactual_simulation_triggered": True,
+                    "counterfactual_telemetry": cf_res,
+                    "thalamic_speech_act": thal_act,
+                    "thalamic_d1_scores": thal_scores,
+                    "ca3_top1_resonance": 1.2,
+                    "epistemic_uncertainty": 0.0,
+                    "ba44_syntax_bridge_connector": ", and consequently",
+                    "swr_consolidated_into_nmda_matrix": False,
+                    "online_dopamine_imprinted_tokens": 0,
+                    "pure_weight_generated_response": cf_text,
+                    "response_passport": passport,
+                    "basal_ganglia_selected_action": bg_action,
+                    "basal_ganglia_d1_scores": bg_scores,
+                    "episode_teaching_telemetry": {},
+                    "latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+                    "assistant_turn_latency_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+                }
 
         episode_teach_info: Dict[str, object] = {}
         if is_teach:
@@ -214,11 +307,13 @@ class ZiwagoBiologicalSNNAssistant:
                     f"into the 8,192-branch NMDA matrix and Protected Core Bank: "
                     f"{episode_teach_info['clean_fact']}"
                 )
+                self.organism.last_cortical_trajectory_trace = [["Col5_HIPPOCAMPAL_CA3", "Col9_PFC_BA46"]]
                 passport = self.organism._build_response_passport(
                     stimulus_ids=u_ids,
                     proportional_gate_zone="ZONE_1_ONLINE_DA_CONSOLIDATION",
                     son_vte_grounding="consolidated_online_episode",
                     think_trace=f"OnlineConsolidation: imprinted {episode_teach_info['sentences_imprinted']} sentence(s) into poles {self.organism.last_selected_ca3_pole_indices}",
+                    thalamic_speech_act=thal_act,
                 )
                 self.organism.dialogue_state.record_turn_and_poles(
                     stimulus_vec64=q_raw_vec,
@@ -251,6 +346,9 @@ class ZiwagoBiologicalSNNAssistant:
                     "multi_hop_rollout_used": False,
                     "active_inference_clarification_triggered": False,
                     "endogenous_cortical_think_triggered": False,
+                    "counterfactual_simulation_triggered": False,
+                    "thalamic_speech_act": thal_act,
+                    "thalamic_d1_scores": thal_scores,
                     "ca3_top1_resonance": 2.8,
                     "epistemic_uncertainty": 0.0,
                     "ba44_syntax_bridge_connector": "",
@@ -274,6 +372,16 @@ class ZiwagoBiologicalSNNAssistant:
             enable_episode_chain=wants_para,
         )
 
+        # Обновляем таламический речевой акт с учётом фактического резонанса CA3 и записываем в паспорт ответа:
+        thal_act, thal_scores = self.genesis.thalamic_router.route_speech_act(
+            utterance=user_utterance,
+            ca3_resonance=float(res.get("ca3_top1_resonance", 1.0)),  # type: ignore[arg-type]
+            prev_was_clarify=prev_was_clarify,
+            known_in_ontology=bool(emergent_disc or res.get("endogenous_cortical_think_triggered")),
+        )
+        if isinstance(res.get("response_passport"), dict):
+            res["response_passport"]["thalamic_speech_act"] = thal_act  # type: ignore[index]
+
         bg_action, bg_scores = self.basal_ganglia.select_action(
             utterance=user_utterance,
             is_episodic_query=is_ep,
@@ -284,6 +392,8 @@ class ZiwagoBiologicalSNNAssistant:
             endogenous_think_triggered=bool(res.get("endogenous_cortical_think_triggered", False)),
         )
 
+        res["thalamic_speech_act"] = thal_act
+        res["thalamic_d1_scores"] = thal_scores
         res["basal_ganglia_selected_action"] = bg_action
         res["basal_ganglia_d1_scores"] = bg_scores
         res["episode_teaching_telemetry"] = episode_teach_info
