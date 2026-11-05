@@ -82,10 +82,12 @@ class ZiwagoGenesisDreamOrganismV18:
         # 1. Двигатель синтаксической волны без pos_idx (0% pos_idx!)
         self.valence_wave_generator = SyntacticValenceWaveGenerator(d_vec=64, d_dend=8192, top_k_wta=32, seed=seed + 1801)
 
-        # 2. Кристаллизующийся граф каузальных триплетов мира (E1 -> R -> E2)
+        # 2. Кристаллизующийся граф каузальных триплетов мира (E1 -> R -> E2) с собственным без-позиционным NMDA-декодером рёбер
         self.world_graph = CorticalRelationalWorldGraph(
             encode_fn=self.core_organism.encode_text,
             compute_vec64_fn=self.core_organism.compute_stimulus_vec64,
+            get_vec64_fn=self.core_organism.get_vec64,
+            decode_fn=self.core_organism.decode_token,
         )
 
         # 3. Самоорганизующаяся онтология ролей через дистрибутивную STDP (0% ручных списков!)
@@ -97,11 +99,13 @@ class ZiwagoGenesisDreamOrganismV18:
         # 5. Верификатор двунаправленного замыкания смысла X -> Y_hat -> X_hat
         self.meaning_closure_verifier = BidirectionalMeaningClosureVerifier()
 
+        self._bootstrap_trajectories: List[Tuple[torch.Tensor, Sequence[int], float]] = []
         self._bootstrap_genesis_modules_from_lessons()
 
     def _bootstrap_genesis_modules_from_lessons(self) -> None:
         """Кристаллизует базовые каузальные уроки в без-индексный генератор валентностей `SyntacticValenceWaveGenerator`,
-        дистрибутивную STDP-онтологию `EmergentOntologicalRoleDiscovery` и граф мира `CorticalRelationalWorldGraph`."""
+        дистрибутивную STDP-онтологию `EmergentOntologicalRoleDiscovery` (по Закону Невязки Схемы)
+        и граф мира `CorticalRelationalWorldGraph`."""
         batch_trajs: List[Tuple[torch.Tensor, Sequence[int], float]] = []
         for ep_lessons in FOUNDATIONAL_CURRICULUM_LESSONS_BY_EPOCH.values():
             for _, stim_str, resp_str, f_mod in ep_lessons:
@@ -125,28 +129,62 @@ class ZiwagoGenesisDreamOrganismV18:
                 )
                 batch_trajs.append((q_pole, r_ids, float(f_mod)))
 
-                # 2. Наблюдаем предложения в дистрибутивной STDP-онтологии (формируем канонические рецептивные поля)
-                self.emergent_ontology.observe_sentence_stdp(stim_str, register_as_canonical=True, lr=1.5)
-                self.emergent_ontology.observe_sentence_stdp(resp_str, register_as_canonical=True, lr=1.5)
+                # 2. Регистрируем каузальную схему в STDP-онтологии для работы Закона Невязки Схемы:
+                self.emergent_ontology.register_schema_pair(stim_str, resp_str, lr=1.5)
 
-                # 3. Извлекаем каузальные триплеты в граф мира
-                self.world_graph.extract_and_consolidate_sentence(resp_str, dopamine_gain=f_mod)
-
-        # 1. Совместно обучаем без-позиционную волну валентности (0% pos_idx!) на всех каузальных схемах одновременно:
+        self._bootstrap_trajectories = list(batch_trajs)
         self.valence_wave_generator.imprint_batch_zero_pos(
-            batch_trajectories=batch_trajs,
+            batch_trajectories=self._bootstrap_trajectories,
             get_vec64_fn=self.core_organism.get_vec64,
-            epochs=12,
+            epochs=14,
         )
 
     def ingest_scientific_corpus_into_world_graph(self, sentences: Sequence[str], dopamine_gain: float = 2.0) -> int:
-        """Кристаллизует поток отдельных научных предложений в `CorticalRelationalWorldGraph` и `EmergentOntologicalRoleDiscovery`."""
+        """Кристаллизует поток отдельных научных предложений в `CorticalRelationalWorldGraph`,
+        импринтирует их BPE-траектории напрямую в выделенный `edge_valence_generator` (`0% pos_idx`, `0% f-string`)
+        и обновляет `EmergentOntologicalRoleDiscovery`."""
         triplets_added = 0
         for s in sentences:
             self.emergent_ontology.observe_sentence_stdp(s, register_as_canonical=False, lr=1.2)
             extracted = self.world_graph.extract_and_consolidate_sentence(s, dopamine_gain=dopamine_gain)
             triplets_added += len(extracted)
+        if triplets_added > 0:
+            self.world_graph.imprint_edges_into_dedicated_valence_matrix()
         return triplets_added
+
+    def export_genesis_state_dict(self) -> Dict[str, object]:
+        """Экспортирует полное состояние всех модулей `Ziwago-Genesis v18.1` (100% независимость от `seed`!)."""
+        return {
+            "valence_wave_generator": self.valence_wave_generator.export_state_dict(),
+            "world_graph": self.world_graph.export_state_dict(),
+            "emergent_ontology": self.emergent_ontology.export_state_dict(),
+        }
+
+    def load_genesis_state_dict(self, state: Dict[str, object]) -> None:
+        """Восстанавливает полное состояние модулей `Ziwago-Genesis v18.1`."""
+        if "valence_wave_generator" in state:
+            self.valence_wave_generator.load_state_dict(state["valence_wave_generator"])  # type: ignore[arg-type]
+        if "world_graph" in state:
+            self.world_graph.load_state_dict(state["world_graph"])  # type: ignore[arg-type]
+        if "emergent_ontology" in state:
+            self.emergent_ontology.load_state_dict(state["emergent_ontology"])  # type: ignore[arg-type]
+
+    def save_genesis_checkpoint(self, path: Path, use_fp16: bool = False) -> Dict[str, object]:
+        """Сохраняет единый самодостаточный чекпоинт, включающий ядро `v16.2` и все 5 столпов `Genesis v18.1`."""
+        info = self.core_organism.save_self_contained_checkpoint(path, use_fp16=use_fp16)
+        payload = torch.load(path, map_location="cpu", weights_only=False)
+        payload["genesis_v18_state"] = self.export_genesis_state_dict()
+        torch.save(payload, path)
+        return info
+
+    def load_genesis_checkpoint(self, path: Path, strict_schema: bool = True) -> Dict[str, object]:
+        """Загружает единый самодостаточный чекпоинт ядра `v16.2` и всех 5 столпов `Genesis v18.1`."""
+        val_info = self.core_organism.load_self_contained_checkpoint(path, strict_schema=strict_schema)
+        payload = torch.load(path, map_location="cpu", weights_only=False)
+        gen_state = payload.get("genesis_v18_state")
+        if isinstance(gen_state, dict):
+            self.load_genesis_state_dict(gen_state)
+        return val_info
 
     def generate_genesis_response(
         self,
@@ -155,15 +193,14 @@ class ZiwagoGenesisDreamOrganismV18:
         prefer_world_graph_synthesis: bool = False,
         max_tokens: int = 48,
     ) -> Dict[str, object]:
-        """Генерирует ответ с полным задействованием всех 5 механизмов Ziwago-Genesis v18.0."""
+        """Генерирует ответ с полным задействованием всех 5 механизмов Ziwago-Genesis v18.1."""
         t0 = time.perf_counter()
 
-        # 1. Самоорганизующееся открытие ролей через дистрибутивную STDP (0% ручных списков!)
+        # 1. Самоорганизующееся открытие ролей по Закону Невязки Схемы и STDP (0% предметных стоп-слов!)
         emergent_discoveries = self.emergent_ontology.discover_emergent_role_bindings(user_utterance)
         emergent_bindings: Dict[str, str] = {
             canon: fil for canon, (fil, _sim) in emergent_discoveries.items()
         }
-        # Объединяем с синтаксическим экстрактором и строим аксональный указатель Дугообразного Пучка (Arcuate Fasciculus)
         combined_bindings = dict(emergent_bindings)
         combined_bindings.update(self.core_organism.role_filler_binder.extract_slot_bindings(user_utterance))
         arcuate_map = self.core_organism.role_filler_binder.build_arcuate_token_pointer_map(
@@ -171,8 +208,13 @@ class ZiwagoGenesisDreamOrganismV18:
             self.core_organism.encode_text,
         )
 
-        # 2. Если активирован синтез из Графа Мира (или вопрос касается многошаговой цепочки в графе триплетов):
-        graph_synthesis = self.world_graph.synthesize_novel_sentence_from_graph(user_utterance)
+        # 2. Если активирован синтез из Графа Мира (пословная генерация через 8,192 NMDA-ветви без pos_idx и без f-string!):
+        graph_synthesis = self.world_graph.synthesize_novel_sentence_from_graph(
+            user_utterance,
+            valence_generator=self.valence_wave_generator,
+            get_vec64_fn=self.core_organism.get_vec64,
+            decode_fn=self.core_organism.decode_token,
+        )
         if prefer_world_graph_synthesis and graph_synthesis is not None and int(graph_synthesis["hops_traversed"]) >= 2:
             ans_text = str(graph_synthesis["synthesized_sentence"])
             u_ids = self.core_organism.encode_text(user_utterance)
@@ -336,7 +378,7 @@ def run_v18_genesis_dream_showcase() -> Dict[str, object]:
 
     # 2. Наблюдаем предложения с новыми словами ('bechamel', 'treatise', 'kayaking') без единого ручного словаря:
     unsupervised_exposure_sentences = [
-        "While whisking runny bechamel into a fresh egg yolk, the emulsion stabilizes.",
+        "It is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk.",
         "To fix grammar errors when writing my treatise, read each sentence aloud and simplify overly long clauses.",
         "Staying active is a wonderful habit, and kayaking outdoors is a great way to clear the mind.",
     ]

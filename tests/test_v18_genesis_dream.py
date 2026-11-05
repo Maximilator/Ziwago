@@ -48,7 +48,7 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
             dopamine_gain=2.5,
         )
         for s_exp in (
-            "While whisking runny bechamel into a fresh egg yolk, the emulsion stabilizes.",
+            "It is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk.",
             "To fix grammar errors when writing my treatise, read each sentence aloud and simplify overly long clauses.",
             "Staying active is a wonderful habit, and kayaking outdoors is a great way to clear the mind.",
         ):
@@ -74,13 +74,14 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
 
     def test_pillar2_world_graph_multi_hop_novel_sentence_synthesis(self) -> None:
         """Pillar 2: Verifies CorticalRelationalWorldGraph synthesizes a brand-new 3-hop causal sentence
-        from 3 separate atomic facts that never appeared together as a single sentence."""
+        token-by-token through the dedicated zero-pos_idx NMDA matrix (synthesized_via_zero_pos_nmda_matrix == True)."""
         res = self.genesis.generate_genesis_response(
             "How do astrocytes ignite dendritic plateau potentials in pyramidal neurons?",
             prefer_world_graph_synthesis=True,
         )
         graph_info = res["world_graph_synthesis"]
         self.assertIsNotNone(graph_info)
+        self.assertTrue(bool(graph_info["synthesized_via_zero_pos_nmda_matrix"]))  # type: ignore[index]
         self.assertEqual(int(graph_info["hops_traversed"]), 3)  # type: ignore[index]
         txt = str(res["pure_weight_generated_response"])
         self.assertIn("astrocytes release gliotransmitters such as d-serine", txt.lower())
@@ -88,9 +89,13 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
         self.assertIn("to ignite dendritic plateau potentials in pyramidal neurons", txt.lower())
         self.assertTrue(bool(evaluate_grammar_and_artifacts(txt)["grammar_coherent"]))
 
-    def test_pillar3_unsupervised_stdp_emergent_ontology(self) -> None:
-        """Pillar 3: Verifies EmergentOntologicalRoleDiscovery autonomously binds 'kayaking' -> 'running'
-        and 'treatise' -> 'essay' via temporally asymmetric STDP without hardcoded word lists."""
+    def test_pillar3_unsupervised_stdp_emergent_ontology_and_schema_residual_law(self) -> None:
+        """Pillar 3: Verifies EmergentOntologicalRoleDiscovery uses zero domain stop words in FUNCTION_WORDS_ONLY
+        and autonomously binds 'kayaking' -> 'running', 'treatise' -> 'essay', and 'bechamel' -> 'mayonnaise'
+        purely via the Schema-Residual Law and asymmetric STDP."""
+        for domain_word in ("pyramidal", "neurons", "grammar", "errors", "outdoors", "sauce", "runny", "yolk"):
+            self.assertNotIn(domain_word, EmergentOntologicalRoleDiscovery.FUNCTION_WORDS_ONLY)
+
         res = self.genesis.generate_genesis_response(
             "Can kayaking outdoors clear the mind before fixing grammar errors in my treatise?",
             use_zero_pos_valence_wave=True,
@@ -105,6 +110,15 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
         self.assertIn("kayaking outdoors", txt)
         self.assertIn("treatise", txt)
         self.assertTrue(bool(evaluate_grammar_and_artifacts(str(res["pure_weight_generated_response"]))["grammar_coherent"]))
+
+        res_bech = self.genesis.generate_genesis_response(
+            "Why does a runny bechamel sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
+            use_zero_pos_valence_wave=True,
+        )
+        disc_bech = res_bech["emergent_stdp_role_discoveries"]
+        self.assertIn("mayonnaise", disc_bech)  # type: ignore[arg-type]
+        self.assertEqual(disc_bech["mayonnaise"][0], "bechamel")  # type: ignore[index]
+        self.assertIn("runny bechamel", str(res_bech["pure_weight_generated_response"]).lower())
 
     def test_pillar4_theta_gamma_ttfs_spiking_multiplexer(self) -> None:
         """Pillar 4: Verifies 6-slot Theta-Gamma Time-to-First-Spike (TTFS) phase coding over a 120 ms theta wave
@@ -151,6 +165,22 @@ class TestZiwagoV18GenesisDreamArchitecture(unittest.TestCase):
         self.assertTrue(bool(rep["closure_repair_applied"]))
         self.assertGreater(float(rep["meaning_closure_score"]), 0.70)  # type: ignore[arg-type]
         self.assertIn("pyramidal neurons", str(rep["verified_response"]).lower())
+
+    def test_pillar6_genesis_state_roundtrip_across_different_seeds(self) -> None:
+        """Pillar 6: Verifies full export_genesis_state_dict -> load_genesis_state_dict into a fresh organism
+        initialized with a completely different seed (seed=77777 != 99999) produces 100% byte-identical outputs."""
+        exported = self.genesis.export_genesis_state_dict()
+        fresh_genesis = ZiwagoGenesisDreamOrganismV18(root=ROOT, workers=2, cpu_threads=4, seed=77777)
+        fresh_genesis.load_genesis_state_dict(exported)
+
+        for q, use_graph in (
+            ("How do astrocytes ignite dendritic plateau potentials in pyramidal neurons?", True),
+            ("Can kayaking outdoors clear the mind before fixing grammar errors in my treatise?", False),
+            ("Why does a runny bechamel sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?", False),
+        ):
+            out_orig = self.genesis.generate_genesis_response(q, prefer_world_graph_synthesis=use_graph)["pure_weight_generated_response"]
+            out_fresh = fresh_genesis.generate_genesis_response(q, prefer_world_graph_synthesis=use_graph)["pure_weight_generated_response"]
+            self.assertEqual(out_orig, out_fresh)
 
 
 if __name__ == "__main__":

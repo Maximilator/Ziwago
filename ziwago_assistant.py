@@ -34,6 +34,7 @@ from train_ziwago_v14_pure_synaptic_dialogue import (
 from train_ziwago_v15_omniscient_marathon import (
     execute_sws_synaptic_homeostasis_and_pruning,
 )
+from train_ziwago_v18_genesis_dream import ZiwagoGenesisDreamOrganismV18
 
 
 class BasalGangliaActionSelector:
@@ -89,12 +90,14 @@ class ZiwagoBiologicalSNNAssistant:
         seed: int = 42,
     ):
         self.root = Path(root)
-        self.organism = ZiwagoPureSynapticDialogueOrganismV14(
+        self.genesis = ZiwagoGenesisDreamOrganismV18(
             root=self.root,
+            checkpoint_path=checkpoint_path,
             workers=workers,
             cpu_threads=cpu_threads,
             seed=seed,
         )
+        self.organism = self.genesis.core_organism
         self.organism.use_ngrams = False
         self.basal_ganglia = BasalGangliaActionSelector()
         self.loaded_checkpoint_info: Optional[Dict[str, object]] = None
@@ -102,7 +105,7 @@ class ZiwagoBiologicalSNNAssistant:
         default_ckpt = self.root / "Produce" / "checkpoints" / "ziwago_v16_0_10B_omniscient_master.pt"
         ckpt_to_load = Path(checkpoint_path) if checkpoint_path is not None else default_ckpt
         if ckpt_to_load.exists():
-            self.loaded_checkpoint_info = self.organism.load_self_contained_checkpoint(ckpt_to_load, strict_schema=True)
+            self.loaded_checkpoint_info = self.genesis.load_genesis_checkpoint(ckpt_to_load, strict_schema=True)
 
     def teach_multi_sentence_episode(self, teaching_text: str) -> Dict[str, object]:
         r"""Обучает ассистента одному или нескольким связанным предложениям под всплеском `DA + ACh`
@@ -214,10 +217,11 @@ class ZiwagoBiologicalSNNAssistant:
                 w_d.add_(0.08 * w_c)
         ckpt_info: Dict[str, object] = {}
         if save_checkpoint_path is not None:
-            ckpt_info = self.organism.save_self_contained_checkpoint(Path(save_checkpoint_path), use_fp16=False)
+            ckpt_info = self.genesis.save_genesis_checkpoint(Path(save_checkpoint_path), use_fp16=False)
         return {
             "sws_homeostasis": sws_stat,
             "core_bank_replay_applied": True,
+            "genesis_state_exported": True,
             "saved_checkpoint": ckpt_info,
         }
 

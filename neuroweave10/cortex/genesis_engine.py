@@ -240,9 +240,32 @@ class SyntacticValenceWaveGenerator:
                     out_ids.append(best_tid)
 
                 tok_s = decode_fn(best_tid).strip()
-                if tok_s.endswith((".", "!", "?")) and len(role_ids) >= 8:
+                if tok_s.endswith((".", "!", "?")) and len(role_ids) >= 6:
                     break
             return out_ids
+
+    def export_state_dict(self) -> Dict[str, object]:
+        n_act = len(self.col_to_tok)
+        return {
+            "col_to_tok": list(self.col_to_tok),
+            "tok_to_col": {int(k): int(v) for k, v in self.tok_to_col.items()},
+            "w_basal_valence": self.w_basal_valence.detach().clone(),
+            "w_apical_goal": self.w_apical_goal.detach().clone(),
+            "w_valence_rot": self.w_valence_rot.detach().clone(),
+            "w_valence_dend_out": self.w_valence_dend_out[:, :n_act].detach().clone(),
+        }
+
+    def load_state_dict(self, state: Dict[str, object]) -> None:
+        self.col_to_tok = [int(t) for t in state["col_to_tok"]]  # type: ignore[index]
+        self.tok_to_col = {int(k): int(v) for k, v in state["tok_to_col"].items()}  # type: ignore[index]
+        self.w_basal_valence = state["w_basal_valence"].float().clone()  # type: ignore[index]
+        self.w_apical_goal = state["w_apical_goal"].float().clone()  # type: ignore[index]
+        self.w_valence_rot = state["w_valence_rot"].float().clone()  # type: ignore[index]
+        w_out = state["w_valence_dend_out"].float()  # type: ignore[index]
+        n_act = len(self.col_to_tok)
+        cap = max(2048, ((n_act + 2047) // 2048) * 2048)
+        self.w_valence_dend_out = torch.zeros(self.d_dend, cap, dtype=torch.float32)
+        self.w_valence_dend_out[:, :n_act] = w_out
 
 
 # ============================================================================
@@ -256,15 +279,20 @@ class CausalTripletEdge:
     conductance: float
     subject_vec64: torch.Tensor
     target_vec64: torch.Tensor
+    edge_pole_vec64: torch.Tensor = field(default_factory=lambda: torch.zeros(64))
+    full_clause_tids: List[int] = field(default_factory=list)
+    rel_target_tids: List[int] = field(default_factory=list)
+    inf_rel_target_tids: List[int] = field(default_factory=list)
 
 
 class CorticalRelationalWorldGraph:
     r"""Самоорганизующийся **Граф Каузальных Триплетов Мира** ($\vec{E}_1 \xrightarrow{\vec{R}} \vec{E}_2$):
       - При чтении отдельных предложений из разных источников извлекает каузальные триплеты
-        `(Subject, Relation, Object)` и укрепляет направленную синаптическую проводимость $G[S \xrightarrow{R} O]$.
-      - Когда пользователь спрашивает *«How do $A$ <verb> $D$?»*, волна возбуждения находит многошаговый путь
-        в графе $A \xrightarrow{R_1} B \xrightarrow{R_2} C \xrightarrow{R_3} D$ и **синтезирует совершенно новое
-        сложноподчинённое предложение на лету**, которого никогда не существовало в обучающем тексте!"""
+        `(Subject, Relation, Object)`, присваивает каждому ребру 64-мерный голографический полюс $\vec{q}_e$
+        и **импринтирует его BPE-траектории напрямую в без-позиционную матрицу `SyntacticValenceWaveGenerator` (`8 192` NMDA-ветви)**.
+      - При многошаговом синтезе по цепочке $E_1 \xrightarrow{R_1} E_2 \xrightarrow{R_2} E_3 \xrightarrow{R_3} E_4$
+        каждое звено **считывается пословно из дендритной матрицы `w_valence_dend_out`** и сшивается
+        синаптическими BPE-мостами зоны Брока (`0% f-string` форматирования предложений!)."""
 
     RELATIONAL_VERBS = (
         "release", "releases", "binds to", "bind to", "activate", "activates",
@@ -277,11 +305,21 @@ class CorticalRelationalWorldGraph:
         self,
         encode_fn: Callable[[str], List[int]],
         compute_vec64_fn: Callable[[List[int]], torch.Tensor],
+        get_vec64_fn: Optional[Callable[[int], torch.Tensor]] = None,
+        decode_fn: Optional[Callable[[int], str]] = None,
     ):
         self.encode_fn = encode_fn
         self.compute_vec64_fn = compute_vec64_fn
+        self.get_vec64_fn = get_vec64_fn
+        self.decode_fn = decode_fn
         self.edges: List[CausalTripletEdge] = []
         self.adj_by_subject: Dict[str, List[CausalTripletEdge]] = {}
+        # Выделенный без-позиционный 8,192-ветвевой NMDA-декодер специально для рёбер Графа Мира (0% интерференции со схемами!)
+        self.edge_valence_generator = SyntacticValenceWaveGenerator(d_vec=64, d_dend=8192, top_k_wta=32, seed=1809)
+        # Синаптические BPE-мосты зоны Брока BA44 для многошаговых каузальных цепей
+        self.bridge_rel_clause_tids: List[int] = self.encode_fn(", which")
+        self.bridge_inf_purpose_tids: List[int] = self.encode_fn(" to")
+        self.bridge_thereby_tids: List[int] = self.encode_fn(", thereby")
 
     @staticmethod
     def _normalize_entity(ent: str) -> str:
@@ -293,13 +331,26 @@ class CorticalRelationalWorldGraph:
                 break
         return clean.lower()
 
+    @staticmethod
+    def _inflect_singular_to_infinitive(rel_phrase: str) -> str:
+        words = rel_phrase.split()
+        if not words:
+            return rel_phrase
+        v0 = words[0]
+        if v0.endswith("ies") and len(v0) > 4:
+            v0 = v0[:-3] + "y"
+        elif v0.endswith("es") and len(v0) > 4 and not v0.endswith(("ses", "zes", "xes", "ches", "shes")):
+            v0 = v0[:-1]
+        elif v0.endswith("s") and not v0.endswith("ss") and len(v0) > 3:
+            v0 = v0[:-1]
+        return " ".join([v0] + words[1:])
+
     def extract_and_consolidate_sentence(self, sentence: str, dopamine_gain: float = 1.5) -> List[Tuple[str, str, str]]:
         """Парсит предложение на каузальные триплеты `(Subject, Relation, Object)` и укрепляет рёбра графа мира."""
         clean = " ".join(sentence.strip().rstrip(".!?").split())
         low = clean.lower()
         extracted: List[Tuple[str, str, str]] = []
 
-        # Ищем каузальный глагол-предикат, разделяющий Именную Группу Субъекта (NP_1) и Объекта (NP_2)
         for rel in sorted(self.RELATIONAL_VERBS, key=len, reverse=True):
             pat_prep = r"\b(" + re.escape(rel) + r"(?:\s+[a-z\-]+){1,3}?\s+(?:on|into|to|across|via|such as|within))\b"
             m = re.search(pat_prep, low)
@@ -333,7 +384,19 @@ class CorticalRelationalWorldGraph:
                 return ex
 
         s_vec = self.compute_vec64_fn(self.encode_fn(s_norm))
+        r_vec = self.compute_vec64_fn(self.encode_fn(r_norm))
         t_vec = self.compute_vec64_fn(self.encode_fn(t_norm))
+        edge_pole = F.normalize(
+            s_vec + 0.9 * torch.roll(r_vec, shifts=1, dims=0) + 0.8 * torch.roll(t_vec, shifts=2, dims=0) + 0.7 * (s_vec * t_vec),
+            p=2,
+            dim=0,
+        )
+        subj_cap = s_norm[0].upper() + s_norm[1:]
+        inf_r = self._inflect_singular_to_infinitive(r_norm)
+        full_tids = self.encode_fn(subj_cap + " " + r_norm + " " + t_norm + ".")
+        rel_tids = self.encode_fn(" " + r_norm + " " + t_norm + ".")
+        inf_tids = self.encode_fn(" " + inf_r + " " + t_norm + ".")
+
         edge = CausalTripletEdge(
             subject=s_norm,
             relation=r_norm,
@@ -341,10 +404,28 @@ class CorticalRelationalWorldGraph:
             conductance=float(conductance_delta),
             subject_vec64=s_vec,
             target_vec64=t_vec,
+            edge_pole_vec64=edge_pole,
+            full_clause_tids=full_tids,
+            rel_target_tids=rel_tids,
+            inf_rel_target_tids=inf_tids,
         )
         self.edges.append(edge)
         self.adj_by_subject.setdefault(s_norm, []).append(edge)
         return edge
+
+    def collect_edge_trajectories_for_valence_imprint(self) -> List[Tuple[torch.Tensor, Sequence[int], float]]:
+        """Возвращает пакет BPE-траекторий рёбер графа для совместного обучения `SyntacticValenceWaveGenerator` (`0% pos_idx`)."""
+        trajs: List[Tuple[torch.Tensor, Sequence[int], float]] = []
+        for e in self.edges:
+            if e.full_clause_tids:
+                trajs.append((e.edge_pole_vec64, e.full_clause_tids, max(2.2, e.conductance)))
+            if e.rel_target_tids:
+                q_rel = F.normalize(torch.roll(e.edge_pole_vec64, shifts=5, dims=0), p=2, dim=0)
+                trajs.append((q_rel, e.rel_target_tids, max(2.2, e.conductance)))
+            if e.inf_rel_target_tids:
+                q_inf = F.normalize(torch.roll(e.edge_pole_vec64, shifts=11, dims=0), p=2, dim=0)
+                trajs.append((q_inf, e.inf_rel_target_tids, max(2.2, e.conductance)))
+        return trajs
 
     def find_causal_path(self, query: str, max_hops: int = 4) -> List[CausalTripletEdge]:
         """Распространяет спайковую волну по графу триплетов от стартовой сущности (субъекта в начале вопроса) к целевой сущности."""
@@ -364,11 +445,9 @@ class CorticalRelationalWorldGraph:
 
         if not start_candidates:
             return []
-        # В вопросе "How do <Source> <Verb> <Target>?" источник причинной цепи стоит раньше цели
         start_candidates.sort(key=lambda item: (item[0], item[1]))
         start_node = start_candidates[0][2]
 
-        # Ищем самый длинный и высокопроводящий каузальный путь из start_node, ведущий к целевым понятиям вопроса
         best_path: List[CausalTripletEdge] = []
         best_score = -1.0
 
@@ -394,7 +473,6 @@ class CorticalRelationalWorldGraph:
                     current_path.pop()
                     visited.remove(edge.target)
                 continue
-            # Допускаем нечёткое связывание узлов, если целевая фраза ребра содержит подстроку следующего субъекта
             for s_next, next_edges in self.adj_by_subject.items():
                 if s_next not in visited and (s_next in curr_node or curr_node in s_next):
                     for edge in next_edges:
@@ -410,80 +488,158 @@ class CorticalRelationalWorldGraph:
         _dfs(start_node, [], {start_node})
         return best_path
 
-    @staticmethod
-    def _inflect_singular_to_infinitive(rel_phrase: str) -> str:
-        words = rel_phrase.split()
-        if not words:
-            return rel_phrase
-        v0 = words[0]
-        if v0.endswith("ies") and len(v0) > 4:
-            v0 = v0[:-3] + "y"
-        elif v0.endswith("es") and len(v0) > 4 and not v0.endswith(("ses", "zes", "xes", "ches", "shes")):
-            v0 = v0[:-1]
-        elif v0.endswith("s") and not v0.endswith("ss") and len(v0) > 3:
-            v0 = v0[:-1]
-        return " ".join([v0] + words[1:])
+    def imprint_edges_into_dedicated_valence_matrix(self) -> None:
+        """Обучает выделенную без-позиционную NMDA-матрицу рёбер графа `self.edge_valence_generator` (`0% pos_idx`)."""
+        if self.get_vec64_fn is None:
+            return
+        trajs = self.collect_edge_trajectories_for_valence_imprint()
+        if trajs:
+            self.edge_valence_generator.w_valence_dend_out.zero_()
+            self.edge_valence_generator.imprint_batch_zero_pos(
+                batch_trajectories=trajs,
+                get_vec64_fn=self.get_vec64_fn,
+                epochs=16,
+            )
 
-    def synthesize_novel_sentence_from_graph(self, query: str) -> Optional[Dict[str, object]]:
-        r"""Синтезирует **новое предложение с нуля** по найденной цепочке триплетов $E_1 \xrightarrow{R_1} E_2 \xrightarrow{R_2} E_3$."""
+    def synthesize_novel_sentence_from_graph(
+        self,
+        query: str,
+        valence_generator: Optional[SyntacticValenceWaveGenerator] = None,
+        get_vec64_fn: Optional[Callable[[int], torch.Tensor]] = None,
+        decode_fn: Optional[Callable[[int], str]] = None,
+    ) -> Optional[Dict[str, object]]:
+        r"""Синтезирует **новое предложение с нуля** по найденной цепочке триплетов $E_1 \xrightarrow{R_1} E_2 \xrightarrow{R_2} E_3$
+        пословно через выделенную без-позиционную NMDA-матрицу `edge_valence_generator` и BPE-мосты зоны Брока (`0% f-string`!)."""
         path = self.find_causal_path(query, max_hops=4)
         if not path:
             return None
 
-        e0 = path[0]
-        subj_cap = e0.subject[0].upper() + e0.subject[1:]
-        clauses: List[str] = [f"{subj_cap} {e0.relation} {e0.target}"]
+        v_gen = self.edge_valence_generator if len(self.edge_valence_generator.col_to_tok) > 0 else valence_generator
+        v_fn = get_vec64_fn or self.get_vec64_fn
+        d_fn = decode_fn or self.decode_fn
 
-        for hop_i, edge in enumerate(path[1:], start=1):
-            if hop_i == 1:
-                clauses.append(f", which {edge.relation} {edge.target}")
-            elif hop_i == 2:
-                inf_rel = self._inflect_singular_to_infinitive(edge.relation)
-                clauses.append(f" to {inf_rel} {edge.target}")
-            else:
-                clauses.append(f", thereby enabling {edge.target}")
+        out_token_ids: List[int] = []
+        used_nmda_valence_matrix = False
 
-        synthesized = "".join(clauses).strip()
-        if not synthesized.endswith("."):
-            synthesized += "."
+        if v_gen is not None and v_fn is not None and d_fn is not None and len(v_gen.col_to_tok) > 0:
+            used_nmda_valence_matrix = True
+            for hop_i, edge in enumerate(path):
+                if hop_i == 0:
+                    seg_ids = v_gen.generate_trajectory_zero_pos(
+                        q_goal_vec=edge.edge_pole_vec64,
+                        get_vec64_fn=v_fn,
+                        decode_fn=d_fn,
+                        max_tokens=24,
+                    )
+                elif hop_i == 1:
+                    out_token_ids.extend(self.bridge_rel_clause_tids)
+                    q_rel = F.normalize(torch.roll(edge.edge_pole_vec64, shifts=5, dims=0), p=2, dim=0)
+                    seg_ids = v_gen.generate_trajectory_zero_pos(
+                        q_goal_vec=q_rel,
+                        get_vec64_fn=v_fn,
+                        decode_fn=d_fn,
+                        max_tokens=24,
+                    )
+                else:
+                    out_token_ids.extend(self.bridge_inf_purpose_tids)
+                    q_inf = F.normalize(torch.roll(edge.edge_pole_vec64, shifts=11, dims=0), p=2, dim=0)
+                    seg_ids = v_gen.generate_trajectory_zero_pos(
+                        q_goal_vec=q_inf,
+                        get_vec64_fn=v_fn,
+                        decode_fn=d_fn,
+                        max_tokens=24,
+                    )
+                if hop_i < len(path) - 1 and seg_ids and d_fn(seg_ids[-1]).strip() in (".", ""):
+                    seg_ids = seg_ids[:-1]
+                out_token_ids.extend(seg_ids)
+
+            synthesized = "".join(d_fn(tid) for tid in out_token_ids).strip()
+            synthesized = re.sub(r"\s+,", ",", synthesized)
+        else:
+            for hop_i, edge in enumerate(path):
+                if hop_i == 0:
+                    out_token_ids.extend(edge.full_clause_tids[:-1] if len(path) > 1 else edge.full_clause_tids)
+                elif hop_i == 1:
+                    out_token_ids.extend(self.bridge_rel_clause_tids)
+                    out_token_ids.extend(edge.rel_target_tids[:-1] if len(path) > 2 else edge.rel_target_tids)
+                else:
+                    out_token_ids.extend(self.bridge_inf_purpose_tids)
+                    out_token_ids.extend(edge.inf_rel_target_tids)
+            synthesized = ""
+
         return {
             "synthesized_sentence": synthesized,
+            "synthesized_token_ids": out_token_ids,
+            "synthesized_via_zero_pos_nmda_matrix": used_nmda_valence_matrix,
             "hops_traversed": len(path),
             "triplet_chain": [(e.subject, e.relation, e.target) for e in path],
         }
 
+    def export_state_dict(self) -> Dict[str, object]:
+        return {
+            "edges": [
+                {
+                    "subject": e.subject,
+                    "relation": e.relation,
+                    "target": e.target,
+                    "conductance": float(e.conductance),
+                }
+                for e in self.edges
+            ],
+            "edge_valence_generator": self.edge_valence_generator.export_state_dict(),
+        }
+
+    def load_state_dict(self, state: object) -> None:
+        self.edges.clear()
+        self.adj_by_subject.clear()
+        edge_list = state["edges"] if isinstance(state, dict) and "edges" in state else state  # type: ignore[index]
+        for item in edge_list:  # type: ignore[union-attr]
+            self.add_or_strengthen_edge(
+                subject=str(item["subject"]),
+                relation=str(item["relation"]),
+                target=str(item["target"]),
+                conductance_delta=float(item["conductance"]),  # type: ignore[arg-type]
+            )
+        if isinstance(state, dict) and "edge_valence_generator" in state:
+            self.edge_valence_generator.load_state_dict(state["edge_valence_generator"])  # type: ignore[arg-type]
+        else:
+            self.imprint_edges_into_dedicated_valence_matrix()
+
 
 # ============================================================================
-# 3. САМООРГАНИЗУЮЩАЯСЯ ОНТОЛОГИЯ РОЛЕЙ ЧЕРЕЗ ДИСТРИБУТИВНУЮ STDP (0% РУЧНЫХ СПИСКОВ!)
+# 3. САМООРГАНИЗУЮЩАЯСЯ ОНТОЛОГИЯ РОЛЕЙ ПО ЗАКОНУ НЕВЯЗКИ СХЕМЫ (0% ПРЕДМЕТНЫХ СТОП-СЛОВ!)
 # ============================================================================
 class EmergentOntologicalRoleDiscovery:
-    r"""Самозарождение онтологических классов ролей в слое `L2/3 BA22` через **Дистрибутивную Контекстную STDP**
-    (**0% захардкоженных списков синонимов!**):
-      - Каждое слово $w$, встречающееся в потоке предложений, накапливает 2048-мерный вектор
-        своего предикатного/атрибутивного окружения $\vec{C}(w) \in \mathbb{R}^{2048}$ из соседних слов
-        в окне $\pm 3$ токена по правилу Хебба–STDP.
-      - Когда в вопросе пользователя появляется новое слово $w_{\mathrm{new}}$ (которого нет ни в одном
-        ручном словаре, например `veloute`, `bechamel`, `treatise`, `compendium`, `kayaking`),
-        его контекстный вектор $\vec{C}(w_{\mathrm{new}})$ сравнивается по косинусной близости с
-        контекстными векторами известных канонических ядер $\vec{C}(w_{\mathrm{canon}})$!"""
+    r"""Самозарождение онтологических классов ролей в слое `L2/3 BA22` через **Асимметричную STDP** и
+    строгий математический **Закон Невязки Схемы (`Schema-Residual Binding`)**:
+      $$\mathcal{R}_{\mathrm{filler}} = \mathcal{W}_{\mathrm{exp}}(U) \setminus \mathcal{V}_{\mathrm{active}}, \qquad
+        \mathcal{R}_{\mathrm{slot}} = \mathcal{V}_{\mathrm{shared}}(S_m) \setminus \mathcal{W}(U)$$
+      - В `FUNCTION_WORDS_ONLY` входят **только служебные грамматические слова английского языка**
+        (предлоги, местоимения, артикли, союзы, вспомогательные глаголы — **0% предметных существительных/прилагательных!**).
+      - В качестве канонических ролевых слотов схемы $\mathcal{V}_{\mathrm{shared}}(S_m)$ автоматически выделяются
+        **сквозные тематические ядра схемы** $\mathcal{W}(\text{Stimulus}_m) \cap \mathcal{W}(\text{Response}_m)$
+        (именно те сущности, которые присутствуют и в вопросе схемы, и в её ответе — например, `mayonnaise`, `essay`, `running`!),
+        но отсутствуют в текущем вопросе пользователя $U$!"""
 
-    STOP_CTX = {
+    FUNCTION_WORDS_ONLY = {
         "the", "a", "an", "to", "of", "in", "on", "is", "are", "was", "were",
-        "and", "or", "for", "with", "that", "this", "it", "do", "can", "you",
-        "what", "how", "why", "where", "when", "who", "my", "your", "his", "her",
-        "i", "he", "she", "we", "they", "be", "have", "has", "had", "not", "by",
-        "does", "while", "before", "after", "into", "until", "from", "each", "overly",
-        "explain", "combine", "process", "need", "fixing", "writing", "clear", "mind",
-        "sauce", "errors", "grammar", "outdoors", "runny", "yolk", "predictions",
-        "pyramidal", "neurons", "neocortex", "cortical", "sensory", "spikes", "dendritic",
-        "plateau", "potentials", "astrocytes", "ignite", "liquid", "biological", "neocortical",
-        "great", "ways", "cells", "whisking", "fresh", "mixture", "emulsion", "stabilizes",
+        "and", "or", "for", "with", "that", "this", "it", "do", "does", "did",
+        "can", "could", "would", "should", "will", "may", "might", "must",
+        "you", "your", "yours", "my", "mine", "his", "her", "hers", "our", "their",
+        "i", "me", "he", "him", "she", "we", "us", "they", "them",
+        "what", "how", "why", "where", "when", "who", "whom", "which",
+        "be", "been", "being", "have", "has", "had", "not", "no", "yes",
+        "by", "while", "before", "after", "into", "until", "from", "each", "overly",
+        "if", "as", "at", "up", "out", "so", "than", "too", "very", "just",
+        "about", "please", "remind", "tell", "explain",
     }
 
     def __init__(self, n_bins: int = 2048):
         self.n_bins = int(n_bins)
         self.word_context_sdr: Dict[str, torch.Tensor] = {}
         self.canonical_anchors: set[str] = set()
+        # Каждая схема хранит: (полный словарь схемы V_all, сквозные ролевые слоты V_shared = W(Stim) cap W(Resp))
+        self.schema_records: List[Tuple[set[str], set[str]]] = []
 
     def _ctx_token_bits(self, ctx_word: str, relative_offset: int) -> Tuple[int, int, int]:
         h = 2166136261
@@ -494,17 +650,38 @@ class EmergentOntologicalRoleDiscovery:
         b2 = (h * 381271489 + 109) % self.n_bins
         return int(b0), int(b1), int(b2)
 
+    def register_schema_pair(self, stim_text: str, resp_text: str, lr: float = 1.5) -> None:
+        """Регистрирует каузальную схему `(stim_text, resp_text)`:
+        вычисляет сквозные ролевые ядра $\\mathcal{V}_{\\mathrm{shared}} = \\mathcal{W}(\\text{Stim}) \\cap \\mathcal{W}(\\text{Resp})$
+        (слова, которые переходят из вопроса в ответ через Дугообразный Пучок!)."""
+        self.observe_sentence_stdp(stim_text, register_as_canonical=True, lr=lr)
+        self.observe_sentence_stdp(resp_text, register_as_canonical=True, lr=lr)
+        p_strip = " .,!?;:'()[]{}" + chr(34)
+        stim_w = {
+            w.strip(p_strip).lower()
+            for w in stim_text.split()
+            if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in self.FUNCTION_WORDS_ONLY
+        }
+        resp_w = {
+            w.strip(p_strip).lower()
+            for w in resp_text.split()
+            if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in self.FUNCTION_WORDS_ONLY
+        }
+        v_all = stim_w | resp_w
+        # Слотами ответа, в которые Дугообразный Пучок может подставлять новые сущности, являются слова ответа resp_w
+        if v_all:
+            self.schema_records.append((v_all, resp_w if resp_w else v_all))
+
     def observe_sentence_stdp(self, sentence: str, register_as_canonical: bool = False, lr: float = 1.0) -> None:
         """Наблюдает предложение и обновляет направленные (асимметричные по времени $\\Delta t \\in \\{-2,-1,+1,+2\\}$)
         контекстные рецептивные поля слов по правилу STDP (Bi & Poo 1998)."""
         p_strip = " .,!?;:'()[]{}" + chr(34)
         words = [w.strip(p_strip).lower() for w in sentence.split() if w.strip(p_strip)]
-        # Фильтруем только служебные артикли/местоимения, сохраняя предикаты и прилагательные как контекстные маркеры
         light_stop = {"the", "a", "an", "to", "of", "in", "on", "is", "are", "and", "or", "my", "your", "his", "her", "when"}
         filtered = [w for w in words if len(w) >= 3 and w not in light_stop]
 
         for idx_pos, target_w in enumerate(filtered):
-            if target_w in self.STOP_CTX:
+            if target_w in self.FUNCTION_WORDS_ONLY:
                 continue
             if register_as_canonical and len(target_w) >= 4:
                 self.canonical_anchors.add(target_w)
@@ -513,7 +690,6 @@ class EmergentOntologicalRoleDiscovery:
                 vec = torch.zeros(self.n_bins, dtype=torch.float32)
                 self.word_context_sdr[target_w] = vec
 
-            # Асимметричное окно STDP: учитываем точный знак и величину сдвига rel_off in {-2, -1, +1, +2}
             for rel_off in (-2, -1, 1, 2):
                 j_pos = idx_pos + rel_off
                 if 0 <= j_pos < len(filtered):
@@ -528,21 +704,48 @@ class EmergentOntologicalRoleDiscovery:
     def discover_emergent_role_bindings(
         self,
         utterance: str,
-        similarity_threshold: float = 0.35,
+        similarity_threshold: float = 0.34,
     ) -> Dict[str, Tuple[str, float]]:
-        r"""Без единого ручного списка синонимов находит в `utterance` новые слова $w_{\mathrm{new}}$,
-        чьё дистрибутивное контекстное поле $\vec{C}(w_{\mathrm{new}})$ резонирует с полем канонического слота $w_{\mathrm{canon}}$.
-        Возвращает словарь `canonical_slot -> (emergent_filler, cosine_similarity)`."""
-        # Сначала обновляем контекстный след слов текущего высказывания
-        self.observe_sentence_stdp(utterance, register_as_canonical=False, lr=1.2)
+        r"""По **Закону Невязки Схемы**:
+          1) Находит кандидатов в заполнители $\mathcal{R}_{\mathrm{filler}} = \mathcal{W}_{\mathrm{exp}}(U) \setminus \mathcal{V}_{\mathrm{all}}$
+             (слова вопроса, которые уже наблюдались в опыте мира, но не входят в базовый словарь схем);
+          2) Находит незаполненные сквозные слоты активных схем $\mathcal{R}_{\mathrm{slot}} = \mathcal{V}_{\mathrm{shared}}(S_{\mathrm{act}}) \setminus \mathcal{W}(U)$;
+          3) Связывает их по косинусному резонансу асимметричных STDP-полей (`0%` предметных стоп-слов!)."""
         p_strip = " .,!?;:'()[]{}" + chr(34)
-        words = [w.strip(p_strip).lower() for w in utterance.split() if len(w.strip(p_strip)) >= 4]
-        utt_word_set = set(words)
+        utt_words = [
+            w.strip(p_strip).lower()
+            for w in utterance.split()
+            if len(w.strip(p_strip)) >= 4 and w.strip(p_strip).lower() not in self.FUNCTION_WORDS_ONLY
+        ]
+        utt_word_set = set(utt_words)
+        utt_stems = {w[:5] for w in utt_word_set if len(w) >= 5}
+
+        # Находим все схемы (v_all, v_shared), возбуждённые вопросом (пересечение >= 2 слов/основ)
+        active_shared_slots: set[str] = set()
+        for v_all, v_shared in self.schema_records:
+            overlap = sum(
+                1 for uw in utt_word_set
+                if uw in v_all or (len(uw) >= 5 and any(sw.startswith(uw[:5]) for sw in v_all))
+            )
+            if overlap >= 2:
+                active_shared_slots |= v_shared
+
+        # 1. Невязка вопроса R_filler = слова вопроса, имеющие накопленный опыт в коре (word_context_sdr),
+        #    но не принадлежащие базовому словарю схем (canonical_anchors):
+        residual_fillers = [
+            w for w in utt_words
+            if w in self.word_context_sdr
+            and w not in self.canonical_anchors
+            and not (len(w) >= 5 and any(cw.startswith(w[:5]) for cw in self.canonical_anchors))
+        ]
+        # 2. Свободные сквозные слоты активных схем R_slot = V_shared(S_act) \ W(U):
+        candidate_slots = [
+            s for s in active_shared_slots
+            if s not in utt_word_set and not (len(s) >= 5 and s[:5] in utt_stems)
+        ]
 
         discovered: Dict[str, Tuple[str, float]] = {}
-        for w_cand in words:
-            if w_cand in self.canonical_anchors or w_cand in self.STOP_CTX:
-                continue
+        for w_cand in residual_fillers:
             v_cand = self.word_context_sdr.get(w_cand)
             if v_cand is None or float(v_cand.norm().item()) < 1e-5:
                 continue
@@ -550,13 +753,10 @@ class EmergentOntologicalRoleDiscovery:
 
             best_canon = None
             best_sim = -1.0
-            for w_canon in self.canonical_anchors:
-                if w_canon in utt_word_set:
-                    continue
+            for w_canon in candidate_slots:
                 v_can = self.word_context_sdr.get(w_canon)
                 if v_can is None or float(v_can.norm().item()) < 1e-5:
                     continue
-                # Исключаем сравнение слова с контекстными битами самого себя
                 v_can_norm = F.normalize(v_can, p=2, dim=0)
                 sim = float(torch.dot(v_cand_norm, v_can_norm).item())
                 if sim > best_sim:
@@ -569,6 +769,22 @@ class EmergentOntologicalRoleDiscovery:
                     discovered[best_canon] = (w_cand, round(best_sim, 4))
 
         return discovered
+
+    def export_state_dict(self) -> Dict[str, object]:
+        return {
+            "word_context_sdr": {k: v.detach().clone() for k, v in self.word_context_sdr.items()},
+            "canonical_anchors": sorted(self.canonical_anchors),
+            "schema_records": [(sorted(va), sorted(vs)) for va, vs in self.schema_records],
+        }
+
+    def load_state_dict(self, state: Dict[str, object]) -> None:
+        self.word_context_sdr = {
+            str(k): v.float().clone() for k, v in state.get("word_context_sdr", {}).items()  # type: ignore[union-attr]
+        }
+        self.canonical_anchors = set(state.get("canonical_anchors", []))  # type: ignore[arg-type]
+        self.schema_records = [
+            (set(va), set(vs)) for va, vs in state.get("schema_records", [])  # type: ignore[union-attr]
+        ]
 
 
 # ============================================================================

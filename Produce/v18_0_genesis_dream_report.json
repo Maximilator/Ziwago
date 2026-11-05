@@ -1,25 +1,15 @@
 {
   "version": "18.0-Ziwago-Genesis-Dream-SNN",
   "pillars_verified": 5,
-  "world_graph_edges_count": 4,
-  "emergent_ontology_vocabulary_size": 116,
+  "world_graph_edges_count": 3,
+  "emergent_ontology_vocabulary_size": 143,
   "showcase_results": [
     {
       "pillar": "Pillar 1: Zero-pos_idx Syntactic Valence Wave (BA44 Continuous State-Machine)",
       "stimulus": "Explain how neocortical pyramidal cells combine bottom-up sensory spikes with top-down cortical predictions.",
       "generation_engine": "SyntacticValenceWaveGenerator (0% pos_idx) + BidirectionalMeaningClosureVerifier",
       "zero_pos_idx_used": true,
-      "world_graph_synthesis": {
-        "synthesized_sentence": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft nmda compartments.",
-        "hops_traversed": 1,
-        "triplet_chain": [
-          [
-            "pyramidal neurons",
-            "receive bottom-up sensory spikes on",
-            "basal dendrites and top-down cortical predictions on apical tuft nmda compartments"
-          ]
-        ]
-      },
+      "world_graph_synthesis": null,
       "emergent_stdp_role_discoveries": {},
       "arcuate_bindings_applied": {},
       "theta_gamma_ttfs_reconstruction_cosine": 1.0,
@@ -31,7 +21,7 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
-      "latency_ms": 34.93
+      "latency_ms": 43.17
     },
     {
       "pillar": "Pillar 2: World-Graph Multi-Hop Novel Sentence Synthesis (3 Separate Facts -> 1 Unseen Sentence)",
@@ -40,6 +30,51 @@
       "zero_pos_idx_used": true,
       "world_graph_synthesis": {
         "synthesized_sentence": "Astrocytes release gliotransmitters such as d-serine, which binds to glycine sites on apical nmda receptors to ignite dendritic plateau potentials in pyramidal neurons.",
+        "synthesized_token_ids": [
+          35167,
+          948,
+          4879,
+          2650,
+          1278,
+          5151,
+          26084,
+          2781,
+          1010,
+          884,
+          355,
+          288,
+          12,
+          2655,
+          500,
+          837,
+          543,
+          37354,
+          284,
+          40232,
+          500,
+          5043,
+          319,
+          2471,
+          605,
+          28642,
+          6814,
+          20099,
+          284,
+          44794,
+          288,
+          437,
+          46015,
+          38008,
+          2785,
+          82,
+          287,
+          12972,
+          859,
+          11624,
+          16890,
+          13
+        ],
+        "synthesized_via_zero_pos_nmda_matrix": true,
         "hops_traversed": 3,
         "triplet_chain": [
           [
@@ -70,7 +105,7 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Astrocytes release gliotransmitters such as d-serine, which binds to glycine sites on apical nmda receptors to ignite dendritic plateau potentials in pyramidal neurons.",
-      "latency_ms": 10.87
+      "latency_ms": 43.04
     },
     {
       "pillar": "Pillar 3: Unsupervised STDP Emergent Ontology ('bechamel' + 'treatise' + 'kayaking' — NOT in any hardcoded dict!)",
@@ -81,11 +116,11 @@
       "emergent_stdp_role_discoveries": {
         "running": [
           "kayaking",
-          0.5577
+          0.5862
         ],
         "essay": [
           "treatise",
-          0.8683
+          0.7077
         ]
       },
       "arcuate_bindings_applied": {
@@ -101,25 +136,20 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Staying active is a wonderful habit, and kayaking outdoors is one of my favorite ways to clear the mind, before you fix grammar errors in your treatise, read each sentence aloud, check subject-verb agreement, and simplify overly long clauses.",
-      "latency_ms": 57.26
+      "latency_ms": 56.36
     },
     {
       "pillar": "Pillar 4 & 5: Theta-Gamma TTFS Multiplexing + Forward-Inverse Meaning Closure (X -> Y_hat -> X_hat)",
       "stimulus": "Why does a runny bechamel sauce need an egg yolk while pyramidal neurons in the neocortex process predictions?",
       "generation_engine": "SyntacticValenceWaveGenerator (0% pos_idx) + BidirectionalMeaningClosureVerifier",
       "zero_pos_idx_used": true,
-      "world_graph_synthesis": {
-        "synthesized_sentence": "Pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft nmda compartments.",
-        "hops_traversed": 1,
-        "triplet_chain": [
-          [
-            "pyramidal neurons",
-            "receive bottom-up sensory spikes on",
-            "basal dendrites and top-down cortical predictions on apical tuft nmda compartments"
-          ]
+      "world_graph_synthesis": null,
+      "emergent_stdp_role_discoveries": {
+        "mayonnaise": [
+          "bechamel",
+          0.7394
         ]
       },
-      "emergent_stdp_role_discoveries": {},
       "arcuate_bindings_applied": {
         "mayonnaise": "bechamel"
       },
@@ -132,7 +162,7 @@
         "meaning_closed": true
       },
       "pure_weight_generated_response": "Yes, it is possible to fix runny bechamel by slowly whisking the mixture into a fresh egg yolk until the emulsion stabilizes, while pyramidal neurons receive bottom-up sensory spikes on basal dendrites and top-down cortical predictions on apical tuft NMDA compartments.",
-      "latency_ms": 90.2
+      "latency_ms": 86.99
     }
   ]
 }
