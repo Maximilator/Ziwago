@@ -522,3 +522,101 @@ class ConsciousnessMetricsDashboard:
             "ast_attention_schema_alignment": round(ast_alignment, 4),
             "priesemann_subcritical_sigma": round(priesemann_sigma, 4),
         }
+
+
+# ============================================================================
+# EVOTRAIN v25.1 ИННОВАЦИЯ 1: 16-БАНКОВОЕ КОРТИКАЛЬНОЕ РАЗДЕЛЕНИЕ (`CorticalColumnarSubBankRouter`)
+# ============================================================================
+class CorticalColumnarSubBankRouter:
+    r"""16-банковый кортикальный маршрутизатор дендритных подпространств (`EVOTRAIN v25.1 Innovation 1`):
+      - Проецирует 64-мерный вектор полюса $\vec{p} \in \mathbb{R}^{64}$ на 16 ортогональных базисных векторов
+        коры Бродмана $\mathbf{B}_{\mathrm{col}} \in \mathbb{R}^{16 \times 64}$ и распределяет полюса по 16
+        суб-банкам $c(\vec{p}) \in \{0..15\}$.
+      - Позволяет масштабировать `CA3` до $16 \times 300 = 4\,800+$ полюсов без взаимного перетирания ветвей `Top-32 WTA`."""
+
+    def __init__(self, n_banks: int = 16, d_vec: int = 64, seed: int = 2501):
+        self.n_banks = int(n_banks)
+        self.d_vec = int(d_vec)
+        gen = torch.Generator(device="cpu")
+        gen.manual_seed(int(seed))
+        raw_b = torch.randn((self.n_banks, self.d_vec), generator=gen, dtype=torch.float32)
+        q_orth, _ = torch.linalg.qr(raw_b.t())
+        self.bank_basis = F.normalize(q_orth.t()[: self.n_banks], p=2, dim=-1)
+        self.bank_pole_counts: Dict[int, int] = {i: 0 for i in range(self.n_banks)}
+
+    def route_pole_to_sub_bank(self, pole_vec64: torch.Tensor) -> int:
+        with torch.no_grad():
+            p_norm = F.normalize(pole_vec64.float() + 1e-8, p=2, dim=0)
+            sims = self.bank_basis @ p_norm
+            b_idx = int(torch.argmax(sims).item())
+            return b_idx
+
+    def compute_bank_distribution(self, ca3_attractors: torch.Tensor) -> Dict[int, int]:
+        counts = {i: 0 for i in range(self.n_banks)}
+        if ca3_attractors.shape[0] == 0:
+            return counts
+        with torch.no_grad():
+            p_mat = F.normalize(ca3_attractors.float() + 1e-8, p=2, dim=-1)
+            bank_ids = torch.argmax(p_mat @ self.bank_basis.t(), dim=-1).tolist()
+            for bid in bank_ids:
+                counts[int(bid)] = counts.get(int(bid), 0) + 1
+        self.bank_pole_counts = counts
+        return counts
+
+
+# ============================================================================
+# EVOTRAIN v25.1 ИННОВАЦИЯ 3: СОКРАТИЧЕСКИЙ СИНТЕЗАТОР ВОПРОСОВ (`BA46SocraticInverseQuerySynthesizer`)
+# ============================================================================
+class BA46SocraticInverseQuerySynthesizer:
+    r"""Эндогенный Сократический Генератор Вопросов (`BA46 Inverse Query Synthesizer`, `EVOTRAIN v25.1 Innovation 3`):
+      - Превращает декларативные научные утверждения из монографий `Knowledge/` и `WikiText-103`
+        вида $\text{Subject} + \text{CausalVerb} + \text{Object}$ в естественные вопросительные полюса
+        (`"How does <Subject> <BaseVerb> <Object>?"`), обеспечивая тройную запись каждого факта:
+        1) Вопросно-ответный полюс в `CA3`;
+        2) Эпизодическую цепь в `w_ca3_episode_links`;
+        3) Каузальное ребро в `CorticalRelationalWorldGraph`."""
+
+    CAUSAL_VERB_STEMS: Dict[str, Tuple[str, str]] = {
+        "releases": ("does", "release"),
+        "release": ("do", "release"),
+        "activates": ("does", "activate"),
+        "activate": ("do", "activate"),
+        "inhibits": ("does", "inhibit"),
+        "inhibit": ("do", "inhibit"),
+        "suppresses": ("does", "suppress"),
+        "suppress": ("do", "suppress"),
+        "produces": ("does", "produce"),
+        "produce": ("do", "produce"),
+        "fuels": ("does", "fuel"),
+        "fuel": ("do", "fuel"),
+        "stimulates": ("does", "stimulate"),
+        "stimulate": ("do", "stimulate"),
+        "phosphorylates": ("does", "phosphorylate"),
+        "phosphorylate": ("do", "phosphorylate"),
+        "stabilizes": ("does", "stabilize"),
+        "stabilize": ("do", "stabilize"),
+        "absorbs": ("does", "absorb"),
+        "absorb": ("do", "absorb"),
+        "splits": ("does", "split"),
+        "split": ("do", "split"),
+        "directs": ("does", "direct"),
+        "direct": ("do", "direct"),
+        "shields": ("does", "shield"),
+        "shield": ("do", "shield"),
+    }
+
+    def synthesize_socratic_question_from_fact(self, declarative_sentence: str) -> Optional[str]:
+        clean = " ".join(declarative_sentence.strip().rstrip(".!?").split())
+        words = clean.split()
+        if len(words) < 5:
+            return None
+        for idx, w in enumerate(words[1:-1], start=1):
+            w_low = w.lower()
+            if w_low in self.CAUSAL_VERB_STEMS:
+                aux, base_v = self.CAUSAL_VERB_STEMS[w_low]
+                subj = " ".join(words[:idx])
+                subj_low = subj[0].lower() + subj[1:] if len(subj) > 1 and not subj[:2].isupper() else subj
+                obj = " ".join(words[idx + 1 :])
+                return f"How {aux} {subj_low} {base_v} {obj}?"
+        return None
+

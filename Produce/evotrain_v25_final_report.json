@@ -1,0 +1,50 @@
+{
+  "version": "EVOTRAIN v25.1 — Ultradian Multi-Bank Socratic Master",
+  "status": "COMPLETED_AND_CERTIFIED",
+  "cycles_completed": 1,
+  "elapsed_sec": 114.95,
+  "verified_ca3_poles": 344,
+  "pruned_garbage_poles_in_final_sws": 0,
+  "active_vocab_columns": 10705,
+  "world_graph_triplets": 18,
+  "zero_pos_edge_cols": 175,
+  "socratic_questions_synthesized": 16,
+  "stdp_vocab_size": 13964,
+  "bcm_ingestion_yield_pct": 100.0,
+  "domain_a_retention_pct": 87.5,
+  "fusi_zenke_shield_density_pct": 1.6952,
+  "golden_holdout_score": "8/8 (100% byte-for-byte)",
+  "free_disk_gb": 25.8,
+  "consciousness_metrics": {
+    "gwt_ignition_score": 0.9933,
+    "iit_pci_complexity_proxy": 0.3623,
+    "rpt_recurrence_index": 0.95,
+    "hot_metacognitive_confidence": 0.966,
+    "ast_attention_schema_alignment": 0.9,
+    "priesemann_subcritical_sigma": 0.9859
+  },
+  "cortical_16_bank_distribution": {
+    "0": 8,
+    "1": 62,
+    "2": 10,
+    "3": 1,
+    "4": 5,
+    "5": 11,
+    "6": 27,
+    "7": 17,
+    "8": 13,
+    "9": 73,
+    "10": 44,
+    "11": 45,
+    "12": 3,
+    "13": 13,
+    "14": 9,
+    "15": 3
+  },
+  "checkpoint_validation": {
+    "valid": true,
+    "schema_version": "ziwago.checkpoint.v16.2",
+    "tokenizer_sha256": "d16567cd4d433cc4f5ae8a566e04c9d0f1959e2ca6d43706712a2dad66ba09f5",
+    "active_vocab_columns": 10705
+  }
+}
