@@ -1,11 +1,11 @@
 # NEUROWEAVE ZIWAGO: EVOTRAIN v25.1 LIVE DASHBOARD
 
-- **Status:** `RUNNING_10H_ULTRADIAN_EVOLUTION`
-- **Current Phase:** `Cycle 129 (RATCHET_PROTECTED_PEAK)`
-- **Ultradian Cycles Completed:** `129`
-- **Elapsed Time:** `13002.63 s` (`3.6118 h` / `10.0 h`)
-- **Raw Sensory Tokens Scanned:** `48,971,433`
-- **BCM-Gated Useful Tokens Consolidated:** `2,130,181` (`Yield: 4.35%`)
+- **Status:** `COMPLETED_AND_CERTIFIED`
+- **Current Phase:** `Cycle 372 (RATCHET_PROTECTED_PEAK)`
+- **Ultradian Cycles Completed:** `372`
+- **Elapsed Time:** `36067.54 s` (`10.0188 h` / `10.0 h`)
+- **Raw Sensory Tokens Scanned:** `141,029,694`
+- **BCM-Gated Useful Tokens Consolidated:** `6,117,877` (`Yield: 4.338%`)
 - **Verified High-Closure CA3 Poles (Peak Ratchet):** `369` (`0` garbage poles)
 - **Active Vocabulary Columns:** `10788`
 - **World Graph Causal Triplets:** `378` (`227` zero-pos_idx columns)
